@@ -24,7 +24,8 @@ assets/vakken.js      lijst van alle vakken per jaar
 ```
 
 ## Stand van zaken
-- Stap 1 (startpagina) en stap 2 (gedeelde basis) zijn klaar; `welkom.html` (stap 3) staat er in een eerste versie.
+- Stap 1 (startpagina), stap 2 (gedeelde basis), stap 3 (`welkom.html`) en stap 4 (`hub.html`) zijn klaar. Volgende: stap 5 (jaarpagina's).
+- De tool-kaarten op de hub linken voorlopig naar de live site (`?leren=1` en `?deel=1`); zodra de tools in v2 staan, worden dat interne links.
 - Gedeelde helpers staan op `window.BES` (`naamOpslaan`, `naamOphalen`, `jaarOpslaan`, `jaarOphalen`); de losse `window.naamOpslaan` enz. blijven als alias bestaan.
 - Navigatiebalk: `<nav class="navigation">` of `<nav class="nav-vol">` krijgt het Helder-gedrag (recht bovenaan, pill bij scrollen). De startpagina houdt bewust zijn eigen pill-balk.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
