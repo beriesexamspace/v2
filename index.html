@@ -10,33 +10,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
 <style>
-  :root{
-    --white:#FFFFFF;
-    --ink:#1D1D1F;
-    --ink-soft:#6E6E73;
-    --grey-title:#8A8A8E;
-    --accent:#0071e3;
-    --accent-dark:#0062c4;
-    --line:#E9E7F3;
-    --sig:#B1B1B7;
-    --pill:980px;
-    --font:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
+  *{margin:0;padding:0}
   html{scroll-behavior:smooth}
-  body{
-    min-height:100dvh;
-    display:flex;
-    flex-direction:column;
-    background:var(--white);
-    color:var(--ink);
-    font-family:var(--font);
-    -webkit-font-smoothing:antialiased;
-    overflow-x:hidden;
-  }
-  a{color:inherit;text-decoration:none}
-  :focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:6px}
+  :focus-visible{border-radius:6px}
 
   /* Navigatiebalk */
   .nav{
@@ -70,7 +48,7 @@
   .knop{
     display:inline-flex;align-items:center;gap:8px;
     background:var(--accent);color:#fff;
-    font-weight:600;font-size:15px;
+    font-weight:600;font-size:15px;line-height:normal;min-height:0;border:0;
     padding:11px 22px;border-radius:var(--pill);
     box-shadow:0 8px 22px rgba(0,113,227,.22);
     transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s cubic-bezier(.2,.8,.2,1),background .2s ease;
@@ -142,7 +120,6 @@
   .foot-r b{font-weight:500;color:var(--ink);display:block}
   .foot-r span{color:var(--ink-soft);font-size:13px}
 
-  @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
   @keyframes nav-in{to{opacity:1}}
 
   @media (max-width:768px){
@@ -204,7 +181,7 @@
     <h1><span class="r1">Jouw leerstof.</span><span class="r2">Jouw eigen space.</span></h1>
     <p class="lead">Alles wat je nodig hebt om overzicht te krijgen, slimmer te leren en door te groeien.</p>
     <div class="cta">
-      <a class="knop groot" href="welkom.html">Begin nu →</a>
+      <a class="knop groot" id="beginNu" href="welkom.html">Begin nu →</a>
       <br>
       <a class="account" href="#">Maak een account</a>
     </div>
@@ -254,6 +231,15 @@
     setTimeout(schrijf, t + LEEG);
   }
   setTimeout(schrijf, 400);
+})();
+</script>
+<script src="assets/app.js"></script>
+<script>
+(function(){
+  try {
+    var naam = window.BES && window.BES.naamOphalen();
+    if (naam) document.getElementById("beginNu").setAttribute("href", "hub.html");
+  } catch (e) {}
 })();
 </script>
 </body>

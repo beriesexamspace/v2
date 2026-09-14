@@ -41,10 +41,17 @@
     }
   };
 
+  window.BES = Object.assign(window.BES || {}, {
+    naamOpslaan: window.naamOpslaan,
+    naamOphalen: window.naamOphalen,
+    jaarOpslaan: window.jaarOpslaan,
+    jaarOphalen: window.jaarOphalen
+  });
+
   const revealPage = () => root.classList.add('page-ready');
 
   const setupNavigation = () => {
-    const navigation = document.querySelector('nav.navigation');
+    const navigation = document.querySelector('nav.navigation, nav.nav-vol');
     if (!navigation) return;
 
     const menuButton = navigation.querySelector('.menu-toggle');
