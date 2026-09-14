@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#FFFFFF">
+  <meta name="robots" content="noindex">
+  <title>Wat is nieuw | Berie's Exam Space</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css?v=6">
+  <script src="assets/app.js?v=6"></script>
+  <style>
+    .nieuw-pagina { padding: clamp(40px, 7vh, 72px) 0 48px; }
+    .nieuw-wrap { max-width: 640px; }
+    .nieuw-pagina .pagina-kop .eyebrow {
+      margin: 0 0 16px;
+      color: var(--accent);
+      font-size: .9375rem;
+    }
+    .nieuw-blok + .nieuw-blok { margin-top: 32px; }
+    .nieuw-blok h2 { margin: 0 0 16px; font-size: 1.125rem; }
+    .nieuw-regels { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+    .nieuw-regels li { display: flex; align-items: flex-start; gap: 12px; font-size: .9375rem; line-height: 1.6; }
+    .nieuw-regels li > span:first-child { flex-shrink: 0; color: var(--teal); }
+    .nieuw-sentinel { height: 1px; margin-top: 32px; }
+    .nieuw-begrepen { margin-top: 16px; transition: opacity 200ms var(--ease), transform 200ms var(--ease), box-shadow 200ms var(--ease); }
+    .nieuw-begrepen:disabled,
+    .nieuw-begrepen:disabled:hover,
+    .nieuw-begrepen:disabled:active { opacity: .45; transform: none; box-shadow: var(--shadow-primary); cursor: default; }
+    @media (prefers-reduced-motion: reduce) {
+      .nieuw-begrepen { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="pagina nieuw-pagina" aria-labelledby="nieuw-titel">
+    <div class="wrap nieuw-wrap">
+      <header class="pagina-kop">
+        <p class="eyebrow">Nieuw</p>
+        <h1 id="nieuw-titel">Dit is er veranderd.</h1>
+        <p>Even doorlezen, dan weet je hoe alles werkt. Scrol naar beneden om verder te gaan.</p>
+      </header>
+
+      <section class="nieuw-blok" aria-labelledby="nieuw-blok-titel">
+        <h2 id="nieuw-blok-titel">Nieuw</h2>
+        <ul class="nieuw-regels">
+          <li><span aria-hidden="true">✓</span><span>Een nieuwe startpagina met je eigen naam.</span></li>
+          <li><span aria-hidden="true">✓</span><span>Een account: aanmelden met naam, e-mail en wachtwoord, meer vragen we niet.</span></li>
+          <li><span aria-hidden="true">✓</span><span>Een eigen pagina voor de WhatsApp-groep.</span></li>
+          <li><span aria-hidden="true">✓</span><span>Examensimulatie naast de gewone Examen Training.</span></li>
+        </ul>
+      </section>
+
+      <section class="nieuw-blok" aria-labelledby="veranderd-titel">
+        <h2 id="veranderd-titel">Veranderd</h2>
+        <ul class="nieuw-regels">
+          <li><span aria-hidden="true">✓</span><span>Eerst kies je je jaar, daarna je vak. Alles in één tabblad.</span></li>
+          <li><span aria-hidden="true">✓</span><span>Terug kan altijd, stap voor stap tot de startpagina.</span></li>
+          <li><span aria-hidden="true">✓</span><span>De kaart Help mee is weg; insturen kan via de hub.</span></li>
+          <li><span aria-hidden="true">✓</span><span>Herkansing is weg; oefenen doe je per hoofdstuk.</span></li>
+        </ul>
+      </section>
+
+      <section class="nieuw-blok" aria-labelledby="werking-titel">
+        <h2 id="werking-titel">Zo werkt het</h2>
+        <ul class="nieuw-regels">
+          <li><span aria-hidden="true">✓</span><span>Zonder account kun je gewoon oefenen; je naam blijft dan alleen op dit toestel.</span></li>
+          <li><span aria-hidden="true">✓</span><span>Met een account zie je later je voortgang op elk toestel.</span></li>
+          <li><span aria-hidden="true">✓</span><span>Reken je punten en Examen-info vind je op de hub onder Tools.</span></li>
+          <li><span aria-hidden="true">✓</span><span>Zie je groen? Dan is iets gelukt.</span></li>
+          <li><span aria-hidden="true">✓</span><span>Vragen? Die stel je in de WhatsApp-groep.</span></li>
+        </ul>
+      </section>
+
+      <div class="nieuw-sentinel" id="nieuw-einde" aria-hidden="true"></div>
+      <button class="knop nieuw-begrepen" id="nieuw-begrepen" type="button" disabled aria-disabled="true">Begrepen →</button>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p class="footer-brand">Berie's Exam Space</p>
+    <div class="footer-details">
+      <p>Duidelijk leren. Rustig groeien.</p>
+      <p class="project-label">A project of Berie Foundation</p>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      const sentinel = document.getElementById('nieuw-einde');
+      const button = document.getElementById('nieuw-begrepen');
+      let observer;
+
+      const enable = () => {
+        button.disabled = false;
+        button.setAttribute('aria-disabled', 'false');
+        observer?.disconnect();
+        window.removeEventListener('scroll', checkVisible);
+        window.removeEventListener('resize', checkVisible);
+      };
+
+      const checkVisible = () => {
+        const bounds = sentinel.getBoundingClientRect();
+        if (bounds.bottom > 0 && bounds.top < window.innerHeight) enable();
+      };
+
+      if ('IntersectionObserver' in window) {
+        observer = new IntersectionObserver(entries => {
+          if (entries.some(entry => entry.isIntersecting)) enable();
+        }, { threshold: .01 });
+        observer.observe(sentinel);
+      } else {
+        window.addEventListener('scroll', checkVisible, { passive: true });
+        window.addEventListener('resize', checkVisible);
+      }
+      checkVisible();
+
+      button.addEventListener('click', () => {
+        if (button.disabled) return;
+        for (const type of ['localStorage', 'sessionStorage']) {
+          try { window[type].setItem('bes_nieuw_gezien', '1'); } catch {}
+        }
+        window.location.assign('hub.html');
+      });
+    })();
+  </script>
+</body>
+</html>
