@@ -9,7 +9,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='%230071e3'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='Inter,Arial,sans-serif' font-size='34' font-weight='700' fill='%23fff'%3EB%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Herr+Von+Muellerhoff&family=Pinyon+Script&display=swap" rel="stylesheet">
 <style>
   :root{
     --white:#FFFFFF;
@@ -91,14 +91,20 @@
     position:absolute;
     left:50%;
     top:50%;
-    width:min(84vw,1000px);
+    width:min(90vw,1140px);
     height:auto;
-    transform:translate(-50%,-62%);
-    opacity:.55;
+    transform:translate(-50%,-58%);
+    opacity:.52;
     pointer-events:none;
     z-index:0;
   }
-  .sig path{fill:none;stroke:var(--sig);stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round}
+  .sig text{
+    font-family:'Herr Von Muellerhoff','Pinyon Script',cursive;
+    font-size:230px;
+    fill:var(--sig);
+  }
+  .sig .krul{fill:none;stroke:var(--sig);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+  .sig .masker{fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round}
   .hero-in{
     position:relative;z-index:1;
     max-width:960px;
@@ -153,7 +159,7 @@
     .brand{font-size:15px}
     .knop{padding:10px 18px;font-size:14px}
     .hero{padding:96px 20px 32px}
-    .sig{width:96vw;opacity:.4;transform:translate(-50%,-58%)}
+    .sig{width:98vw;opacity:.42;transform:translate(-50%,-60%)}
     .knop.groot{width:100%;max-width:320px;justify-content:center}
     .lead{font-size:1.05rem}
     footer{flex-direction:column;align-items:flex-start;padding:20px 22px}
@@ -176,13 +182,15 @@
 </header>
 
 <main class="hero">
-  <svg class="sig" viewBox="0 0 900 340" aria-hidden="true" focusable="false">
-    <path d="M118 302 C138 228 172 130 224 58 C246 28 268 40 258 72 C244 116 206 168 166 208 C204 190 262 186 288 222 C306 248 274 286 226 292 C196 296 172 284 164 268"/>
-    <path d="M318 236 C348 232 372 214 362 198 C348 178 314 200 314 232 C316 266 348 278 380 258"/>
-    <path d="M400 262 C408 240 416 220 420 212 C426 226 442 220 456 212"/>
-    <path d="M474 260 C482 238 490 220 494 212"/>
-    <path d="M500 178 C502 176 504 178 502 180 C500 182 498 180 500 178"/>
-    <path d="M518 236 C548 232 572 214 562 198 C548 178 514 200 514 232 C516 266 548 278 582 256 C630 226 706 230 786 206 C806 200 822 208 812 216"/>
+  <svg class="sig" viewBox="0 0 1200 460" aria-hidden="true" focusable="false">
+    <defs>
+      <mask id="sigmask" maskUnits="userSpaceOnUse" x="0" y="0" width="1200" height="460">
+        <path class="masker" id="mask1" d="M0 0"/>
+        <path class="masker" id="mask2" d="M0 0"/>
+      </mask>
+    </defs>
+    <text id="sigtext" x="600" y="250" text-anchor="middle" mask="url(#sigmask)">Beries Foundation</text>
+    <path class="krul" id="krul" d="M96 352 C260 318 420 400 600 356 C760 318 900 330 1040 372 C1090 387 1110 410 1074 414 C1040 418 1000 384 1044 356 C1080 334 1134 340 1160 370"/>
   </svg>
 
   <div class="hero-in">
@@ -205,47 +213,88 @@
 <script>
 (function(){
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var paths = Array.prototype.slice.call(document.querySelectorAll('.sig path'));
-  var lens = paths.map(function(p){ return p.getTotalLength(); });
-  var total = lens.reduce(function(a,b){ return a+b; }, 0);
+  var svg = document.querySelector('.sig');
+  var tekst = document.getElementById('sigtext');
+  var m1 = document.getElementById('mask1');
+  var m2 = document.getElementById('mask2');
+  var krul = document.getElementById('krul');
+  var VB_W = 1200, MAX_W = 1120;
 
-  paths.forEach(function(p,i){
-    p.style.strokeDasharray = lens[i] + ' ' + lens[i];
-    p.style.strokeDashoffset = reduce ? 0 : lens[i];
-  });
-  if (reduce) return;
+  function klaarzetten(){
+    // Tekst passend maken en de maskerstroken per woord op de gemeten tekst leggen.
+    var fs = 230;
+    tekst.style.fontSize = fs + 'px';
+    var bb = tekst.getBBox();
+    if (bb.width > MAX_W) { fs = Math.floor(fs * MAX_W / bb.width); tekst.style.fontSize = fs + 'px'; bb = tekst.getBBox(); }
+    var n = tekst.getNumberOfChars();
+    var spatie = tekst.textContent.indexOf(' ');
+    var e0 = tekst.getExtentOfChar(0), e1 = tekst.getExtentOfChar(spatie - 1);
+    var e2 = tekst.getExtentOfChar(spatie + 1), e3 = tekst.getExtentOfChar(n - 1);
+    var cy = bb.y + bb.height * 0.5;
+    var dikte = bb.height * 1.15;
+    m1.setAttribute('d', 'M' + (e0.x - 20) + ' ' + cy + ' L' + (e1.x + e1.width + 24) + ' ' + cy);
+    m2.setAttribute('d', 'M' + (e2.x - 24) + ' ' + cy + ' L' + (e3.x + e3.width + 30) + ' ' + cy);
+    m1.style.strokeWidth = dikte; m2.style.strokeWidth = dikte;
+    // De krul volgt de gemeten onderkant van de tekst.
+    var onder = bb.y + bb.height * 0.78;
+    var links = Math.max(60, bb.x - 30), rechts = Math.min(VB_W - 40, bb.x + bb.width + 40);
+    var mid = (links + rechts) / 2;
+    krul.setAttribute('d',
+      'M' + links + ' ' + (onder + 26) +
+      ' C' + (links + 160) + ' ' + (onder - 10) + ' ' + (mid - 80) + ' ' + (onder + 70) + ' ' + mid + ' ' + (onder + 30) +
+      ' C' + (mid + 150) + ' ' + (onder - 8) + ' ' + (rechts - 140) + ' ' + (onder + 4) + ' ' + (rechts - 40) + ' ' + (onder + 50) +
+      ' C' + (rechts + 4) + ' ' + (onder + 70) + ' ' + (rechts + 20) + ' ' + (onder + 96) + ' ' + (rechts - 24) + ' ' + (onder + 100) +
+      ' C' + (rechts - 62) + ' ' + (onder + 104) + ' ' + (rechts - 90) + ' ' + (onder + 66) + ' ' + (rechts - 52) + ' ' + (onder + 40) +
+      ' C' + (rechts - 20) + ' ' + (onder + 20) + ' ' + (rechts + 24) + ' ' + (onder + 24) + ' ' + (rechts + 36) + ' ' + (onder + 46)
+    );
+  }
 
-  var SCHRIJF = 4000, STIL = 2000, WIS = 3000, LEEG = 1000, LIFT = 60;
-  var anims = [];
+  function stroken(){ return [m1, m2, krul]; }
 
-  function schrijf(){
-    anims.forEach(function(a){ a.cancel(); }); anims = [];
-    var t = 0;
-    paths.forEach(function(p,i){
-      var d = SCHRIJF * lens[i] / total;
-      anims.push(p.animate(
-        [{strokeDashoffset: lens[i]}, {strokeDashoffset: 0}],
-        {duration: d, delay: t, easing: 'linear', fill: 'both'}
-      ));
-      t += d + LIFT;
+  function begin(){
+    klaarzetten();
+    var paden = stroken();
+    var lens = paden.map(function(p){ return p.getTotalLength(); });
+    var total = lens.reduce(function(a,b){ return a+b; }, 0);
+    paden.forEach(function(p,i){
+      p.style.strokeDasharray = lens[i] + ' ' + lens[i];
+      p.style.strokeDashoffset = reduce ? 0 : lens[i];
     });
-    setTimeout(wis, t + STIL);
-  }
+    if (reduce) return;
 
-  function wis(){
-    var t = 0;
-    for (var i = paths.length - 1; i >= 0; i--) {
-      var d = WIS * lens[i] / total;
-      anims.push(paths[i].animate(
-        [{strokeDashoffset: 0}, {strokeDashoffset: lens[i]}],
-        {duration: d, delay: t, easing: 'linear', fill: 'both'}
-      ));
-      t += d + LIFT;
+    var SCHRIJF = 4000, STIL = 2000, WIS = 3000, LEEG = 1000, LIFT = 120;
+    var anims = [];
+
+    function schrijf(){
+      anims.forEach(function(a){ a.cancel(); }); anims = [];
+      var t = 0;
+      paden.forEach(function(p,i){
+        var d = SCHRIJF * lens[i] / total;
+        anims.push(p.animate([{strokeDashoffset: lens[i]}, {strokeDashoffset: 0}],
+          {duration: d, delay: t, easing: 'linear', fill: 'both'}));
+        t += d + LIFT;
+      });
+      setTimeout(wis, t + STIL);
     }
-    setTimeout(schrijf, t + LEEG);
+    function wis(){
+      var t = 0;
+      for (var i = paden.length - 1; i >= 0; i--) {
+        var d = WIS * lens[i] / total;
+        anims.push(paden[i].animate([{strokeDashoffset: 0}, {strokeDashoffset: lens[i]}],
+          {duration: d, delay: t, easing: 'linear', fill: 'both'}));
+        t += d + LIFT;
+      }
+      setTimeout(schrijf, t + LEEG);
+    }
+    setTimeout(schrijf, 350);
   }
 
-  setTimeout(schrijf, 350);
+  // Eerst het lettertype laten laden, anders meet je de fallback.
+  m1.style.strokeDashoffset = 1e6; m2.style.strokeDashoffset = 1e6; krul.style.strokeDashoffset = 1e6;
+  m1.style.strokeDasharray = '1e6 1e6'; m2.style.strokeDasharray = '1e6 1e6'; krul.style.strokeDasharray = '1e6 1e6';
+  if (document.fonts && document.fonts.load) {
+    document.fonts.load('230px "Herr Von Muellerhoff"').then(begin, begin);
+  } else { begin(); }
 })();
 </script>
 </body>
