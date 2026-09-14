@@ -34,7 +34,7 @@ assets/vakken.js      lijst van alle vakken per jaar
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert `style.css`, `app.js` of `vakken.js`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 4), anders zien telefoons nog tien minuten de oude versie.
+- Verandert `style.css`, `app.js` of `vakken.js`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 5), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - Relatieve links, zodat alles lokaal en op GitHub Pages werkt.
 - De live site (beriesexamspace.github.io) wordt niet aangeraakt tot v2 klaar is.
