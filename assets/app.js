@@ -206,11 +206,69 @@
     motion.addEventListener('change', updateSignature);
   };
 
+  // Getekende muisaanwijzer, overgenomen uit Helder (app.js). Alleen bij een echte muis; touch toont niets.
+  const setupCursor = () => {
+    if (document.querySelector('.cursor-dot')) return;
+    const dot = document.createElement('div');
+    dot.className = 'cursor-dot';
+    dot.setAttribute('aria-hidden', 'true');
+    dot.setAttribute('popover', 'manual');
+    if (typeof dot.showPopover !== 'function') return;
+    document.body.append(dot);
+    let currentDialog = null;
+    let releaseTimer;
+    const clear = () => {
+      clearTimeout(releaseTimer);
+      dot.classList.remove('is-pressed', 'is-releasing', 'over-control');
+      document.documentElement.classList.remove('ball-cursor');
+      if (dot.matches(':popover-open')) dot.hidePopover();
+      currentDialog = null;
+    };
+    const updatePointer = event => {
+      if (event.pointerType !== 'mouse') { clear(); return; }
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      if (target.closest('input, textarea, [contenteditable="true"], select')) { clear(); return; }
+      const dialog = document.querySelector('dialog[open]');
+      // Reinsert above a newly opened modal in the browser's top layer.
+      if (dialog !== currentDialog && dot.matches(':popover-open')) dot.hidePopover();
+      currentDialog = dialog;
+      dot.style.left = `${event.clientX}px`;
+      dot.style.top = `${event.clientY}px`;
+      const control = target.closest('button, a, [role="button"]');
+      dot.classList.toggle('over-control', !!control && !control.matches(':disabled, [aria-disabled="true"]'));
+      try {
+        if (!dot.matches(':popover-open')) dot.showPopover();
+        document.documentElement.classList.add('ball-cursor');
+      } catch { clear(); }
+    };
+    document.addEventListener('pointermove', updatePointer, { passive: true });
+    document.addEventListener('pointerout', event => { if (!event.relatedTarget) clear(); });
+    document.addEventListener('pointerdown', event => {
+      updatePointer(event);
+      if (event.pointerType !== 'mouse' || event.button !== 0 || !dot.matches(':popover-open')) return;
+      clearTimeout(releaseTimer);
+      dot.classList.remove('is-releasing');
+      dot.classList.add('is-pressed');
+    }, { passive: true });
+    document.addEventListener('pointerup', event => {
+      if (event.pointerType !== 'mouse' || event.button !== 0 || !dot.classList.contains('is-pressed')) return;
+      dot.classList.remove('is-pressed');
+      dot.classList.add('is-releasing');
+      releaseTimer = setTimeout(() => dot.classList.remove('is-releasing'), 300);
+    }, { passive: true });
+    document.addEventListener('pointercancel', clear);
+    document.addEventListener('keydown', clear);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) clear(); });
+    window.addEventListener('blur', clear);
+  };
+
   const initialize = () => {
     try {
       setupNavigation();
       setupLinks();
       setupSignature();
+      setupCursor();
     } finally {
       revealPage();
     }

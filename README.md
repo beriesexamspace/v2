@@ -28,12 +28,13 @@ assets/vakken.js      lijst van alle vakken per jaar
 - De jaarpagina's zijn één sjabloon; alleen `data-jaar` op `<body>`, de titel en de `<h1>` verschillen. De vakkaarten linken naar de bestaande tools op de huidige site tot `v2: true` staat in `vakken.js`.
 - Gedeelde kaartstijl in `style.css`: `.pagina` (binnenpagina met terugknop), `.kaart-pijl`, `.kaart-tekst`, `.kaart-titel`, `.kaart-sub`, `.pijl`, `.rooster-2`, `.sectie`, `.sectie-kop`.
 - De tool-kaarten op de hub linken voorlopig naar de live site (`?leren=1` en `?deel=1`); zodra de tools in v2 staan, worden dat interne links.
+- De startpagina (`index.html`) heeft bewust geen navigatiebalk en past in één schermhoogte. De getekende grijze muisaanwijzer (overgenomen uit Helder) zit in `style.css` en `app.js` en werkt op elke pagina; op touch verschijnt hij niet.
 - Gedeelde helpers staan op `window.BES` (`naamOpslaan`, `naamOphalen`, `jaarOpslaan`, `jaarOphalen`); de losse `window.naamOpslaan` enz. blijven als alias bestaan.
-- Navigatiebalk: `<nav class="navigation">` of `<nav class="nav-vol">` krijgt het Helder-gedrag (recht bovenaan, pill bij scrollen). De startpagina houdt bewust zijn eigen pill-balk.
+- Navigatiebalk: `<nav class="navigation">` of `<nav class="nav-vol">` krijgt het Helder-gedrag (recht bovenaan, pill bij scrollen). De startpagina heeft geen balk.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert `style.css`, `app.js` of `vakken.js`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 3), anders zien telefoons nog tien minuten de oude versie.
+- Verandert `style.css`, `app.js` of `vakken.js`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 4), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - Relatieve links, zodat alles lokaal en op GitHub Pages werkt.
 - De live site (beriesexamspace.github.io) wordt niet aangeraakt tot v2 klaar is.
