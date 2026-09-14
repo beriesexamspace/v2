@@ -75,9 +75,10 @@
   .knop.groot{font-size:19px;padding:18px 34px}
   .account{display:inline-block;margin-top:clamp(10px,2vh,18px);font-size:15.5px;color:var(--accent);font-weight:500}
   .account:hover{text-decoration:underline}
-  .account-options{display:flex;flex-direction:column;align-items:center;margin-top:clamp(10px,1.8vh,16px)}
+  .account-options{display:flex;flex-direction:column;align-items:center}
   .account-options .account{margin-top:clamp(6px,1vh,10px)}
   .account-session{max-width:34rem;margin:0 auto}
+  .account-session p{margin:0}
   .account-session .account{overflow-wrap:anywhere}
   .knop:active{transform:scale(.97);transition-duration:80ms}
 
@@ -129,14 +130,14 @@
     <h1><span class="r1">Jouw leerstof.</span><span class="r2">Jouw eigen space.</span></h1>
     <p class="lead">Alles wat je nodig hebt om overzicht te krijgen, slimmer te leren en door te groeien.</p>
     <div class="cta">
-      <a class="knop groot" id="beginNu" href="welkom.html">Begin nu →</a>
       <div class="account-options" data-account-opties>
-        <a class="knop" href="aanmelden.html">Aanmelden</a>
+        <a class="knop groot" href="aanmelden.html">Aanmelden →</a>
         <a class="account" href="inloggen.html">Al een account? Log in</a>
       </div>
-      <p class="account-session" data-account-sessie hidden>
-        <a class="account" data-account-uitloggen href="index.html">Uitloggen</a>
-      </p>
+      <div class="account-session" data-account-sessie hidden>
+        <a class="knop groot" href="hub.html">Naar je space →</a>
+        <p><a class="account" data-account-uitloggen href="index.html">Uitloggen</a></p>
+      </div>
     </div>
   </div>
 </main>
@@ -193,17 +194,5 @@
 <script src="assets/config.js?v=7" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
 <script src="assets/auth.js?v=6" defer></script>
-<script>
-(function(){
-  function updateBegin(){
-  try {
-    var naam = window.BES && window.BES.naamOphalen();
-    document.getElementById("beginNu").setAttribute("href", naam ? "hub.html" : "welkom.html");
-  } catch (e) {}
-  }
-  updateBegin();
-  window.addEventListener('bes:auth', updateBegin);
-})();
-</script>
 </body>
 </html>
