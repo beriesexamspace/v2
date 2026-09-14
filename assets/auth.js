@@ -3,6 +3,8 @@
 
   const BES = window.BES = window.BES || {};
   const config = window.BES_CONFIG || {};
+  const scriptPath = document.currentScript?.getAttribute('src') || 'assets/auth.js';
+  const pagePrefix = scriptPath.split('assets/auth.js')[0];
   let client = null;
   let currentUser = null;
   let recoveryUserId = null;
@@ -57,7 +59,7 @@
   function renderAccount() {
     document.querySelectorAll('a.pill.login-button').forEach(link => {
       link.textContent = currentUser ? 'Uitloggen' : 'Inloggen →';
-      link.setAttribute('href', currentUser ? '#' : 'inloggen.html');
+      link.setAttribute('href', currentUser ? '#' : pagePrefix + 'inloggen.html');
       link.toggleAttribute('data-account-uitloggen', Boolean(currentUser));
     });
     document.querySelectorAll('[data-account-opties]').forEach(element => { element.hidden = Boolean(currentUser); });
@@ -107,6 +109,7 @@
   const auth = BES.auth = {
     beschikbaar: false,
     gereed: Promise.resolve(null),
+    get client() { return client; },
 
     async gebruiker() {
       await auth.gereed;
@@ -140,11 +143,11 @@
       await request(api => api.signOut());
       recoveryUserId = null;
       setUser(null, true);
-      window.location.assign('index.html');
+      window.location.assign(pagePrefix + 'index.html');
     },
 
     async herstelMail(email) {
-      const redirectTo = new URL('wachtwoord.html', window.location.href).href;
+      const redirectTo = new URL(pagePrefix + 'wachtwoord.html', window.location.href).href;
       await request(api => api.resetPasswordForEmail(String(email).trim(), { redirectTo }));
     },
 
