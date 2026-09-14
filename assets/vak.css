@@ -84,6 +84,8 @@
 .hack-regel { display: flex; align-items: baseline; gap: 16px; margin-top: 12px; }
 .hack-vink { flex: 0 0 auto; color: var(--teal); font-size: 1.25rem; }
 .hack-regel p { margin: 0; color: var(--ink); font-size: .9375rem; }
+.hack-tekst { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.hack-tekst strong { font-weight: 600; font-size: 1rem; }
 .theorie-kaart + .theorie-kaart { margin-top: 16px; }
 .theorie-kaart h3 { margin: 0 0 16px; font-size: 1.0625rem; font-weight: 600; }
 .theorie-kaart ul { margin: 0; padding-left: 20px; color: var(--muted); font-size: .9375rem; line-height: 1.7; }

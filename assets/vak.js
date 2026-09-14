@@ -79,8 +79,8 @@
     return {
       ...raw,
       vragen: raw.vragen.map((question, id) => ({ ...question, id })),
-      hacks: (Array.isArray(raw.hacks) ? raw.hacks : []).filter(item => item && chapters.has(item.h) && typeof item.t === 'string'),
-      theorie: (Array.isArray(raw.theorie) ? raw.theorie : []).filter(item => item && chapters.has(item.h) && typeof item.kop === 'string' && Array.isArray(item.items) && item.items.every(point => typeof point === 'string'))
+      hacks: (Array.isArray(raw.hacks) ? raw.hacks : []).filter(item => item && (item.h === 'algemeen' || chapters.has(item.h)) && typeof item.t === 'string'),
+      theorie: (Array.isArray(raw.theorie) ? raw.theorie : []).filter(item => item && (item.h === 'algemeen' || chapters.has(item.h)) && typeof item.kop === 'string' && Array.isArray(item.items) && item.items.every(point => typeof point === 'string'))
     };
   }
 
@@ -490,16 +490,21 @@
       theory.replaceChildren();
       if (!data.hacks.length) hacks.append(create('p', 'gedimde-tekst', 'Voor dit vak zijn er nog geen studie-hacks.'));
       if (!data.theorie.length) theory.append(create('p', 'gedimde-tekst', 'Voor dit vak staat nog geen theorie klaar.'));
-      data.hoofdstukken.forEach(chapter => {
+      // Hacks en theorie met h: 'algemeen' horen bij het hele vak en komen bovenaan
+      const groepen = [{ id: 'algemeen', naam: 'Voor het hele vak' }, ...data.hoofdstukken];
+      groepen.forEach(chapter => {
         const tips = data.hacks.filter(item => item.h === chapter.id);
         if (tips.length) {
           const section = create('section', 'hack-groep');
-          section.append(create('h2', '', chapter.naam));
+          section.append(create('h2', '', chapter.id === 'algemeen' ? 'Slim leren' : chapter.naam));
           tips.forEach(item => {
             const row = create('div', 'hack-regel kaart');
             const tick = create('span', 'hack-vink', '✓');
             tick.setAttribute('aria-hidden', 'true');
-            row.append(tick, create('p', '', item.t));
+            const tekst = create('div', 'hack-tekst');
+            if (typeof item.kop === 'string' && item.kop.trim()) tekst.append(create('strong', '', item.kop.trim()));
+            tekst.append(create('p', '', item.t));
+            row.append(tick, tekst);
             section.append(row);
           });
           hacks.append(section);
@@ -507,7 +512,7 @@
         const blocks = data.theorie.filter(item => item.h === chapter.id);
         if (blocks.length) {
           const section = create('section', 'theorie-groep');
-          section.append(create('h2', '', chapter.naam));
+          section.append(create('h2', '', chapter.id === 'algemeen' ? 'Algemeen' : chapter.naam));
           blocks.forEach(item => {
             const card = create('article', 'theorie-kaart kaart');
             const list = create('ul');
