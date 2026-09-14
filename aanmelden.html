@@ -150,12 +150,16 @@
         }
       };
 
+      // Wacht op een animatie, maar nooit langer dan 300ms: als de tab verborgen is staan animaties stil
+      // en zou het formulier anders blijven hangen.
+      const wachtOp = animation => Promise.race([animation.finished.catch(() => {}), new Promise(resolve => window.setTimeout(resolve, 300))]);
+
       const changeStep = async (next, name) => {
         changing = true;
         let fadeOut = null;
         if (!reducedMotion.matches && content.animate) {
           fadeOut = content.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 100, easing: 'ease-out', fill: 'forwards' });
-          await fadeOut.finished;
+          await wachtOp(fadeOut);
         }
         step = next;
         clearError();
@@ -180,7 +184,7 @@
         if (!reducedMotion.matches && content.animate) {
           const fadeIn = content.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 100, easing: 'ease-out' });
           if (fadeOut) fadeOut.cancel();
-          await fadeIn.finished;
+          await wachtOp(fadeIn);
         } else if (fadeOut) {
           fadeOut.cancel();
         }
