@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#FFFFFF">
+  <meta name="robots" content="noindex">
+  <title>WhatsApp-groep | Berie's Exam Space</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css?v=5">
+  <script src="assets/app.js?v=5"></script>
+  <style>
+    .whatsapp-kaart { max-width: 640px; }
+
+    .whatsapp-regel {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin: 0;
+      font-size: .9375rem;
+      line-height: 1.6;
+    }
+
+    .whatsapp-regel + .whatsapp-regel { margin-top: 20px; }
+    .whatsapp-vink { flex-shrink: 0; color: var(--accent); }
+
+    .whatsapp-knop {
+      max-width: 100%;
+      margin-top: 28px;
+      white-space: normal;
+      text-align: center;
+    }
+
+    .whatsapp-privacy {
+      max-width: 640px;
+      margin: 16px 0 0;
+      color: var(--muted);
+      font-size: .8125rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 767px) {
+      .whatsapp-knop { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navigation" aria-label="Hoofdnavigatie">
+      <a class="brand" href="index.html" aria-label="Berie's Exam Space, startpagina">
+        <span class="brand-symbol" aria-hidden="true">B</span>
+        <span class="brand-name"><span>Berie's</span> <span>Exam Space</span></span>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu">Menu</button>
+      <ul class="navigation-links" id="site-menu">
+        <li><a href="#">Hoe werkt het</a></li>
+        <li><a href="#">Wat krijg je</a></li>
+        <li><a href="#">Over ons</a></li>
+        <li><a href="whatsapp.html">WhatsApp-groep</a></li>
+        <li><a href="#">Feedback</a></li>
+      </ul>
+      <a class="pill login-button" href="#">Inloggen&nbsp; →</a>
+    </nav>
+  </header>
+
+  <main class="pagina" aria-labelledby="whatsapp-titel">
+    <div class="wrap">
+      <a class="terug" href="hub.html" data-terug="hub.html" data-terug-tekst="Terug">← Terug</a>
+
+      <header class="pagina-kop">
+        <h1 id="whatsapp-titel">De WhatsApp-groep</h1>
+        <p>Eén groep voor iedereen die met Berie's Exam Space leert.</p>
+      </header>
+
+      <div class="kaart whatsapp-kaart">
+        <p class="whatsapp-regel"><span class="whatsapp-vink" aria-hidden="true">✓</span><span>Waarvoor: je blijft op de hoogte van alles wat er op de site bij komt.</span></p>
+        <p class="whatsapp-regel"><span class="whatsapp-vink" aria-hidden="true">✓</span><span>Welke updates: nieuwe vakken, nieuwe vragen en verbeteringen, meestal een paar keer per maand.</span></p>
+        <p class="whatsapp-regel"><span class="whatsapp-vink" aria-hidden="true">✓</span><span>Alleen de beheerder plaatst berichten. Geen drukte, geen groepsgesprekken.</span></p>
+      </div>
+
+      <a class="knop whatsapp-knop" href="[URL_WHATSAPP]">Word lid van de WhatsApp-groep →</a>
+      <p class="whatsapp-privacy">Zoals in elke WhatsApp-groep is je nummer zichtbaar voor de andere leden.</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p class="footer-brand">Berie's Exam Space</p>
+    <div class="footer-details">
+      <p>Duidelijk leren. Rustig groeien.</p>
+      <p class="project-label">A project of Berie Foundation</p>
+    </div>
+  </footer>
+</body>
+</html>

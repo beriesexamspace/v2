@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=4">
-  <script src="assets/app.js?v=4"></script>
+  <link rel="stylesheet" href="assets/style.css?v=5">
+  <script src="assets/app.js?v=5"></script>
   <style>
     .jaar {
       display: flex;
@@ -32,40 +32,8 @@
     .jaar .label { visibility: hidden; }
     .jaar.is-laatst .label { visibility: visible; }
 
-    .helpmee {
-      max-width: 640px;
-      margin: 0 auto;
-      padding: 36px 32px;
-      text-align: center;
-    }
-
-    .helpmee h2 {
-      margin: 0;
-      font-size: 1.375rem;
-      font-weight: 600;
-      line-height: 1.25;
-      letter-spacing: -.01em;
-      text-wrap: balance;
-    }
-
-    .helpmee p {
-      max-width: 30rem;
-      margin: 12px auto 0;
-      color: var(--muted);
-      font-size: 1rem;
-      line-height: 1.55;
-    }
-
-    .helpmee .knop { margin-top: 24px; }
-
-    @media (hover: hover) {
-      .helpmee .knop:hover { transform: translateY(-1px); }
-    }
-
     @media (max-width: 767px) {
       .jaar { min-height: 0; gap: 14px; }
-      .helpmee { padding: 28px 22px; }
-      .helpmee .knop { width: 100%; }
     }
   </style>
 </head>
@@ -81,7 +49,7 @@
         <li><a href="#">Hoe werkt het</a></li>
         <li><a href="#">Wat krijg je</a></li>
         <li><a href="#">Over ons</a></li>
-        <li><a href="#">WhatsApp-groep</a></li>
+        <li><a href="whatsapp.html">WhatsApp-groep</a></li>
         <li><a href="#">Feedback</a></li>
       </ul>
       <a class="pill login-button" href="#">Inloggen&nbsp; →</a>
@@ -152,13 +120,6 @@
         </div>
       </section>
 
-      <section class="sectie" aria-labelledby="helpmee-kop">
-        <div class="kaart helpmee">
-          <h2 id="helpmee-kop">Help mee, deel je vak</h2>
-          <p>Heb jij samenvattingen of oude examenvragen? Stuur ze in (élk jaar).</p>
-          <a class="knop" href="https://beriesexamspace.com/?deel=1">Insturen →</a>
-        </div>
-      </section>
     </div>
   </main>
 
