@@ -5,6 +5,8 @@
   --grey-title: #8A8A8E;
   --accent: #0071e3;
   --accent-dark: #0062c4;
+  --teal: #3fb9b2;
+  --teal-zacht: rgba(63,185,178,.12);
   --surface: #F5F5F7;
   --line: #E9E7F3;
   --sig: #B1B1B7;
@@ -28,6 +30,7 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
 
 html {
   background: var(--white);
@@ -125,7 +128,7 @@ a:focus-visible, button:focus-visible {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--teal);
   color: var(--white);
   font-size: 1rem;
   font-weight: 700;
@@ -447,8 +450,8 @@ h1 span { display: block; }
   align-items: center;
   padding: 4px 10px;
   border-radius: var(--pill);
-  background: rgba(0,113,227,.1);
-  color: var(--accent);
+  background: var(--teal-zacht);
+  color: var(--teal);
   font-size: .75rem;
   font-weight: 600;
   line-height: 1.2;
@@ -692,6 +695,106 @@ html.page-fade.page-ready body { animation: page-in 250ms ease-out both; }
   .rooster-2 { grid-template-columns: minmax(0, 1fr); gap: 16px; }
   .rooster-3 { gap: 16px; }
   .sectie { margin-top: 44px; }
+}
+
+.auth-back {
+  position: absolute;
+  top: 76px;
+  left: 32px;
+  z-index: 2;
+}
+
+.auth-stage { width: 100%; max-width: 780px; margin: 0 auto; }
+.auth-form { width: min(320px, 100%); margin: 28px auto 0; text-align: left; }
+.auth-form label { display: block; margin: 0 0 8px; font-size: .875rem; font-weight: 500; }
+.auth-field + .auth-field { margin-top: 20px; }
+.auth-form .knop { width: 100%; margin-top: 24px; }
+.auth-input {
+  display: block;
+  width: 100%;
+  min-height: 56px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--white);
+  color: var(--ink);
+  font: 400 1.0625rem var(--font-family);
+  line-height: 24px;
+}
+.auth-input::placeholder { color: var(--muted); opacity: 1; }
+.auth-input:focus { border-color: var(--accent); outline: 2px solid var(--accent); outline-offset: 3px; }
+.auth-input[aria-invalid="true"] { border-color: #b42318; }
+.auth-help, .auth-error {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: .875rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.auth-error a, .auth-links a { color: var(--accent); text-underline-offset: 4px; }
+.account-fout { margin: 12px 0 0; color: var(--muted); font-size: .875rem; line-height: 1.5; }
+.account-fout a { color: var(--accent); text-underline-offset: 4px; }
+.site-header > .account-fout {
+  position: absolute;
+  top: 76px;
+  right: 20px;
+  max-width: min(400px, calc(100% - 40px));
+  margin: 0;
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--white);
+}
+.auth-links { display: flex; flex-direction: column; gap: 8px; margin: 16px 0 0; text-align: center; font-size: .9375rem; line-height: 1.5; }
+.auth-links a { display: block; padding: 6px 0; }
+.auth-password { position: relative; }
+.auth-password .auth-input { padding-right: 74px; }
+.auth-toggle {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  min-height: 44px;
+  padding: 8px;
+  border: 0;
+  border-radius: 12px;
+  color: var(--accent);
+  background: transparent;
+  font: 500 .875rem var(--font-family);
+  cursor: pointer;
+}
+.auth-success { text-align: center; }
+.auth-success .knop { margin-top: 28px; }
+.auth-success .vinkje { margin-bottom: 24px; }
+.vinkje { display: block; width: 64px; height: 64px; margin: 0 auto 24px; fill: none; }
+.vinkje circle {
+  stroke: var(--teal);
+  stroke-width: 2;
+  stroke-dasharray: 188.496;
+  stroke-dashoffset: 188.496;
+  animation: cirkel-tekenen 400ms var(--ease) both;
+}
+.vinkje path {
+  stroke: var(--teal);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 37.487;
+  stroke-dashoffset: 37.487;
+  animation: vink-tekenen 350ms var(--ease) 400ms both;
+}
+@keyframes cirkel-tekenen { to { stroke-dashoffset: 0; } }
+@keyframes vink-tekenen { to { stroke-dashoffset: 0; } }
+
+.knop:active, .knop-secundair:active, .pill:active { transform: scale(.97); transition-duration: 80ms; }
+.kaart:active { transform: translateY(0) scale(.99); transition-duration: 80ms; }
+.knop:disabled, .knop[aria-disabled="true"] { opacity: .45; transform: none; box-shadow: var(--shadow-primary); cursor: default; }
+@media (hover: hover) {
+  .auth-error a:hover, .auth-links a:hover { text-decoration: underline; }
+}
+@media (max-width: 767px) { .auth-back { left: 20px; } }
+@media (prefers-reduced-motion: reduce) {
+  .knop:active, .knop-secundair:active, .pill:active, .kaart:active { transform: none; }
+  .vinkje circle, .vinkje path { animation: none; stroke-dashoffset: 0; }
 }
 
 /* Getekende muisaanwijzer, overgenomen uit Helder (style.css) */

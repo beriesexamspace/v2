@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=5">
+<link rel="stylesheet" href="assets/style.css?v=6">
 <style>
   *{margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -75,6 +75,11 @@
   .knop.groot{font-size:19px;padding:18px 34px}
   .account{display:inline-block;margin-top:clamp(10px,2vh,18px);font-size:15.5px;color:var(--accent);font-weight:500}
   .account:hover{text-decoration:underline}
+  .account-options{display:flex;flex-direction:column;align-items:center;margin-top:clamp(10px,1.8vh,16px)}
+  .account-options .account{margin-top:clamp(6px,1vh,10px)}
+  .account-session{max-width:34rem;margin:0 auto}
+  .account-session .account{overflow-wrap:anywhere}
+  .knop:active{transform:scale(.97);transition-duration:80ms}
 
   @media (max-width:768px){
     .hero{padding:clamp(16px,3vh,28px) 20px clamp(12px,2.5vh,20px)}
@@ -85,6 +90,7 @@
   @media (prefers-reduced-motion:reduce){
     .hero-in,.cta{animation:none;opacity:1}
     .knop{transition:none}
+    .knop:hover,.knop:active{transform:none}
     html{scroll-behavior:auto}
   }
 </style>
@@ -124,8 +130,13 @@
     <p class="lead">Alles wat je nodig hebt om overzicht te krijgen, slimmer te leren en door te groeien.</p>
     <div class="cta">
       <a class="knop groot" id="beginNu" href="welkom.html">Begin nu →</a>
-      <br>
-      <a class="account" href="#">Maak een account</a>
+      <div class="account-options" data-account-opties>
+        <a class="knop" href="aanmelden.html">Aanmelden</a>
+        <a class="account" href="inloggen.html">Al een account? Log in</a>
+      </div>
+      <p class="account-session" data-account-sessie hidden>
+        <a class="account" data-account-uitloggen href="index.html">Uitloggen</a>
+      </p>
     </div>
   </div>
 </main>
@@ -178,13 +189,20 @@
   setTimeout(schrijf, 400);
 })();
 </script>
-<script src="assets/app.js?v=5"></script>
+<script src="assets/app.js?v=6"></script>
+<script src="assets/config.js?v=6" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
+<script src="assets/auth.js?v=6" defer></script>
 <script>
 (function(){
+  function updateBegin(){
   try {
     var naam = window.BES && window.BES.naamOphalen();
-    if (naam) document.getElementById("beginNu").setAttribute("href", "hub.html");
+    document.getElementById("beginNu").setAttribute("href", naam ? "hub.html" : "welkom.html");
   } catch (e) {}
+  }
+  updateBegin();
+  window.addEventListener('bes:auth', updateBegin);
 })();
 </script>
 </body>

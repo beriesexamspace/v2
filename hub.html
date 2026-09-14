@@ -3,6 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>
+    (() => {
+      let opslagBeschikbaar = false;
+      for (const type of ['localStorage', 'sessionStorage']) {
+        try {
+          const opslag = window[type];
+          if (opslag.getItem('bes_nieuw_gezien')) return;
+          opslag.setItem('bes_nieuw_opslagtest', '1');
+          opslag.removeItem('bes_nieuw_opslagtest');
+          opslagBeschikbaar = true;
+        } catch {}
+      }
+      if (opslagBeschikbaar) window.location.replace('nieuw.html');
+    })();
+  </script>
   <meta name="description" content="Kies je jaar, gebruik de tools en help mee met je eigen vak in Berie's Exam Space.">
   <meta name="theme-color" content="#FFFFFF">
   <meta name="robots" content="noindex">
@@ -10,8 +25,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=5">
-  <script src="assets/app.js?v=5"></script>
+  <link rel="stylesheet" href="assets/style.css?v=6">
+  <script src="assets/app.js?v=6"></script>
+  <script src="assets/config.js?v=6" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
+  <script src="assets/auth.js?v=6" defer></script>
   <style>
     .jaar {
       display: flex;
@@ -52,7 +70,7 @@
         <li><a href="whatsapp.html">WhatsApp-groep</a></li>
         <li><a href="#">Feedback</a></li>
       </ul>
-      <a class="pill login-button" href="#">Inloggen&nbsp; →</a>
+      <a class="pill login-button" href="inloggen.html">Inloggen&nbsp; →</a>
     </nav>
   </header>
 
@@ -62,7 +80,7 @@
 
       <header class="pagina-kop">
         <h1 id="begroeting">Welkom.</h1>
-        <p>In welk jaar zit je?</p>
+        <p id="hub-vraag">In welk jaar zit je?</p>
       </header>
 
       <section class="rijst" aria-label="Kies je jaar">
@@ -135,8 +153,15 @@
     (() => {
       const bes = window.BES || {};
       const begroeting = document.getElementById('begroeting');
-      const naam = typeof bes.naamOphalen === 'function' ? (bes.naamOphalen() || '').trim() : '';
-      if (naam) begroeting.textContent = 'Welkom terug, ' + naam + '.';
+      const vraag = document.getElementById('hub-vraag');
+      const updateBegroeting = user => {
+        const opgeslagen = typeof bes.naamOphalen === 'function' ? bes.naamOphalen() : '';
+        const naam = String(user?.user_metadata?.naam || opgeslagen || '').trim();
+        begroeting.textContent = naam ? 'Welkom terug, ' + naam + '.' : 'Welkom.';
+        vraag.textContent = naam ? 'Wat gaan we vandaag oefenen?' : 'In welk jaar zit je?';
+      };
+      updateBegroeting();
+      window.addEventListener('bes:auth', event => updateBegroeting(event.detail?.user));
 
       const kaarten = Array.from(document.querySelectorAll('.jaar[data-jaar]'));
       const laatst = typeof bes.jaarOphalen === 'function' ? bes.jaarOphalen() : null;

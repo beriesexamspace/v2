@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Maak je account voor Berie's Exam Space met je naam, e-mail en wachtwoord.">
+  <meta name="theme-color" content="#FFFFFF">
+  <title>Aanmelden | Berie's Exam Space</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css?v=6">
+  <script src="assets/app.js?v=6" defer></script>
+  <script src="assets/config.js?v=6" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
+  <script src="assets/auth.js?v=6" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navigation" aria-label="Hoofdnavigatie">
+      <a class="brand" href="index.html" aria-label="Berie's Exam Space, startpagina">
+        <span class="brand-symbol" aria-hidden="true">B</span>
+        <span class="brand-name"><span>Berie's</span> <span>Exam Space</span></span>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu">Menu</button>
+      <ul class="navigation-links" id="site-menu">
+        <li><a href="#">Hoe werkt het</a></li>
+        <li><a href="#">Wat krijg je</a></li>
+        <li><a href="#">Over ons</a></li>
+        <li><a href="whatsapp.html">WhatsApp-groep</a></li>
+        <li><a href="#">Feedback</a></li>
+      </ul>
+      <a class="pill login-button" href="inloggen.html">Inloggen&nbsp; →</a>
+    </nav>
+  </header>
+
+  <div class="first-screen">
+    <main class="hero" aria-labelledby="signup-title">
+      <a class="terug auth-back" id="signup-back" href="index.html" data-terug="index.html" data-terug-tekst="Terug">← Terug</a>
+      <div class="hero-stage auth-stage">
+        <div class="hero-content" id="signup-content">
+          <p class="eyebrow" id="signup-step">Stap 1 van 3</p>
+          <svg class="vinkje" id="signup-check" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true" hidden>
+            <circle cx="32" cy="32" r="30" fill="none" stroke="var(--teal)" stroke-width="2"></circle>
+            <path d="M20 33 l9 9 l17 -18" fill="none" stroke="var(--teal)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+          <h1 id="signup-title" tabindex="-1">Hoe mogen we je noemen?</h1>
+          <form class="auth-form" id="signup-form" novalidate>
+            <div id="name-step">
+              <input class="auth-input" id="signup-name" type="text" placeholder="Je voornaam of bijnaam" aria-label="Je voornaam of bijnaam" aria-describedby="signup-error" maxlength="24" autocomplete="given-name" autocapitalize="words" spellcheck="false" enterkeyhint="next">
+            </div>
+            <div id="email-step" hidden>
+              <input class="auth-input" id="signup-email" type="email" placeholder="naam@voorbeeld.be" aria-label="E-mailadres" aria-describedby="email-help signup-error" autocomplete="email" autocapitalize="none" spellcheck="false" enterkeyhint="next" disabled>
+              <p class="auth-help" id="email-help">We gebruiken je e-mail alleen om in te loggen en je wachtwoord te herstellen.</p>
+            </div>
+            <div id="password-step" hidden>
+              <div class="auth-password">
+                <input class="auth-input" id="signup-password" type="password" placeholder="Je wachtwoord" aria-label="Wachtwoord" aria-describedby="password-help signup-error" autocomplete="new-password" minlength="8" enterkeyhint="go" disabled>
+                <button class="auth-toggle" id="show-password" type="button" aria-controls="signup-password" aria-pressed="false">Toon</button>
+              </div>
+              <p class="auth-help" id="password-help">Minimaal 8 tekens. Meer eisen stellen we niet.</p>
+            </div>
+            <p class="auth-error" id="signup-error" role="alert" hidden></p>
+            <button class="knop" id="signup-submit" type="submit">Verder →</button>
+          </form>
+          <div class="auth-success" id="signup-success" hidden>
+            <a class="knop" href="nieuw.html">Verder →</a>
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer class="site-footer">
+      <p class="footer-brand">Berie's Exam Space</p>
+      <div class="footer-details">
+        <p>Duidelijk leren. Rustig groeien.</p>
+        <p class="project-label">A project of Berie Foundation</p>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const auth = window.BES.auth;
+      const form = document.getElementById('signup-form');
+      const content = document.getElementById('signup-content');
+      const heading = document.getElementById('signup-title');
+      const stepLabel = document.getElementById('signup-step');
+      const back = document.getElementById('signup-back');
+      const submit = document.getElementById('signup-submit');
+      const error = document.getElementById('signup-error');
+      const fields = ['signup-name', 'signup-email', 'signup-password'].map(id => document.getElementById(id));
+      const panels = ['name-step', 'email-step', 'password-step'].map(id => document.getElementById(id));
+      const titles = ['Hoe mogen we je noemen?', 'Wat is je e-mailadres?', 'Kies een wachtwoord.'];
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const cleanName = value => Array.from(value.normalize('NFC').replace(/[^\p{L}\p{M}\p{Nd} '\u2019-]/gu, '')).slice(0, 24).join('');
+      let step = 0;
+      let changing = false;
+      let submitting = false;
+
+      const addLink = (text, href) => {
+        const link = document.createElement('a');
+        link.textContent = text;
+        link.href = href;
+        error.append(' ', link);
+      };
+
+      const showError = (message, field, code) => {
+        error.dataset.code = code || '';
+        error.replaceChildren();
+        error.hidden = false;
+        if (code === 'duplicate') {
+          error.textContent = 'Dit e-mailadres heeft al een account.';
+          addLink('Log in.', 'inloggen.html');
+        } else {
+          error.textContent = message;
+          if (code === 'unavailable') addLink('Ga verder met oefenen →', 'hub.html');
+        }
+        if (field) {
+          field.setAttribute('aria-invalid', 'true');
+          field.focus({ preventScroll: true });
+        }
+      };
+
+      const availability = () => {
+        if (auth && auth.beschikbaar) return true;
+        showError('Accounts zijn nog niet ingeschakeld. Je kunt wel gewoon oefenen.', null, 'unavailable');
+        return false;
+      };
+
+      const clearError = () => {
+        fields.forEach(field => field.removeAttribute('aria-invalid'));
+        if (!auth?.beschikbaar && error.dataset.code === 'unavailable' && !error.hidden) return;
+        error.hidden = true;
+        error.replaceChildren();
+        availability();
+      };
+
+      const cleanInput = () => {
+        const field = fields[0];
+        const value = field.value;
+        const start = field.selectionStart ?? value.length;
+        const end = field.selectionEnd ?? start;
+        const clean = cleanName(value);
+        if (clean !== value) {
+          field.value = clean;
+          field.setSelectionRange(
+            Math.min(cleanName(value.slice(0, start)).length, clean.length),
+            Math.min(cleanName(value.slice(0, end)).length, clean.length)
+          );
+        }
+      };
+
+      const changeStep = async (next, name) => {
+        changing = true;
+        let fadeOut = null;
+        if (!reducedMotion.matches && content.animate) {
+          fadeOut = content.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 100, easing: 'ease-out', fill: 'forwards' });
+          await fadeOut.finished;
+        }
+        step = next;
+        clearError();
+        panels.forEach((panel, index) => {
+          panel.hidden = index !== step;
+          fields[index].disabled = index !== step;
+        });
+        if (step < 3) {
+          heading.textContent = titles[step];
+          stepLabel.textContent = 'Stap ' + (step + 1) + ' van 3';
+          submit.textContent = step === 2 ? 'Account maken →' : 'Verder →';
+          if (step === 0) back.setAttribute('data-terug', 'index.html');
+          else back.removeAttribute('data-terug');
+        } else {
+          heading.textContent = 'Klaar, ' + name + '. Je account staat.';
+          stepLabel.hidden = true;
+          back.hidden = true;
+          form.hidden = true;
+          document.getElementById('signup-check').removeAttribute('hidden');
+          document.getElementById('signup-success').hidden = false;
+        }
+        if (!reducedMotion.matches && content.animate) {
+          const fadeIn = content.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 100, easing: 'ease-out' });
+          if (fadeOut) fadeOut.cancel();
+          await fadeIn.finished;
+        } else if (fadeOut) {
+          fadeOut.cancel();
+        }
+        if (step < 3) fields[step].focus({ preventScroll: true });
+        else heading.focus({ preventScroll: true });
+        changing = false;
+      };
+
+      fields[0].value = cleanName(window.BES.naamOphalen() || '');
+      fields[0].addEventListener('input', event => {
+        if (!event.isComposing) cleanInput();
+      });
+      fields[0].addEventListener('compositionend', cleanInput);
+      fields.forEach(field => field.addEventListener('input', clearError));
+
+      back.addEventListener('click', event => {
+        if (step > 0 || changing || submitting) {
+          event.preventDefault();
+          if (!changing && !submitting && step < 3) changeStep(step - 1);
+        }
+      });
+
+      document.getElementById('show-password').addEventListener('click', event => {
+        const visible = fields[2].type === 'password';
+        fields[2].type = visible ? 'text' : 'password';
+        event.currentTarget.textContent = visible ? 'Verberg' : 'Toon';
+        event.currentTarget.setAttribute('aria-pressed', String(visible));
+      });
+
+      form.addEventListener('submit', async event => {
+        event.preventDefault();
+        if (changing || submitting || step > 2) return;
+        cleanInput();
+        clearError();
+        if (step === 0) {
+          if (!fields[0].value.trim()) {
+            showError('Vul je naam in om verder te gaan.', fields[0]);
+            return;
+          }
+          await changeStep(1);
+          return;
+        }
+        if (step === 1) {
+          fields[1].value = fields[1].value.trim();
+          if (!fields[1].value || !fields[1].validity.valid) {
+            showError('Vul een geldig e-mailadres in om verder te gaan.', fields[1]);
+            return;
+          }
+          await changeStep(2);
+          return;
+        }
+        if (fields[2].value.length < 8) {
+          showError('Je wachtwoord is te kort. Gebruik minimaal 8 tekens.', fields[2]);
+          return;
+        }
+        if (!availability()) return;
+        submitting = true;
+        submit.disabled = true;
+        submit.textContent = 'Even geduld…';
+        form.setAttribute('aria-busy', 'true');
+        try {
+          const name = fields[0].value.trim();
+          await auth.aanmelden(name, fields[1].value.trim(), fields[2].value);
+          window.BES.naamOpslaan(name);
+          fields[2].value = '';
+          fields[2].type = 'password';
+          await changeStep(3, name);
+        } catch (failure) {
+          showError(failure.message || 'Aanmelden is niet gelukt. Probeer het opnieuw.', failure.code === 'weak_password' ? fields[2] : null, failure.code);
+        } finally {
+          submitting = false;
+          submit.disabled = false;
+          submit.textContent = 'Account maken →';
+          form.removeAttribute('aria-busy');
+        }
+      });
+
+      availability();
+      if (auth) Promise.resolve(auth.gereed).then(user => {
+        if (user) window.location.replace('hub.html');
+      }).catch(() => {});
+    });
+  </script>
+</body>
+</html>
