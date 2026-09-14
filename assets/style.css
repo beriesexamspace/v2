@@ -583,3 +583,91 @@ html.page-fade.page-ready body { animation: page-in 250ms ease-out both; }
   .pill:hover { transform: none; }
 }
 
+
+/* Kaarten met pijl (hub, jaarpagina's) en secties op binnenpagina's */
+.pagina {
+  flex: 1 0 auto;
+  width: 100%;
+  padding: 96px 0 80px;
+}
+
+.pagina .terug { margin-bottom: 28px; }
+
+.pagina .pagina-kop, .pagina .rijst { animation: rise 600ms var(--ease) both; }
+
+.pagina .pagina-kop h1 { text-wrap: balance; }
+
+.sectie {
+  margin-top: 56px;
+  animation: rise 600ms var(--ease) 150ms both;
+}
+
+.sectie-kop {
+  margin: 0 0 20px;
+  font-size: 1.375rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -.01em;
+}
+
+.rooster-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.kaart-tekst {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.kaart-titel {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -.01em;
+}
+
+.kaart-sub {
+  color: var(--muted);
+  font-size: .9375rem;
+  line-height: 1.5;
+}
+
+.pijl {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 1.125rem;
+  line-height: 1;
+  transition: background-color 200ms var(--ease), color 200ms var(--ease), transform 200ms var(--ease);
+}
+
+.kaart-pijl {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.kaart-pijl .kaart-titel { font-size: 1.125rem; }
+
+@media (hover: hover) {
+  .kaart:hover .pijl { background: var(--accent); color: var(--white); transform: translateX(2px); }
+}
+
+@media (max-width: 767px) {
+  .pagina { padding: 84px 0 64px; }
+  .pagina .terug { margin-bottom: 20px; }
+  .rooster-2 { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .rooster-3 { gap: 16px; }
+  .sectie { margin-top: 44px; }
+}

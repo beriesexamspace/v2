@@ -13,20 +13,6 @@
   <link rel="stylesheet" href="assets/style.css">
   <script src="assets/app.js"></script>
   <style>
-    .hub {
-      flex: 1 0 auto;
-      width: 100%;
-      padding: 96px 0 80px;
-    }
-
-    .hub-terug { margin-bottom: 28px; }
-
-    .hub-kop { animation: rise 600ms var(--ease) both; }
-
-    .hub-kop h1 { text-wrap: balance; }
-
-    .jaren { animation: rise 600ms var(--ease) both; }
-
     .jaar {
       display: flex;
       flex-direction: column;
@@ -42,72 +28,9 @@
       min-height: 36px;
     }
 
+    .jaar .kaart-tekst { margin-top: auto; }
     .jaar .label { visibility: hidden; }
     .jaar.is-laatst .label { visibility: visible; }
-
-    .pijl {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: var(--surface);
-      color: var(--ink);
-      font-size: 1.125rem;
-      line-height: 1;
-      transition: background-color 200ms var(--ease), color 200ms var(--ease), transform 200ms var(--ease);
-    }
-
-    .kaart-tekst {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-top: auto;
-    }
-
-    .kaart-titel {
-      font-size: 1.25rem;
-      font-weight: 600;
-      line-height: 1.25;
-      letter-spacing: -.01em;
-    }
-
-    .kaart-sub {
-      color: var(--muted);
-      font-size: .9375rem;
-      line-height: 1.5;
-    }
-
-    .sectie {
-      margin-top: 56px;
-      animation: rise 600ms var(--ease) 150ms both;
-    }
-
-    .sectie-kop {
-      margin: 0 0 20px;
-      font-size: 1.375rem;
-      font-weight: 600;
-      line-height: 1.2;
-      letter-spacing: -.01em;
-    }
-
-    .rooster-2 {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 24px;
-    }
-
-    .tool {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-    }
-
-    .tool .kaart-tekst { margin-top: 0; }
-    .tool .kaart-titel { font-size: 1.125rem; }
 
     .helpmee {
       max-width: 640px;
@@ -136,24 +59,13 @@
     .helpmee .knop { margin-top: 24px; }
 
     @media (hover: hover) {
-      .kaart:hover .pijl { background: var(--accent); color: var(--white); transform: translateX(2px); }
       .helpmee .knop:hover { transform: translateY(-1px); }
     }
 
     @media (max-width: 767px) {
-      .hub { padding: 84px 0 64px; }
-      .hub-terug { margin-bottom: 20px; }
       .jaar { min-height: 0; gap: 14px; }
-      .rooster-2 { grid-template-columns: minmax(0, 1fr); gap: 16px; }
-      .rooster-3 { gap: 16px; }
-      .sectie { margin-top: 44px; }
       .helpmee { padding: 28px 22px; }
       .helpmee .knop { width: 100%; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .hub-kop, .jaren, .sectie { animation: none; }
-      .pijl { transition: none; }
     }
   </style>
 </head>
@@ -176,16 +88,16 @@
     </nav>
   </header>
 
-  <main class="hub" aria-labelledby="begroeting">
+  <main class="pagina" aria-labelledby="begroeting">
     <div class="wrap">
-      <a class="terug hub-terug" href="index.html" data-terug="index.html" data-terug-tekst="Terug">← Terug</a>
+      <a class="terug" href="index.html" data-terug="index.html" data-terug-tekst="Terug">← Terug</a>
 
-      <header class="pagina-kop hub-kop">
+      <header class="pagina-kop">
         <h1 id="begroeting">Welkom.</h1>
         <p>In welk jaar zit je?</p>
       </header>
 
-      <section class="jaren" aria-label="Kies je jaar">
+      <section class="rijst" aria-label="Kies je jaar">
         <div class="rooster-3">
           <a class="kaart jaar" href="jaar-1ba.html" data-jaar="1ba">
             <span class="jaar-rij">
@@ -223,14 +135,14 @@
       <section class="sectie" aria-labelledby="tools-kop">
         <h2 class="sectie-kop" id="tools-kop">Tools</h2>
         <div class="rooster-2">
-          <a class="kaart tool" href="https://beriesexamspace.com/?leren=1">
+          <a class="kaart kaart-pijl" href="https://beriesexamspace.com/?leren=1">
             <span class="kaart-tekst">
               <span class="kaart-titel">Reken je punten</span>
               <span class="kaart-sub">Bereken je gewogen gemiddelde en of je gedelibereerd wordt.</span>
             </span>
             <span class="pijl" aria-hidden="true">→</span>
           </a>
-          <a class="kaart tool" href="https://beriesexamspace.com/?leren=1">
+          <a class="kaart kaart-pijl" href="https://beriesexamspace.com/?leren=1">
             <span class="kaart-tekst">
               <span class="kaart-titel">Examen-info</span>
               <span class="kaart-sub">Deliberatie, tweede zit, puntenblad, inzage en beroep.</span>
