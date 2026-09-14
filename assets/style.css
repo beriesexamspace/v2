@@ -731,9 +731,10 @@ html.page-fade.page-ready body { animation: page-in 250ms ease-out both; }
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
-.auth-error a, .auth-links a { color: var(--accent); text-underline-offset: 4px; }
-.account-fout { margin: 12px 0 0; color: var(--muted); font-size: .875rem; line-height: 1.5; }
-.account-fout a { color: var(--accent); text-underline-offset: 4px; }
+/* Foutregels duidelijk rood, met de link erin in dezelfde kleur en onderstreept */
+.auth-error, .account-fout { margin: 12px 0 0; color: #b42318; font-size: .9375rem; font-weight: 500; line-height: 1.5; }
+.auth-error a, .account-fout a { color: #b42318; text-decoration: underline; text-underline-offset: 4px; }
+.auth-links a { color: var(--accent); text-underline-offset: 4px; }
 .site-header > .account-fout {
   position: absolute;
   top: 76px;
