@@ -118,6 +118,24 @@
   };
 
   const setupLinks = () => {
+    const wrapBackArrow = link => {
+      if (link.querySelector('.terug-pijl')) return;
+      const text = Array.from(link.childNodes).find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
+      if (!text || !/^\s*\u2190/.test(text.textContent)) return;
+      const arrow = document.createElement('span');
+      arrow.className = 'terug-pijl';
+      arrow.setAttribute('aria-hidden', 'true');
+      arrow.textContent = '\u2190';
+      const arrowText = text.splitText(text.textContent.indexOf('\u2190'));
+      arrowText.splitText(1);
+      arrowText.replaceWith(arrow);
+    };
+
+    const wrapBackLinks = element => {
+      if (element.matches('a.terug')) wrapBackArrow(element);
+      element.querySelectorAll('a.terug').forEach(wrapBackArrow);
+    };
+
     document.querySelectorAll('[data-terug]').forEach(element => {
       const link = element.tagName === 'A' ? element : document.createElement('a');
       if (link !== element) {
@@ -130,8 +148,20 @@
       link.href = element.dataset.terug;
       link.classList.add('terug');
       link.textContent = `\u2190 ${element.dataset.terugTekst || 'Terug'}`;
+      wrapBackArrow(link);
       if (link !== element) element.replaceWith(link);
     });
+
+    wrapBackLinks(document.body);
+    new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
+        const link = mutation.target instanceof Element ? mutation.target.closest('a.terug') : null;
+        if (link) wrapBackArrow(link);
+        mutation.addedNodes.forEach(node => {
+          if (node instanceof Element) wrapBackLinks(node);
+        });
+      });
+    }).observe(document.body, { childList: true, subtree: true });
 
     document.querySelectorAll('a[href][target="_blank"]').forEach(link => {
       try {
@@ -235,7 +265,7 @@
       currentDialog = dialog;
       dot.style.left = `${event.clientX}px`;
       dot.style.top = `${event.clientY}px`;
-      const control = target.closest('button, a, [role="button"]');
+      const control = target.closest('button, a, [role="button"], [role="tab"], [role="checkbox"], [role="radio"], .optie, label[for]');
       dot.classList.toggle('over-control', !!control && !control.matches(':disabled, [aria-disabled="true"]'));
       try {
         if (!dot.matches(':popover-open')) dot.showPopover();

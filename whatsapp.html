@@ -9,13 +9,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=11">
-  <script src="assets/app.js?v=11"></script>
-  <script src="assets/config.js?v=11" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=12">
+  <script src="assets/app.js?v=12"></script>
+  <script src="assets/config.js?v=12" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=11" defer></script>
+  <script src="assets/auth.js?v=12" defer></script>
   <style>
-    .whatsapp-kaart { max-width: 640px; }
+    .whatsapp-kaart { max-width: 640px; margin-inline: auto; }
 
     .whatsapp-regel {
       display: flex;
@@ -29,13 +29,31 @@
     .whatsapp-regel + .whatsapp-regel { margin-top: 20px; }
     .whatsapp-vink { flex-shrink: 0; color: var(--accent); }
 
-    .whatsapp-knop {
+    .whatsapp-contact {
+      display: flex;
+      align-items: center;
+      gap: 24px;
       margin-top: 28px;
+    }
+
+    .whatsapp-join.knop { gap: 8px; min-width: 0; background: #25D366; box-shadow: none; }
+    .whatsapp-join svg { flex-shrink: 0; }
+    .whatsapp-groep { display: grid; gap: 6px; min-width: 0; line-height: 1.5; }
+    .whatsapp-groep strong { font-size: 1rem; font-weight: 600; }
+    .whatsapp-groep span { color: var(--muted); font-size: .875rem; }
+
+    @media (hover: hover) {
+      .whatsapp-join.knop:not(:disabled):not([aria-disabled="true"]):hover { background: #1EBE5A; box-shadow: none; }
+    }
+
+    @media (max-width: 767px) {
+      .whatsapp-contact { flex-direction: column; align-items: flex-start; gap: 20px; }
+      .whatsapp-join.knop { width: auto; margin-inline: 0; }
     }
 
     .whatsapp-privacy {
       max-width: 640px;
-      margin: 16px 0 0;
+      margin: 16px auto 0;
       color: var(--muted);
       font-size: .8125rem;
       line-height: 1.5;
@@ -52,8 +70,8 @@
       </a>
       <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu">Menu</button>
       <ul class="navigation-links" id="site-menu">
-        <li><a href="#">Hoe werkt het</a></li>
-        <li><a href="#">Wat krijg je</a></li>
+        <li><a href="hub.html#hoe-werkt-het">Hoe werkt het</a></li>
+        <li><a href="hub.html#nieuw">Wat is nieuw</a></li>
         <li><a href="#">Over ons</a></li>
         <li><a href="whatsapp.html">WhatsApp-groep</a></li>
         <li><a href="#">Feedback</a></li>
@@ -77,7 +95,16 @@
         <p class="whatsapp-regel"><span class="whatsapp-vink" aria-hidden="true">✓</span><span>Alleen de beheerder plaatst berichten. Geen drukte, geen groepsgesprekken.</span></p>
       </div>
 
-      <a class="knop whatsapp-knop" href="[URL_WHATSAPP]">Word lid van de groep →</a>
+      <div class="kaart whatsapp-kaart whatsapp-contact">
+        <a class="knop whatsapp-join" href="[URL_WHATSAPP]">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M20.52 3.48A11.87 11.87 0 0 0 12.06 0C5.5 0 .16 5.34.16 11.9c0 2.1.55 4.15 1.6 5.95L.07 24l6.3-1.65a11.9 11.9 0 0 0 5.69 1.45h.01c6.55 0 11.89-5.34 11.89-11.9a11.82 11.82 0 0 0-3.44-8.42ZM12.07 21.8a9.85 9.85 0 0 1-5.03-1.38l-.36-.22-3.74.98 1-3.64-.24-.38a9.86 9.86 0 0 1-1.52-5.26c0-5.45 4.44-9.89 9.89-9.89 2.64 0 5.12 1.03 6.99 2.9a9.81 9.81 0 0 1 2.89 6.99c0 5.46-4.43 9.9-9.88 9.9Zm5.42-7.41c-.3-.15-1.76-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.18.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.88-.78-1.48-1.75-1.65-2.05-.18-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.19.05-.36-.03-.51-.07-.15-.67-1.61-.92-2.2-.24-.59-.48-.51-.67-.52H7.8c-.2 0-.52.07-.8.37-.27.3-1.04 1.01-1.04 2.47s1.06 2.87 1.21 3.07c.15.2 2.1 3.21 5.08 4.5.71.31 1.26.49 1.69.63.71.22 1.36.19 1.87.11.57-.08 1.76-.72 2.01-1.42.25-.69.25-1.29.18-1.41-.08-.13-.28-.2-.58-.35Z"/></svg>
+          <span>Word lid →</span>
+        </a>
+        <div class="whatsapp-groep">
+          <strong>Berie's Exam Space</strong>
+          <span>WhatsApp-groep, alleen updates</span>
+        </div>
+      </div>
       <p class="whatsapp-privacy">Zoals in elke WhatsApp-groep is je nummer zichtbaar voor de andere leden.</p>
     </div>
   </main>
