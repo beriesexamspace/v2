@@ -154,7 +154,8 @@ a:focus-visible, button:focus-visible {
   font-size: .9375rem;
   font-weight: 500;
   white-space: nowrap;
-  transition: color .2s var(--ease), background-color .2s var(--ease);
+  text-underline-offset: 4px;
+  transition: color 150ms var(--ease), transform 150ms var(--ease);
 }
 
 .pill, .knop, .knop-secundair {
@@ -385,6 +386,7 @@ h1 span { display: block; }
   font: 500 15px/1.5 var(--font-family);
   text-decoration: none;
   text-underline-offset: 4px;
+  transition: opacity 150ms var(--ease);
 }
 
 @media (min-width: 768px) {
@@ -412,7 +414,13 @@ h1 span { display: block; }
   font-size: .9375rem;
   font-weight: 500;
   text-underline-offset: 4px;
+  transition: color 150ms var(--ease), transform 150ms var(--ease), opacity 150ms var(--ease);
 }
+
+.terug-pijl { display: inline-block; transition: transform 150ms var(--ease); }
+.terug:active { transform: scale(.97); opacity: .8; }
+.tekstlink:not(.terug):active { opacity: .7; }
+.navigation-links a:active { transform: scale(.97); }
 
 .pagina-kop { margin: 0 0 32px; }
 
@@ -493,13 +501,14 @@ html.page-fade.page-ready body { animation: page-in 250ms ease-out both; }
 }
 
 @media (hover: hover) {
-  .kaart:hover { transform: translateY(-2px); box-shadow: var(--shadow-card-hover); }
+  .kaart:where(a[href], button, [role="button"], [role="checkbox"], [role="radio"]):not(:disabled):not([aria-disabled="true"]):hover { transform: translateY(-2px); box-shadow: var(--shadow-card-hover); }
   .knop:not(:disabled):not([aria-disabled="true"]):hover { background: var(--accent-dark); box-shadow: var(--shadow-primary-hover); }
   .knop-secundair:hover { background: var(--surface); }
-  .terug:hover { text-decoration: underline; }
+  .terug:hover, .terug.tekstlink:hover, .vak-pagina .vak-tekstknop.terug:hover { color: var(--ink); text-decoration: underline; }
+  .terug:hover .terug-pijl { transform: translateX(-2px); }
   .navigation-links a:hover {
-    color: var(--accent);
-    background: var(--surface);
+    color: var(--ink);
+    text-decoration: underline;
   }
   .pill:hover { background: var(--accent-dark); }
   .primary-button:hover { box-shadow: var(--shadow-primary-hover); }
@@ -686,7 +695,7 @@ html.page-fade.page-ready body { animation: page-in 250ms ease-out both; }
 .kaart-pijl .kaart-titel { font-size: 1.125rem; }
 
 @media (hover: hover) {
-  .kaart:hover .pijl { background: var(--accent); color: var(--white); transform: translateX(2px); }
+  .kaart:where(a[href], button, [role="button"], [role="checkbox"], [role="radio"]):not(:disabled):not([aria-disabled="true"]):hover .pijl { background: var(--accent); color: var(--white); transform: translateX(2px); }
 }
 
 @media (max-width: 767px) {
@@ -788,14 +797,35 @@ html.page-fade.page-ready body { animation: page-in 250ms ease-out both; }
 @keyframes vink-tekenen { to { stroke-dashoffset: 0; } }
 
 .knop:active, .knop-secundair:active, .pill:active { transform: scale(.97); transition-duration: 80ms; }
-.kaart:active { transform: translateY(0) scale(.99); transition-duration: 80ms; }
+.kaart:where(a[href], button, [role="button"], [role="checkbox"], [role="radio"]):not(:disabled):not([aria-disabled="true"]):active { transform: translateY(0) scale(.99); transition-duration: 80ms; }
+.kaart:where(a[href], button, [role="button"]):active .pijl { transform: scale(.99); }
+
+.vak-pagina :is(.vak-tab, .optie, [role="checkbox"], [role="radio"]) {
+  transition: background-color 150ms var(--ease), border-color 150ms var(--ease), transform 150ms var(--ease), box-shadow 150ms var(--ease);
+}
+
+@media (hover: hover) {
+  .vak-pagina :is(.vak-tab, .optie, [role="checkbox"], [role="radio"]):not(:disabled):not([aria-disabled="true"]):not([aria-selected="true"]):not([aria-checked="true"]):not(.is-gekozen, .is-goed, .is-fout):hover {
+    border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+    background: var(--surface);
+  }
+  .vak-pagina .optie.is-gekozen:not(.is-goed, .is-fout):hover {
+    border-color: var(--accent);
+    background: rgba(0,113,227,.06);
+  }
+}
+
+.vak-pagina :is(.vak-tab, .optie, [role="checkbox"], [role="radio"]):not(:disabled):not([aria-disabled="true"]):active { transform: scale(.98); }
 .knop:disabled, .knop[aria-disabled="true"] { opacity: .45; transform: none; box-shadow: var(--shadow-primary); cursor: default; }
 @media (hover: hover) {
   .auth-error a:hover, .auth-links a:hover, .terug.tekstlink:hover { text-decoration: underline; }
 }
 @media (max-width: 767px) { .auth-back { left: 20px; } }
 @media (prefers-reduced-motion: reduce) {
-  .knop:active, .knop-secundair:active, .pill:active, .kaart:active { transform: none; }
+  .knop:active, .knop-secundair:active, .pill:active,
+  .kaart:is(:hover, :active), .kaart:is(:hover, :active) .pijl,
+  .terug:active, .terug:hover .terug-pijl, .navigation-links a:active,
+  .vak-pagina :is(.vak-tab, .optie, [role="checkbox"], [role="radio"]):active { transform: none !important; }
   .vinkje circle, .vinkje path { animation: none; stroke-dashoffset: 0; }
 }
 

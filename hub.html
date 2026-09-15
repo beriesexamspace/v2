@@ -15,7 +15,7 @@
           opslagBeschikbaar = true;
         } catch {}
       }
-      if (opslagBeschikbaar) window.location.replace('nieuw.html');
+      if (opslagBeschikbaar) window.location.replace('nieuw.html' + window.location.hash);
     })();
   </script>
   <meta name="description" content="Kies je jaar, gebruik de tools en help mee met je eigen vak in Berie's Exam Space.">
@@ -25,12 +25,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=11">
-  <script src="assets/app.js?v=11"></script>
-  <script src="assets/config.js?v=11" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=12">
+  <script src="assets/app.js?v=12"></script>
+  <script src="assets/updates.js?v=12"></script>
+  <script src="assets/config.js?v=12" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=11" defer></script>
+  <script src="assets/auth.js?v=12" defer></script>
   <style>
+    html { scroll-behavior: smooth; }
+
     .jaar {
       display: flex;
       flex-direction: column;
@@ -50,8 +53,55 @@
     .jaar .label { visibility: hidden; }
     .jaar.is-laatst .label { visibility: visible; }
 
+    .hub-sectie { scroll-margin-top: 88px; }
+
+    .hub-updates {
+      display: grid;
+      gap: 20px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .hub-update {
+      display: grid;
+      grid-template-columns: 160px minmax(0, 1fr);
+      gap: 24px;
+      font-size: .9375rem;
+      line-height: 1.6;
+    }
+
+    .hub-update-datum { color: var(--muted); }
+
+    .hub-stap {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .hub-stap-nummer {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--teal-zacht);
+      color: var(--teal);
+      font-weight: 600;
+    }
+
+    .hub-stap .kaart-titel, .hub-stap .kaart-sub { margin: 0; }
+
     @media (max-width: 767px) {
       .jaar { min-height: 0; gap: 14px; }
+      .hub-update { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
     }
   </style>
 </head>
@@ -64,8 +114,8 @@
       </a>
       <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu">Menu</button>
       <ul class="navigation-links" id="site-menu">
-        <li><a href="#">Hoe werkt het</a></li>
-        <li><a href="#">Wat krijg je</a></li>
+        <li><a href="hub.html#hoe-werkt-het">Hoe werkt het</a></li>
+        <li><a href="hub.html#nieuw">Wat is nieuw</a></li>
         <li><a href="#">Over ons</a></li>
         <li><a href="whatsapp.html">WhatsApp-groep</a></li>
         <li><a href="#">Feedback</a></li>
@@ -76,8 +126,6 @@
 
   <main class="pagina" aria-labelledby="begroeting">
     <div class="wrap">
-      <a class="terug" href="index.html" data-terug="index.html" data-terug-tekst="Terug">← Terug</a>
-
       <header class="pagina-kop">
         <h1 id="begroeting">Welkom.</h1>
         <p id="hub-vraag">In welk jaar zit je?</p>
@@ -138,6 +186,47 @@
         </div>
       </section>
 
+      <section class="sectie hub-sectie" id="nieuw" aria-labelledby="nieuw-kop">
+        <h2 class="sectie-kop" id="nieuw-kop">Wat is nieuw</h2>
+        <div class="kaart">
+          <ul class="hub-updates" id="hub-updates"></ul>
+        </div>
+      </section>
+
+      <section class="sectie hub-sectie" id="hoe-werkt-het" aria-labelledby="hoe-werkt-het-kop">
+        <h2 class="sectie-kop" id="hoe-werkt-het-kop">Hoe werkt het</h2>
+        <div class="rooster-2">
+          <div class="kaart hub-stap">
+            <span class="hub-stap-nummer">1</span>
+            <div class="kaart-tekst">
+              <h3 class="kaart-titel">Log in</h3>
+              <p class="kaart-sub">Eén account, je naam en je voortgang op elk toestel.</p>
+            </div>
+          </div>
+          <div class="kaart hub-stap">
+            <span class="hub-stap-nummer">2</span>
+            <div class="kaart-tekst">
+              <h3 class="kaart-titel">Kies je jaar en vak</h3>
+              <p class="kaart-sub">1ste, 2de of 3de bachelor, daarna het vak dat je wilt oefenen.</p>
+            </div>
+          </div>
+          <div class="kaart hub-stap">
+            <span class="hub-stap-nummer">3</span>
+            <div class="kaart-tekst">
+              <h3 class="kaart-titel">Kies hoofdstukken en modus</h3>
+              <p class="kaart-sub">Examen Training met uitleg na elke vraag, of Examensimulatie met de uitslag aan het einde.</p>
+            </div>
+          </div>
+          <div class="kaart hub-stap">
+            <span class="hub-stap-nummer">4</span>
+            <div class="kaart-tekst">
+              <h3 class="kaart-titel">Zie je voortgang groeien</h3>
+              <p class="kaart-sub">Per hoofdstuk zie je hoeveel je al goed had. Groen betekent: gelukt.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </div>
   </main>
 
@@ -171,6 +260,60 @@
           if (typeof bes.jaarOpslaan === 'function') bes.jaarOpslaan(kaart.dataset.jaar);
         });
       });
+
+      const updates = document.getElementById('hub-updates');
+      for (const update of window.BES_UPDATES || []) {
+        const item = document.createElement('li');
+        item.className = 'hub-update';
+        const datum = document.createElement('span');
+        datum.className = 'hub-update-datum';
+        datum.textContent = update.datum;
+        const tekst = document.createElement('span');
+        tekst.textContent = update.tekst;
+        item.append(datum, tekst);
+        updates.append(item);
+      }
+
+      const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const sectionForHash = hash => {
+        if (hash !== '#nieuw' && hash !== '#hoe-werkt-het') return null;
+        return document.getElementById(hash.slice(1));
+      };
+      let scrollRequest = 0;
+      const scrollToSection = async section => {
+        const request = ++scrollRequest;
+        if (!motion.matches) {
+          await Promise.allSettled(section.getAnimations().map(animation => animation.finished));
+        }
+        if (request !== scrollRequest) return;
+        section.scrollIntoView({ behavior: motion.matches ? 'auto' : 'smooth', block: 'start' });
+      };
+      let clickedNavigation = false;
+
+      document.querySelectorAll('.navigation-links a[href]').forEach(link => {
+        const target = new URL(link.href, window.location.href);
+        const section = sectionForHash(target.hash);
+        if (!section || target.pathname !== window.location.pathname || target.origin !== window.location.origin) return;
+        link.addEventListener('click', event => {
+          if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+          event.preventDefault();
+          clickedNavigation = true;
+          scrollToSection(section);
+        });
+      });
+
+      const arrivalSection = sectionForHash(window.location.hash);
+      if (arrivalSection) {
+        const afterLayout = () => {
+          Promise.resolve(document.fonts?.ready).then(() => {
+            window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
+              if (!clickedNavigation) scrollToSection(arrivalSection);
+            }));
+          });
+        };
+        if (document.readyState === 'complete') afterLayout();
+        else window.addEventListener('load', afterLayout, { once: true });
+      }
     })();
   </script>
 </body>
