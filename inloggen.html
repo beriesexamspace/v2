@@ -9,11 +9,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=9">
-  <script src="assets/app.js?v=9" defer></script>
-  <script src="assets/config.js?v=9" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=10">
+  <script src="assets/app.js?v=10" defer></script>
+  <script src="assets/config.js?v=10" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=9" defer></script>
+  <script src="assets/auth.js?v=10" defer></script>
 </head>
 <body>
   <header class="site-header">
@@ -36,7 +36,7 @@
 
   <div class="first-screen">
     <main class="hero" aria-labelledby="login-title">
-      <a class="terug auth-back" href="index.html" data-terug="index.html" data-terug-tekst="Terug">← Terug</a>
+      <a class="terug auth-back tekstlink" href="index.html" data-terug="index.html" data-terug-tekst="Terug">← Terug</a>
       <div class="hero-stage auth-stage">
         <div class="hero-content">
           <h1 id="login-title" tabindex="-1">Welkom terug.</h1>
@@ -52,16 +52,16 @@
             <p class="auth-error" id="login-error" role="alert" hidden></p>
             <button class="knop" id="login-submit" type="submit">Inloggen →</button>
             <div class="auth-links" id="login-links">
-              <a href="inloggen.html" id="forgot-password">Wachtwoord vergeten?</a>
-              <a href="aanmelden.html">Nog geen account? Aanmelden</a>
+              <a class="tekstlink" href="inloggen.html" id="forgot-password">Wachtwoord vergeten?</a>
+              <a class="tekstlink" href="aanmelden.html">Nog geen account? Aanmelden</a>
             </div>
             <div class="auth-links" id="reset-links" hidden>
-              <a href="inloggen.html" id="back-to-login">Terug naar inloggen</a>
+              <a class="tekstlink" href="inloggen.html" id="back-to-login">Terug naar inloggen</a>
             </div>
           </form>
           <div class="auth-success" id="reset-sent" hidden>
             <p class="auth-help" role="status">Als dit adres bekend is, hebben we je een e-mail gestuurd.</p>
-            <div class="auth-links"><a href="inloggen.html">Terug naar inloggen</a></div>
+            <div class="auth-links"><a class="tekstlink" href="inloggen.html">Terug naar inloggen</a></div>
           </div>
         </div>
       </div>
@@ -93,6 +93,7 @@
         error.hidden = false;
         if (code === 'unavailable') {
           const link = document.createElement('a');
+          link.className = 'tekstlink';
           link.textContent = 'Ga verder met oefenen →';
           link.href = 'hub.html';
           error.append(' ', link);

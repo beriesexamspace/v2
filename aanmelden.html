@@ -9,11 +9,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=9">
-  <script src="assets/app.js?v=9" defer></script>
-  <script src="assets/config.js?v=9" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=10">
+  <script src="assets/app.js?v=10" defer></script>
+  <script src="assets/config.js?v=10" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=9" defer></script>
+  <script src="assets/auth.js?v=10" defer></script>
 </head>
 <body>
   <header class="site-header">
@@ -36,7 +36,7 @@
 
   <div class="first-screen">
     <main class="hero" aria-labelledby="signup-title">
-      <a class="terug auth-back" id="signup-back" href="index.html" data-terug="index.html" data-terug-tekst="Terug">← Terug</a>
+      <a class="terug auth-back tekstlink" id="signup-back" href="index.html" data-terug="index.html" data-terug-tekst="Terug">← Terug</a>
       <div class="hero-stage auth-stage">
         <div class="hero-content" id="signup-content">
           <p class="eyebrow" id="signup-step">Stap 1 van 3</p>
@@ -48,6 +48,7 @@
           <form class="auth-form" id="signup-form" novalidate>
             <div id="name-step">
               <input class="auth-input" id="signup-name" type="text" placeholder="Je voornaam of bijnaam" aria-label="Je voornaam of bijnaam" aria-describedby="signup-error" maxlength="24" autocomplete="given-name" autocapitalize="words" spellcheck="false" enterkeyhint="next">
+              <p class="auth-error" id="signup-error" role="alert" hidden></p>
             </div>
             <div id="email-step" hidden>
               <input class="auth-input" id="signup-email" type="email" placeholder="naam@voorbeeld.be" aria-label="E-mailadres" aria-describedby="email-help signup-error" autocomplete="email" autocapitalize="none" spellcheck="false" enterkeyhint="next" disabled>
@@ -60,7 +61,6 @@
               </div>
               <p class="auth-help" id="password-help">Minimaal 8 tekens. Meer eisen stellen we niet.</p>
             </div>
-            <p class="auth-error" id="signup-error" role="alert" hidden></p>
             <button class="knop" id="signup-submit" type="submit">Verder →</button>
           </form>
           <div class="auth-success" id="signup-success" hidden>
@@ -99,6 +99,7 @@
 
       const addLink = (text, href) => {
         const link = document.createElement('a');
+        link.className = 'tekstlink';
         link.textContent = text;
         link.href = href;
         error.append(' ', link);
@@ -109,8 +110,9 @@
         error.replaceChildren();
         error.hidden = false;
         if (code === 'duplicate') {
-          error.textContent = 'Dit e-mailadres heeft al een account.';
-          addLink('Log in.', 'inloggen.html');
+          error.textContent = 'Dit e-mailadres wordt al gebruikt.';
+          addLink('Log in', 'inloggen.html');
+          error.append(' of kies een ander adres.');
         } else {
           error.textContent = message;
           if (code === 'unavailable') addLink('Ga verder met oefenen →', 'hub.html');
@@ -168,6 +170,7 @@
           fields[index].disabled = index !== step;
         });
         if (step < 3) {
+          (fields[step].closest('.auth-password') || fields[step]).insertAdjacentElement('afterend', error);
           heading.textContent = titles[step];
           stepLabel.textContent = 'Stap ' + (step + 1) + ' van 3';
           submit.textContent = step === 2 ? 'Account maken →' : 'Verder →';
@@ -253,11 +256,21 @@
           fields[2].type = 'password';
           await changeStep(3, name);
         } catch (failure) {
-          showError(failure.message || 'Aanmelden is niet gelukt. Probeer het opnieuw.', failure.code === 'weak_password' ? fields[2] : null, failure.code);
+          if (failure.code === 'duplicate') {
+            fields[2].value = '';
+            fields[2].type = 'password';
+            const toggle = document.getElementById('show-password');
+            toggle.textContent = 'Toon';
+            toggle.setAttribute('aria-pressed', 'false');
+            await changeStep(1);
+            showError('', fields[1], 'duplicate');
+          } else {
+            showError(failure.message || 'Aanmelden is niet gelukt. Probeer het opnieuw.', failure.code === 'weak_password' ? fields[2] : null, failure.code);
+          }
         } finally {
           submitting = false;
           submit.disabled = false;
-          submit.textContent = 'Account maken →';
+          submit.textContent = step === 2 ? 'Account maken →' : 'Verder →';
           form.removeAttribute('aria-busy');
         }
       });
