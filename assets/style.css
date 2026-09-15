@@ -167,7 +167,7 @@ a:focus-visible, button:focus-visible {
   color: var(--white);
   font-weight: 600;
   white-space: nowrap;
-  transition: transform .25s var(--ease), box-shadow .25s var(--ease);
+  transition: transform .25s var(--ease), box-shadow .25s var(--ease), background-color 200ms var(--ease);
 }
 
 .login-button {
@@ -276,22 +276,6 @@ h1 span { display: block; }
   box-shadow: var(--shadow-primary);
 }
 
-.account {
-  margin: 16px 0 0;
-  color: var(--muted);
-  font-size: .9375rem;
-  line-height: 1.6;
-}
-
-.account a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 32px;
-  color: var(--accent);
-  font-weight: 500;
-  text-underline-offset: 4px;
-}
-
 .site-footer {
   display: flex;
   flex-shrink: 0;
@@ -385,14 +369,30 @@ h1 span { display: block; }
 }
 
 .knop, .knop-secundair {
-  min-height: 56px;
-  padding: 16px 32px;
+  min-height: 44px;
+  padding: 0 28px;
   border: 1px solid var(--transparent);
   font-family: var(--font-family);
   font-size: 1.0625rem;
   line-height: 24px;
   cursor: pointer;
   touch-action: manipulation;
+}
+
+.tekstlink {
+  display: inline-block;
+  color: var(--accent);
+  font: 500 15px/1.5 var(--font-family);
+  text-decoration: none;
+  text-underline-offset: 4px;
+}
+
+@media (min-width: 768px) {
+  .knop, .knop-secundair { min-width: 200px; }
+}
+
+@media (max-width: 767px) {
+  .knop, .knop-secundair { display: flex; width: 100%; max-width: 320px; margin-inline: auto; }
 }
 
 .knop { box-shadow: var(--shadow-primary); }
@@ -494,16 +494,16 @@ html.page-fade.page-ready body { animation: page-in 250ms ease-out both; }
 
 @media (hover: hover) {
   .kaart:hover { transform: translateY(-2px); box-shadow: var(--shadow-card-hover); }
-  .knop:hover { box-shadow: var(--shadow-primary-hover); }
+  .knop:not(:disabled):not([aria-disabled="true"]):hover { background: var(--accent-dark); box-shadow: var(--shadow-primary-hover); }
   .knop-secundair:hover { background: var(--surface); }
   .terug:hover { text-decoration: underline; }
   .navigation-links a:hover {
     color: var(--accent);
     background: var(--surface);
   }
-  .pill:hover, .knop:hover, .knop-secundair:hover { transform: scale(1.03); }
+  .pill:hover { background: var(--accent-dark); }
   .primary-button:hover { box-shadow: var(--shadow-primary-hover); }
-  .account a:hover { text-decoration: underline; }
+  .tekstlink:hover { text-decoration: underline; }
 }
 
 @media (min-width: 1024px) {
@@ -566,7 +566,7 @@ html.page-fade.page-ready body { animation: page-in 250ms ease-out both; }
   }
   .navigation.menu-open .navigation-links a, .nav-vol.menu-open .navigation-links a { display: flex; min-height: 44px; }
   .rooster-3 { grid-template-columns: minmax(0, 1fr); }
-  .login-button { margin-left: 0; min-height: 40px; padding: 10px 14px; font-size: .8125rem; }
+  .login-button { margin-left: 0; min-height: 38px; padding: 9px 14px; font-size: .8125rem; }
   .hero { padding: 96px 20px 40px; }
   .signature { width: 96vw; opacity: .4; top: 30%; }
   .intro { max-width: 34rem; }
@@ -734,6 +734,7 @@ html.page-fade.page-ready body { animation: page-in 250ms ease-out both; }
 /* Foutregels duidelijk rood, met de link erin in dezelfde kleur en onderstreept */
 .auth-error, .account-fout { margin: 12px 0 0; color: #b42318; font-size: .9375rem; font-weight: 500; line-height: 1.5; }
 .auth-error a, .account-fout a { color: #b42318; text-decoration: underline; text-underline-offset: 4px; }
+.auth-error .tekstlink, .account-fout .tekstlink, .terug.tekstlink { color: var(--accent); text-decoration: none; font-size: 15px; }
 .auth-links a { color: var(--accent); text-underline-offset: 4px; }
 .site-header > .account-fout {
   position: absolute;
@@ -790,7 +791,7 @@ html.page-fade.page-ready body { animation: page-in 250ms ease-out both; }
 .kaart:active { transform: translateY(0) scale(.99); transition-duration: 80ms; }
 .knop:disabled, .knop[aria-disabled="true"] { opacity: .45; transform: none; box-shadow: var(--shadow-primary); cursor: default; }
 @media (hover: hover) {
-  .auth-error a:hover, .auth-links a:hover { text-decoration: underline; }
+  .auth-error a:hover, .auth-links a:hover, .terug.tekstlink:hover { text-decoration: underline; }
 }
 @media (max-width: 767px) { .auth-back { left: 20px; } }
 @media (prefers-reduced-motion: reduce) {

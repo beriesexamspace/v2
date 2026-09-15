@@ -75,7 +75,12 @@
       if (!chapter || typeof chapter.id !== 'string' || !chapter.id || chapters.has(chapter.id) || typeof chapter.naam !== 'string' || !chapter.naam.trim()) return null;
       chapters.add(chapter.id);
     }
-    if (raw.vragen.some(question => !question || !chapters.has(question.h) || typeof question.q !== 'string' || !question.q.trim() || typeof question.u !== 'string' || !Array.isArray(question.o) || question.o.length < 2 || question.o.length > 5 || question.o.some(option => typeof option !== 'string' || !option.trim()) || new Set(question.o.map(option => option.trim())).size !== question.o.length || !Number.isInteger(question.a) || question.a < 0 || question.a >= question.o.length)) return null;
+    if (raw.vragen.some(question => {
+      if (!question || !chapters.has(question.h) || typeof question.q !== 'string' || !question.q.trim() || typeof question.u !== 'string' || !Array.isArray(question.o)) return true;
+      const multiple = Array.isArray(question.a);
+      const answers = multiple ? question.a : [question.a];
+      return question.o.length < 2 || question.o.length > (multiple ? 10 : 5) || question.o.some(option => typeof option !== 'string' || !option.trim()) || new Set(question.o.map(option => option.trim())).size !== question.o.length || !answers.length || new Set(answers).size !== answers.length || answers.some(index => !Number.isInteger(index) || index < 0 || index >= question.o.length) || (question.kies !== undefined && question.kies !== 'fout');
+    })) return null;
     return {
       ...raw,
       vragen: raw.vragen.map((question, id) => ({ ...question, id })),
@@ -109,6 +114,15 @@
     let lastRun = null;
     let loggedSyncError = false;
     let lastSyncSent = 0;
+    const choiceHint = create('p', 'vak-hint vraag-keuze-hint');
+    choiceHint.id = 'vraag-keuze-hint';
+    choiceHint.hidden = true;
+    byId('opties').before(choiceHint);
+    const checkAnswer = create('button', 'knop', 'Controleer →');
+    checkAnswer.id = 'controleer-antwoord';
+    checkAnswer.type = 'button';
+    checkAnswer.hidden = true;
+    byId('volgende-vraag').before(checkAnswer);
 
     function cleanProgress(raw) {
       const result = Object.create(null);
@@ -348,7 +362,10 @@
       if (!questions.length || !context.authReady) return;
       session = {
         mode: runMode, owner: context, index: 0,
-        questions: shuffle(questions).map(question => ({ question, options: shuffle(question.o.map((text, index) => ({ text, correct: index === question.a }))), selected: null })),
+        questions: shuffle(questions).map(question => {
+          const answers = Array.isArray(question.a) ? question.a : [question.a];
+          return { question, options: shuffle(question.o.map((text, index) => ({ text, correct: answers.includes(index) }))), pending: new Set(), selected: null };
+        }),
         chapters: Object.fromEntries(data.hoofdstukken.map(({ id }) => [id, { answered: 0, good: 0, total: questions.filter(question => question.h === id).length }]))
       };
       showScreen('oefenen');
@@ -369,11 +386,23 @@
       byId('uitleg-tekst').textContent = '';
       byId('volgende-vraag').hidden = true;
       byId('volgende-vraag').textContent = session.index === session.questions.length - 1 ? 'Bekijk je uitslag →' : 'Volgende →';
+      checkAnswer.hidden = true;
+      const multiple = Array.isArray(current.question.a);
+      choiceHint.hidden = !multiple;
+      const amount = multiple ? current.question.a.length : 1;
+      choiceHint.textContent = multiple ? (current.question.kies === 'fout' ? (amount === 1 ? 'Kies 1 fout antwoord.' : `Kies de ${amount} foute antwoorden.`) : `Kies ${amount} ${amount === 1 ? 'antwoord' : 'antwoorden'}.`) : '';
+      if (multiple) byId('opties').setAttribute('aria-describedby', choiceHint.id);
+      else byId('opties').removeAttribute('aria-describedby');
       byId('opties').replaceChildren();
       current.options.forEach((option, index) => {
-        const button = create('button', 'optie');
+        const button = create('button', multiple ? 'optie optie-meervoudig' : 'optie');
         button.type = 'button';
-        const letter = create('span', 'optie-letter', String.fromCharCode(65 + index));
+        button.setAttribute('aria-keyshortcuts', String((index + 1) % 10));
+        if (multiple) {
+          button.setAttribute('role', 'checkbox');
+          button.setAttribute('aria-checked', 'false');
+        }
+        const letter = create('span', 'optie-letter', multiple ? '' : String.fromCharCode(65 + index));
         letter.setAttribute('aria-hidden', 'true');
         button.append(letter, create('span', 'optie-tekst', option.text));
         button.addEventListener('click', () => answer(index));
@@ -388,20 +417,47 @@
       if (!session || screen !== 'oefenen' || currentTab !== 'paneel-oefenen' || !byId('stop-bevestiging').hidden) return;
       const current = session.questions[session.index];
       if (current.selected !== null || !current.options[index]) return;
-      current.selected = index;
+      if (Array.isArray(current.question.a)) {
+        if (current.pending.has(index)) current.pending.delete(index);
+        else current.pending.add(index);
+        [...byId('opties').children].forEach((button, optionIndex) => {
+          const chosen = current.pending.has(optionIndex);
+          button.classList.toggle('is-gekozen', chosen);
+          button.setAttribute('aria-checked', String(chosen));
+          button.querySelector('.optie-letter').textContent = chosen ? '✓' : '';
+        });
+        checkAnswer.hidden = current.pending.size !== current.question.a.length;
+      } else {
+        current.pending = new Set([index]);
+        confirmAnswer();
+      }
+    }
+
+    function correctAnswer(entry) {
+      return entry.selected !== null && entry.options.every((option, index) => option.correct === entry.selected.includes(index));
+    }
+
+    function confirmAnswer() {
+      if (!session || screen !== 'oefenen' || currentTab !== 'paneel-oefenen' || !byId('stop-bevestiging').hidden) return;
+      const current = session.questions[session.index];
+      const expected = Array.isArray(current.question.a) ? current.question.a.length : 1;
+      if (current.selected !== null || current.pending.size !== expected) return;
+      current.selected = [...current.pending];
+      checkAnswer.hidden = true;
       const training = session.mode === 'training';
       [...byId('opties').children].forEach((button, optionIndex) => {
+        const chosen = current.selected.includes(optionIndex);
         button.disabled = true;
         if (!training) {
-          button.classList.toggle('is-gekozen', optionIndex === index);
-          if (optionIndex === index) button.setAttribute('aria-label', `${current.options[optionIndex].text}, gekozen`);
+          button.classList.toggle('is-gekozen', chosen);
+          if (chosen) button.setAttribute('aria-label', `${current.options[optionIndex].text}, gekozen`);
         } else if (current.options[optionIndex].correct) {
           button.classList.add('is-goed');
           button.querySelector('.optie-letter').replaceChildren(checkmark());
-          button.setAttribute('aria-label', `${current.options[optionIndex].text}, juist antwoord`);
-        } else if (optionIndex === index) {
+          button.setAttribute('aria-label', `${current.options[optionIndex].text}, juiste keuze`);
+        } else if (chosen) {
           button.classList.add('is-fout');
-          button.setAttribute('aria-label', `${current.options[optionIndex].text}, onjuist antwoord`);
+          button.setAttribute('aria-label', `${current.options[optionIndex].text}, onjuiste keuze`);
         }
       });
       byId('vraag-balk').setAttribute('aria-valuenow', String(session.index + 1));
@@ -409,7 +465,7 @@
       if (training) {
         byId('uitleg-tekst').textContent = current.question.u;
         fade(byId('uitleg'));
-        recordAnswer(current.question.h, current.options[index].correct);
+        recordAnswer(current.question.h, correctAnswer(current));
       }
       fade(byId('volgende-vraag'));
       byId('volgende-vraag').focus({ preventScroll: true });
@@ -442,7 +498,7 @@
 
     function finish() {
       const answers = session.questions;
-      const correct = entry => entry.options[entry.selected]?.correct === true;
+      const correct = correctAnswer;
       const good = answers.filter(correct).length;
       const name = typeof BES.naamOphalen === 'function' ? BES.naamOphalen() : '';
       byId('score-kop').textContent = `${good} van ${answers.length} goed.`;
@@ -471,8 +527,17 @@
         answers.forEach((entry, index) => {
           const item = create('article', 'overzicht-vraag kaart');
           item.append(create('h3', '', `${index + 1}. ${entry.question.q}`));
-          item.append(create('p', correct(entry) ? 'antwoord-goed' : 'antwoord-fout', `Jouw antwoord: ${entry.options[entry.selected].text}`));
-          item.append(create('p', '', `Juiste antwoord: ${entry.question.o[entry.question.a]}`));
+          if (Array.isArray(entry.question.a)) {
+            entry.options.forEach((option, optionIndex) => {
+              const chosen = entry.selected.includes(optionIndex);
+              if (!chosen && !option.correct) return;
+              const label = chosen ? (option.correct ? 'Juiste keuze' : 'Onjuiste keuze') : 'Niet gekozen, wel nodig';
+              item.append(create('p', option.correct ? 'antwoord-goed' : 'antwoord-fout', `${label}: ${option.text}`));
+            });
+          } else {
+            item.append(create('p', correct(entry) ? 'antwoord-goed' : 'antwoord-fout', `Jouw antwoord: ${entry.options[entry.selected[0]].text}`));
+            item.append(create('p', '', `Juiste antwoord: ${entry.question.o[entry.question.a]}`));
+          }
           item.append(create('p', '', entry.question.u));
           byId('overzicht-vragen').append(item);
         });
@@ -583,6 +648,7 @@
       start(questions);
     });
     byId('volgende-vraag').addEventListener('click', next);
+    checkAnswer.addEventListener('click', confirmAnswer);
     byId('stop-oefening').addEventListener('click', () => { fade(byId('stop-bevestiging')); byId('stop-nee').focus(); });
     byId('stop-nee').addEventListener('click', () => { byId('stop-bevestiging').hidden = true; byId('stop-oefening').focus(); });
     byId('stop-ja').addEventListener('click', () => { session = null; showScreen('keuzes'); byId('start-oefening').focus(); scheduleSync(); });
@@ -597,8 +663,12 @@
       if (!session || screen !== 'oefenen' || currentTab !== 'paneel-oefenen' || event.repeat || event.ctrlKey || event.metaKey || event.altKey || !byId('stop-bevestiging').hidden) return;
       const target = event.target;
       if (target.closest?.('input, textarea, select, [contenteditable="true"]')) return;
-      if (/^[1-5]$/.test(event.key)) { event.preventDefault(); answer(Number(event.key) - 1); }
-      else if (event.key === 'Enter' && !target.closest?.('a, button, summary, [role="tab"], [role="radio"], [role="checkbox"]')) { event.preventDefault(); next(); }
+      if (/^[0-9]$/.test(event.key)) { event.preventDefault(); answer(event.key === '0' ? 9 : Number(event.key) - 1); }
+      else if (event.key === 'Enter' && !target.closest?.('a, button, summary, [role="tab"], [role="radio"], [role="checkbox"]')) {
+        event.preventDefault();
+        if (!checkAnswer.hidden) confirmAnswer();
+        else next();
+      }
     });
 
     renderChapters();

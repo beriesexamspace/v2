@@ -67,8 +67,7 @@
       element.hidden = !currentUser;
       const link = element.querySelector('[data-account-uitloggen]');
       if (link && currentUser) {
-        const name = cleanName(currentUser.user_metadata?.naam);
-        link.textContent = name ? `Je bent ingelogd als ${name}. Uitloggen` : 'Je bent ingelogd. Uitloggen';
+        link.textContent = 'Uitloggen';
       }
     });
   }

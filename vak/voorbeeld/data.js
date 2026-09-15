@@ -92,6 +92,32 @@ window.BES_VAK = {
       o: ['Om de instructies voortaan over te slaan.', 'Om elk antwoord automatisch te veranderen.', 'Om na te gaan of je alle gevraagde onderdelen hebt beantwoord.', 'Om alleen het aantal pagina’s te tellen.'],
       a: 2,
       u: 'Controleer of je antwoord volledig aansluit bij de opdracht en of je niets hebt overgeslagen. Verander een antwoord alleen met een inhoudelijke reden.'
+    },
+    {
+      h: 'h2',
+      q: 'Welke twee handelingen zijn voorbeelden van actief ophalen uit je geheugen?',
+      o: ['Een antwoord lezen terwijl het voor je ligt.', 'Een begrip uitleggen zonder in je notities te kijken.', 'Een definitie letterlijk overschrijven uit je cursus.', 'Een vraagkaartje beantwoorden voordat je de achterkant bekijkt.'],
+      a: [1, 3],
+      u: 'Zonder notities uitleggen en eerst zelf een vraagkaartje beantwoorden vragen beide om informatie uit je geheugen op te halen. Lezen en overschrijven laten het antwoord al zien.'
+    },
+    {
+      h: 'h3',
+      q: 'Welke twee uitspraken over studieplanning zijn onjuist?',
+      o: [
+        'Een concrete taak heeft een duidelijk eindpunt.',
+        'Terugplannen betekent dat je pas op de deadline beslist wat je gaat doen.',
+        'Je kunt een grote opdracht verdelen in kleinere taken.',
+        'Een deadline geeft aan wanneer het werk af moet zijn.',
+        'Je kunt vooraf schatten hoeveel tijd een taak vraagt.',
+        'Extra ruimte kan helpen als een taak uitloopt.',
+        'Een pauze neemt ook tijd in je dagplanning in.',
+        'Je kunt een planning aanpassen als de omstandigheden veranderen.',
+        'Drie taken van 30 minuten vragen samen 60 minuten werktijd.',
+        'Bij terugplannen plan je tussenstappen vóór de einddatum.'
+      ],
+      a: [1, 8],
+      kies: 'fout',
+      u: 'Bij terugplannen bepaal je vóór de deadline wanneer de tussenstappen plaatsvinden. Drie taken van 30 minuten kosten samen 90 minuten, niet 60. De andere acht uitspraken zijn juist.'
     }
   ],
   hacks: [

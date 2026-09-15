@@ -11,7 +11,6 @@ Nieuwe versie van beriesexamspace.com, in opbouw. Live voorbeeld (niet delen tot
 ## Bestandsstructuur (doel)
 ```
 index.html            startpagina (de deur)
-welkom.html           naam-scherm
 aanmelden.html        account maken, één vraag per stap
 inloggen.html         inloggen en herstelmail aanvragen
 wachtwoord.html       wachtwoord instellen via een herstel-link
@@ -32,7 +31,7 @@ assets/vakken.js      lijst van alle vakken per jaar
 ```
 
 ## Stand van zaken
-- Klaar: stap 1 (startpagina), 2 (gedeelde basis), 3 (`welkom.html`), 4 (`hub.html`), 5 (`jaar-1ba/2ba/3ba.html`), 6a (vak-template), 6b (`assets/vak.js`) en 6c (`assets/vakken.js`, 34 vakken). Het voorbeeldvak bevat 12 vragen. De 34 echte vakken blijven naar de bestaande site verwijzen totdat hun eigen gegevens zijn overgezet.
+- Klaar: startpagina, gedeelde basis, accounts, hub, drie jaarpagina's, vak-template en oefenlogica. Het voorbeeldvak bevat 14 vragen, waaronder twee vragen met meerdere te kiezen antwoorden. Van de 34 vakken in `assets/vakken.js` hebben 33 een eigen map met overgezette inhoud.
 - De jaarpagina's zijn één sjabloon; alleen `data-jaar` op `<body>`, de titel en de `<h1>` verschillen. De vakkaarten linken naar de bestaande tools op de huidige site tot `v2: true` staat in `vakken.js`.
 - Gedeelde kaartstijl in `style.css`: `.pagina` (binnenpagina met terugknop), `.kaart-pijl`, `.kaart-tekst`, `.kaart-titel`, `.kaart-sub`, `.pijl`, `.rooster-2`, `.sectie`, `.sectie-kop`.
 - De tool-kaarten op de hub linken voorlopig naar de live site (`?leren=1` en `?deel=1`); zodra de tools in v2 staan, worden dat interne links.
@@ -42,7 +41,7 @@ assets/vakken.js      lijst van alle vakken per jaar
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 9), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 10), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.
@@ -96,15 +95,19 @@ window.BES_VAK = {
 
 - `id` komt overeen met de mapnaam en het id in `assets/vakken.js`. `jaar` is `1ba`, `2ba` of `3ba`.
 - Hoofdstuk-id's zijn uniek binnen een vak. Elk `h` verwijst naar zo'n id.
-- Een vraag heeft 2 tot 5 verschillende opties. `a` is de index vanaf nul: `0` is de eerste optie, `1` de tweede. `u` legt uit waarom het antwoord juist is.
-- Vragen en opties worden tijdens het oefenen geschud; de juiste antwoordindex blijft gekoppeld aan de oorspronkelijke optie.
+- Een vraag met één antwoord heeft 2 tot 5 verschillende opties. `a` is de index vanaf nul: `0` is de eerste optie, `1` de tweede. `u` legt uit waarom het antwoord juist is.
+- Voor meerdere te kiezen antwoorden is `a` een niet-lege lijst met unieke indexen, bijvoorbeeld `a: [1, 3]`. Deze vragen mogen 2 tot 10 verschillende opties hebben. Voeg optioneel `kies: 'fout'` toe als de onjuiste uitspraken gekozen moeten worden. De indexen in `a` zijn altijd precies de opties die de leerling moet selecteren, ook bij `kies: 'fout'`.
+- Boven deze opties staat bijvoorbeeld "Kies 2 antwoorden." of "Kies de 2 foute antwoorden." Een optie aanvinken of uitvinken telt nog niet als antwoord. "Controleer →" verschijnt alleen als precies het gevraagde aantal gekozen is. Alleen de volledige juiste combinatie levert één goed beantwoorde vraag op; er zijn geen deelpunten.
+- Vragen en opties worden tijdens het oefenen geschud; alle juiste keuzes blijven gekoppeld aan de oorspronkelijke opties. De toetsen 1 tot en met 9 kiezen de bijbehorende optie, 0 kiest optie 10. Bij meerdere antwoorden schakelen deze toetsen de keuze aan of uit. Tab en spatie werken ook op de vinkopties.
 - Tekst is gewone tekst, geen HTML. De vakinhoud staat uitsluitend in `data.js`.
-- Het volledige voorbeeld heeft precies 3 hoofdstukken, 4 vragen per hoofdstuk, 2 studie-hacks per hoofdstuk en 1 theorieblok per hoofdstuk.
+- Het volledige voorbeeld heeft 3 hoofdstukken met respectievelijk 4, 5 en 5 vragen, 2 studie-hacks per hoofdstuk en 1 theorieblok per hoofdstuk. De tweede nieuwe meervoudige vraag bevat 10 opties en vraagt om de twee onjuiste uitspraken.
 - Lege hoofdstukken tonen "Nog geen vragen". Lege lijsten voor vragen, hacks en theorie hebben ieder een eigen lege melding.
 
 ### Oefenen en voortgang
 
 Examen Training gebruikt alle vragen van de gekozen hoofdstukken en geeft uitleg na ieder antwoord. Examensimulatie gebruikt maximaal 20 willekeurige vragen uit alle hoofdstukken, zonder tijdklok of feedback tussendoor. Alleen de uitslag bevat dan de antwoorden en uitleg. "Fouten opnieuw" begint altijd een nieuwe trainingssessie met alleen de fouten uit de afgeronde sessie, ook na een simulatie. In die foutenronde krijg je na ieder antwoord uitleg en wordt de hoofdstukvoortgang bijgewerkt.
+
+Bij meerdere antwoorden markeert de training na "Controleer →" elke benodigde optie teal en elke verkeerd gekozen optie rood. In een simulatie blijven goed/fout en uitleg verborgen tot de uitslag. Het overzicht toont daar per benodigde of gekozen optie wat juist was. De volledige combinatie bepaalt ook in de simulatie en foutenronde de score.
 
 De lokale sleutel is `bes_voortgang_<vakid>`, voor het voorbeeld dus `bes_voortgang_voorbeeld`. `BES.vak.voortgang` geeft een kopie van de actieve hoofdstukgegevens. De opgeslagen JSON bevat de actieve gegevens en de bewaarde profielen. Dit verkorte voorbeeld toont de actieve gegevens:
 
