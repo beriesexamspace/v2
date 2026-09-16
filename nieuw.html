@@ -18,14 +18,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=15">
-  <script src="assets/app.js?v=15"></script>
-  <script src="assets/updates.js?v=15"></script>
-  <script src="assets/config.js?v=15" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=16">
+  <script src="assets/app.js?v=16"></script>
+  <script src="assets/updates.js?v=16"></script>
+  <script src="assets/config.js?v=16" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=15" defer></script>
+  <script src="assets/auth.js?v=16" defer></script>
   <style>
-    .nieuw-pagina { padding: clamp(40px, 7vh, 72px) 0 48px; }
+    .nieuw-pagina { padding: 96px 0 48px; }
     .nieuw-wrap { max-width: 640px; }
     .nieuw-pagina .pagina-kop .eyebrow {
       margin: 0 0 16px;
@@ -34,7 +34,11 @@
     }
     .nieuw-updates { display: grid; gap: 24px; margin: 0; padding: 0; list-style: none; animation: updates-binnen 400ms var(--ease) both; }
     .nieuw-update { display: grid; grid-template-columns: 144px minmax(0, 1fr); gap: 20px; font-size: .9375rem; line-height: 1.6; }
-    .nieuw-datum { color: var(--muted); }
+    .update-meta { display: flex; flex-wrap: wrap; align-content: start; align-items: center; gap: 6px 8px; }
+    .update-datum { color: var(--ink-soft); }
+    .update-label { display: inline-flex; padding: 2px 8px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 600; line-height: 1.5; }
+    .update-label-nieuw { background: var(--teal-zacht); color: var(--teal); }
+    .update-label-verbeterd { background: var(--surface); color: var(--ink-soft); }
     .nieuw-sentinel { height: 1px; margin-top: 32px; }
     .nieuw-begrepen { margin-top: 16px; }
     .nieuw-begrepen:disabled,
@@ -54,6 +58,26 @@
   </style>
 </head>
 <body>
+  <header class="site-header">
+    <nav class="navigation" aria-label="Hoofdnavigatie">
+      <a class="brand" href="index.html" aria-label="Berie's Exam Space, startpagina">
+        <span class="brand-symbol" aria-hidden="true">B</span>
+        <span class="brand-name"><span>Berie's</span> <span>Exam Space</span></span>
+      </a>
+      <a class="home-knop" href="hub.html" aria-label="Home" title="Home">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5M5 9v12h5v-7h4v7h5V9"/></svg>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu">Menu</button>
+      <ul class="navigation-links" id="site-menu">
+        <li><a href="hub.html#hoe-werkt-het">Hoe werkt het</a></li>
+        <li><a href="hub.html#nieuw">Wat is nieuw</a></li>
+        <li><a href="over-mij.html">Over mij</a></li>
+        <li><a href="whatsapp.html">WhatsApp-groep</a></li>
+        <li><a href="#">Feedback</a></li>
+      </ul>
+      <a class="pill login-button" href="inloggen.html">Inloggen&nbsp; →</a>
+    </nav>
+  </header>
   <main class="pagina nieuw-pagina" aria-labelledby="nieuw-titel">
     <div class="wrap nieuw-wrap">
       <header class="pagina-kop">
@@ -81,15 +105,7 @@
     (() => {
       const updates = document.getElementById('nieuw-updates');
       for (const update of window.BES_UPDATES || []) {
-        const item = document.createElement('li');
-        item.className = 'nieuw-update';
-        const datum = document.createElement('span');
-        datum.className = 'nieuw-datum';
-        datum.textContent = update.datum;
-        const tekst = document.createElement('span');
-        tekst.append(window.BES.updateTekst(update.tekst));
-        item.append(datum, tekst);
-        updates.append(item);
+        updates.append(window.BES.updateRij(update, 'nieuw'));
       }
 
       const sentinel = document.getElementById('nieuw-einde');

@@ -139,16 +139,19 @@
     const menuButton = navigation.querySelector('.menu-toggle');
     const menu = navigation.querySelector('.navigation-links');
     const mobile = window.matchMedia('(max-width: 767px)');
+    const fixed = document.body.dataset.nav === 'vast';
     let scrollFrame = 0;
 
     const updateScroll = () => {
-      navigation.classList.toggle('is-zwevend', window.scrollY > 24);
+      navigation.classList.toggle('is-zwevend', !fixed && window.scrollY > 24);
       scrollFrame = 0;
     };
 
-    window.addEventListener('scroll', () => {
-      if (!scrollFrame) scrollFrame = window.requestAnimationFrame(updateScroll);
-    }, { passive: true });
+    if (!fixed) {
+      window.addEventListener('scroll', () => {
+        if (!scrollFrame) scrollFrame = window.requestAnimationFrame(updateScroll);
+      }, { passive: true });
+    }
     window.addEventListener('pageshow', updateScroll);
     updateScroll();
 
