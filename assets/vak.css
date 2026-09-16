@@ -95,10 +95,9 @@
 .theorie-kaart ul { margin: 0; padding-left: 20px; color: var(--muted); font-size: .9375rem; line-height: 1.7; }
 .theorie-kaart li + li { margin-top: 8px; }
 .vak-pagina :is(.uitleg, .stop-bevestiging, .hack-regel, .theorie-kaart, .overzicht-vraag):is(:hover, :active) { transform: none; box-shadow: var(--shadow-soft); }
-@media (hover: hover) {
-  .vak-tekstknop:hover, .vak-reco a:hover { text-decoration: underline; }
-  .optie:not(:disabled):hover { border-color: var(--accent); background: var(--surface); }
-}
+:where(html.has-hover) .vak-tekstknop:hover,
+:where(html.has-hover) .vak-reco a:hover { text-decoration: underline; }
+:where(html.has-hover) .optie:not(:disabled):hover { border-color: var(--accent); background: var(--surface); }
 @media (max-width: 767px) {
   .vak-pagina .pagina-kop h1 { overflow-wrap: anywhere; hyphens: auto; }
   .vak-pagina .wrap { padding-inline: 20px; }

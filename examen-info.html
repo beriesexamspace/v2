@@ -18,11 +18,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=14">
-  <script src="assets/app.js?v=14"></script>
-  <script src="assets/config.js?v=14" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=15">
+  <script src="assets/app.js?v=15"></script>
+  <script src="assets/config.js?v=15" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=14" defer></script>
+  <script src="assets/auth.js?v=15" defer></script>
   <style>
     .info-wrap { max-width: 808px; }
     .info-wrap .pagina-kop .eyebrow { margin: 0 0 20px; color: var(--accent); font-size: .875rem; }
@@ -40,9 +40,9 @@
     .info-leeg a, .info-brondatum a { color: var(--accent); text-underline-offset: 4px; }
     .info-brondatum { margin: 28px 0 0; color: var(--muted); font-size: .8125rem; line-height: 1.7; }
     .info-aankondiging { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
-    @media (hover: hover) {
-      .info-bron:hover, .info-leeg a:hover, .info-brondatum a:hover { text-decoration: underline; }
-    }
+    :where(html.has-hover) .info-bron:hover,
+    :where(html.has-hover) .info-leeg a:hover,
+    :where(html.has-hover) .info-brondatum a:hover { text-decoration: underline; }
     @media (max-width: 767px) {
       .info-tabs { gap: 8px; }
       .info-tab { flex: 1 1 auto; padding: 10px 12px; font-size: .8125rem; }

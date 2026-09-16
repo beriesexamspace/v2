@@ -18,11 +18,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=14">
-  <script src="assets/app.js?v=14"></script>
-  <script src="assets/config.js?v=14" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=15">
+  <script src="assets/app.js?v=15"></script>
+  <script src="assets/config.js?v=15" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=14" defer></script>
+  <script src="assets/auth.js?v=15" defer></script>
   <style>
     .whatsapp-kaart { max-width: 640px; margin-inline: auto; }
 
@@ -51,9 +51,7 @@
     .whatsapp-groep strong { font-size: 1rem; font-weight: 600; }
     .whatsapp-groep span { color: var(--muted); font-size: .875rem; }
 
-    @media (hover: hover) {
-      .whatsapp-join.knop:not(:disabled):not([aria-disabled="true"]):hover { background: var(--whatsapp-hover); box-shadow: none; }
-    }
+    :where(html.has-hover) .whatsapp-join.knop:not(:disabled):not([aria-disabled="true"]):hover { background: var(--whatsapp-hover); box-shadow: var(--shadow-soft); }
 
     @media (max-width: 767px) {
       .whatsapp-contact { flex-direction: column; align-items: flex-start; gap: 20px; }

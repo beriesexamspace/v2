@@ -30,12 +30,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=14">
-  <script src="assets/app.js?v=14"></script>
-  <script src="assets/updates.js?v=14"></script>
-  <script src="assets/config.js?v=14" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=15">
+  <script src="assets/app.js?v=15"></script>
+  <script src="assets/updates.js?v=15"></script>
+  <script src="assets/config.js?v=15" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=14" defer></script>
+  <script src="assets/auth.js?v=15" defer></script>
   <style>
     html { scroll-behavior: smooth; }
 
@@ -86,11 +86,9 @@
     .jaar-pijl { display: inline-block; transition: transform 150ms var(--ease); }
     a.kaart.jaar[data-jaar]:not([aria-disabled="true"]):active { transform: scale(.985); transition-duration: 80ms; }
 
-    @media (hover: hover) {
-      a.kaart.jaar[data-jaar]:not([aria-disabled="true"]):hover { transform: translateY(-4px); box-shadow: var(--jaar-schaduw-hover); }
-      a.kaart.jaar[data-jaar]:hover .jaar-pijl { transform: translateX(2px); }
-      a.kaart.jaar[data-jaar]:not([aria-disabled="true"]):active { transform: scale(.985); }
-    }
+    :where(html.has-hover) a.kaart.jaar[data-jaar]:not([aria-disabled="true"]):hover { transform: translateY(-4px); box-shadow: var(--jaar-schaduw-hover); }
+    :where(html.has-hover) a.kaart.jaar[data-jaar]:hover .jaar-pijl { transform: translateX(2px); }
+    :where(html.has-hover) a.kaart.jaar[data-jaar]:not([aria-disabled="true"]):active { transform: scale(.985); }
 
     .hub-sectie { scroll-margin-top: 88px; }
 

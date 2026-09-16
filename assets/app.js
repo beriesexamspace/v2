@@ -5,6 +5,13 @@
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const needsPageFade = !('CSSViewTransitionRule' in window) || window.location.protocol === 'file:';
 
+  const hoverInput = window.matchMedia('(any-hover: hover)');
+  root.classList.toggle('has-hover', hoverInput.matches);
+  const updateInput = event => root.classList.toggle('has-hover', event.pointerType === 'mouse');
+  document.addEventListener('pointermove', updateInput, { passive: true });
+  document.addEventListener('pointerdown', updateInput, { passive: true });
+  hoverInput.addEventListener('change', event => root.classList.toggle('has-hover', event.matches));
+
   if (needsPageFade && !motion.matches) root.classList.add('page-fade');
 
   window.naamOpslaan = naam => {
