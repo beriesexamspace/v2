@@ -48,6 +48,81 @@
     jaarOphalen: window.jaarOphalen
   });
 
+  const systemTheme = window.matchMedia('(prefers-color-scheme: dark)');
+  const validTheme = value => value === 'licht' || value === 'donker';
+  const storedTheme = () => {
+    try { return window.localStorage.getItem('bes_thema'); } catch { return null; }
+  };
+  let themeUser;
+  let accountTheme = null;
+  let themeChosenHere = false;
+  let themeRevision = 0;
+  let themeSave = Promise.resolve();
+
+  const applyTheme = (value, remember = false) => {
+    if (!validTheme(value)) return;
+    const dark = value === 'donker';
+    root.dataset.theme = dark ? 'dark' : 'light';
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.content = dark ? '#0B0B0C' : '#FFFFFF';
+    document.querySelectorAll('.thema-knop').forEach(button => {
+      button.setAttribute('aria-label', dark ? 'Lichte modus aan' : 'Donkere modus aan');
+      button.setAttribute('aria-pressed', String(dark));
+    });
+    if (remember) {
+      try { window.localStorage.setItem('bes_thema', value); } catch {}
+    }
+  };
+  window.BES.themaToepassen = value => applyTheme(value, true);
+
+  window.addEventListener('bes:auth', event => {
+    const user = event.detail?.user;
+    const id = user?.id || null;
+    if (themeUser !== undefined && themeUser !== id) {
+      themeChosenHere = false;
+      themeRevision++;
+    }
+    themeUser = id;
+    accountTheme = validTheme(user?.user_metadata?.thema) ? user.user_metadata.thema : null;
+    if (!themeChosenHere && validTheme(user?.user_metadata?.thema)) {
+      applyTheme(user.user_metadata.thema, true);
+    }
+  });
+  systemTheme.addEventListener('change', () => {
+    if (!themeChosenHere && !accountTheme && !validTheme(storedTheme())) applyTheme(systemTheme.matches ? 'donker' : 'licht');
+  });
+
+  const setupTheme = () => {
+    const navigation = document.querySelector('nav.navigation, nav.nav-vol');
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'thema-knop';
+    button.innerHTML = '<svg class="thema-zon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.4 1.4m11.2 11.2L19 19M5 19l1.4-1.4M17.6 6.4L19 5"/></svg><svg class="thema-maan" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20.5 14A8.6 8.6 0 0 1 10 3.5 8.7 8.7 0 1 0 20.5 14Z"/></svg>';
+    if (navigation) {
+      navigation.insertBefore(button, navigation.querySelector('.account-controls, .login-button'));
+    } else {
+      button.classList.add('is-los');
+      document.body.prepend(button);
+    }
+    const saved = storedTheme();
+    const initial = root.dataset.theme === 'dark' ? 'donker' : root.dataset.theme === 'light' ? 'licht' : validTheme(saved) ? saved : systemTheme.matches ? 'donker' : 'licht';
+    applyTheme(initial);
+    button.addEventListener('click', () => {
+      const value = root.dataset.theme === 'dark' ? 'licht' : 'donker';
+      const owner = themeUser;
+      themeChosenHere = true;
+      const revision = ++themeRevision;
+      applyTheme(value, true);
+      themeSave = themeSave.catch(() => {}).then(async () => {
+        const auth = window.BES.auth;
+        if (!owner || !auth?.profielBijwerken || revision !== themeRevision) return;
+        const user = await auth.gebruiker();
+        if (user?.id !== owner || revision !== themeRevision) return;
+        await auth.profielBijwerken({ thema: value });
+      }).catch(() => {});
+    });
+  };
+
   const revealPage = () => root.classList.add('page-ready');
 
   const setupNavigation = () => {
@@ -265,7 +340,7 @@
       currentDialog = dialog;
       dot.style.left = `${event.clientX}px`;
       dot.style.top = `${event.clientY}px`;
-      const control = target.closest('button, a, [role="button"], [role="tab"], [role="checkbox"], [role="radio"], .optie, label[for]');
+      const control = target.closest('button, a[href], summary, [role="button"], [role="tab"], [role="checkbox"], [role="radio"], .optie');
       dot.classList.toggle('over-control', !!control && !control.matches(':disabled, [aria-disabled="true"]'));
       try {
         if (!dot.matches(':popover-open')) dot.showPopover();
@@ -295,6 +370,7 @@
 
   const initialize = () => {
     try {
+      setupTheme();
       setupNavigation();
       setupLinks();
       setupSignature();

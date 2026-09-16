@@ -11,6 +11,8 @@
   let initializationError = null;
   let renderTimer = 0;
   let signingOut = false;
+  let logoutInProgress = false;
+  let profileQueue = Promise.resolve();
 
   const messages = {
     unavailable: 'Accounts zijn nog niet ingeschakeld. Je kunt wel gewoon oefenen.',
@@ -19,6 +21,8 @@
     rate_limit: 'Even wachten, probeer het over een minuut opnieuw.',
     network: 'Even geen verbinding. Probeer het opnieuw.',
     invalid_email: 'Dit e-mailadres klopt niet. Controleer het en probeer het opnieuw.',
+    invalid_name: 'Vul je naam in om verder te gaan.',
+    signed_out: 'Je bent niet meer ingelogd. Log opnieuw in.',
     weak_password: 'Je wachtwoord is te kort. Kies minimaal 8 tekens.',
     same_password: 'Dit is je huidige wachtwoord. Kies een ander wachtwoord.',
     recovery_invalid: 'Deze link is verlopen. Vraag een nieuwe aan.',
@@ -56,11 +60,83 @@
     try { window.localStorage.removeItem('bes_naam'); } catch {}
   }
 
+  function clearUpdates() {
+    try { window.sessionStorage.removeItem('bes_nieuw_gezien'); } catch {}
+  }
+
+  function photoUrl(user, value = user?.user_metadata?.foto) {
+    if (!user || typeof value !== 'string' || !value) return '';
+    try {
+      const expected = new URL('/storage/v1/object/public/avatars/' + encodeURIComponent(user.id) + '.jpg', config.supabaseUrl);
+      const actual = new URL(value);
+      return /^https?:$/.test(actual.protocol) && actual.origin === expected.origin && actual.pathname === expected.pathname ? actual.href : '';
+    } catch { return ''; }
+  }
+
+  function fillAvatar(element, user) {
+    const words = cleanName(user?.user_metadata?.naam).split(/\s+/).filter(Boolean);
+    const initials = Array.from(words.map(word => word.match(/\p{L}/u)?.[0] || '').filter(Boolean).slice(0, 2).join('').toLocaleUpperCase('nl')).slice(0, 2).join('');
+    element.replaceChildren();
+    element.textContent = initials;
+    element.setAttribute('aria-hidden', 'true');
+    const source = photoUrl(user);
+    if (!source) return;
+    const image = document.createElement('img');
+    image.alt = '';
+    image.decoding = 'async';
+    image.referrerPolicy = 'no-referrer';
+    image.addEventListener('error', () => { if (element.contains(image)) element.textContent = initials; }, { once: true });
+    image.src = source;
+    element.replaceChildren(image);
+  }
+
+  function logoutLink(className) {
+    const link = document.createElement('a');
+    link.className = className;
+    link.href = pagePrefix + 'index.html';
+    link.textContent = 'Uitloggen';
+    link.setAttribute('data-account-uitloggen', '');
+    return link;
+  }
+
   function renderAccount() {
-    document.querySelectorAll('a.pill.login-button').forEach(link => {
-      link.textContent = currentUser ? 'Uitloggen' : 'Inloggen →';
-      link.setAttribute('href', currentUser ? '#' : pagePrefix + 'inloggen.html');
-      link.toggleAttribute('data-account-uitloggen', Boolean(currentUser));
+    document.querySelectorAll('nav.navigation, nav.nav-vol').forEach(navigation => {
+      let controls = navigation.querySelector('.account-controls');
+      if (!controls) {
+        const original = navigation.querySelector('.login-button');
+        if (!original) return;
+        controls = document.createElement('div');
+        controls.className = 'account-controls';
+        original.replaceWith(controls);
+      }
+      controls.replaceChildren();
+      let mobileLogout = navigation.querySelector('.account-uitloggen-mobiel');
+      if (!currentUser) {
+        const login = document.createElement('a');
+        login.className = 'pill login-button';
+        login.textContent = 'Inloggen →';
+        login.href = pagePrefix + 'inloggen.html';
+        controls.append(login);
+        mobileLogout?.remove();
+        return;
+      }
+      const profile = document.createElement('a');
+      profile.className = 'profiel-knop';
+      profile.href = pagePrefix + 'profiel.html';
+      const avatar = document.createElement('span');
+      avatar.className = 'profiel-avatar';
+      fillAvatar(avatar, currentUser);
+      profile.append(avatar, document.createTextNode('Profiel'));
+      controls.append(profile, logoutLink('tekstlink account-uitloggen'));
+      const menu = navigation.querySelector('.navigation-links');
+      if (menu) {
+        if (!mobileLogout) {
+          mobileLogout = document.createElement('li');
+          mobileLogout.className = 'account-uitloggen-mobiel';
+          menu.append(mobileLogout);
+        }
+        mobileLogout.replaceChildren(logoutLink('tekstlink'));
+      }
     });
     document.querySelectorAll('[data-account-opties]').forEach(element => { element.hidden = Boolean(currentUser); });
     document.querySelectorAll('[data-account-sessie]').forEach(element => {
@@ -84,7 +160,7 @@
     window.clearTimeout(renderTimer);
     renderTimer = window.setTimeout(() => {
       renderAccount();
-      window.dispatchEvent(new CustomEvent('bes:auth', { detail: { user: currentUser } }));
+      window.dispatchEvent(new CustomEvent('bes:auth', { detail: { user: currentUser, uitloggen: logoutInProgress } }));
     }, 0);
   }
 
@@ -109,6 +185,7 @@
     beschikbaar: false,
     gereed: Promise.resolve(null),
     get client() { return client; },
+    avatarVullen: fillAvatar,
 
     async gebruiker() {
       await auth.gereed;
@@ -139,10 +216,17 @@
     },
 
     async uitloggen() {
-      await request(api => api.signOut());
-      recoveryUserId = null;
-      setUser(null, true);
-      window.location.assign(pagePrefix + 'index.html');
+      logoutInProgress = true;
+      try {
+        await request(api => api.signOut());
+        recoveryUserId = null;
+        clearUpdates();
+        setUser(null, true);
+        window.location.assign(pagePrefix + 'index.html');
+      } catch (error) {
+        logoutInProgress = false;
+        throw error;
+      }
     },
 
     async herstelMail(email) {
@@ -165,6 +249,42 @@
       recoveryUserId = null;
       setUser(data.user);
       return data.user;
+    },
+
+    async profielBijwerken(patch = {}, wachtwoord = '') {
+      const owner = currentUser?.id;
+      await requireClient();
+      if (!owner || currentUser?.id !== owner || logoutInProgress) throw failure('signed_out');
+      const metadata = {};
+      if (Object.hasOwn(patch, 'naam')) {
+        metadata.naam = cleanName(patch.naam);
+        if (!metadata.naam) throw failure('invalid_name');
+      }
+      if (Object.hasOwn(patch, 'thema')) {
+        if (!['licht', 'donker'].includes(patch.thema)) throw failure('unknown');
+        metadata.thema = patch.thema;
+      }
+      if (Object.hasOwn(patch, 'foto')) {
+        metadata.foto = patch.foto === null || patch.foto === '' ? null : photoUrl(currentUser, patch.foto);
+        if (metadata.foto === '') throw failure('unknown');
+      }
+      if (wachtwoord && (typeof wachtwoord !== 'string' || wachtwoord.length < 8)) throw failure('weak_password');
+      const operation = async () => {
+        if (!currentUser || currentUser.id !== owner || logoutInProgress) throw failure('signed_out');
+        if (!Object.keys(metadata).length && !wachtwoord) return currentUser;
+        const attributes = { data: metadata };
+        if (wachtwoord) attributes.password = wachtwoord;
+        const data = await request(api => {
+          if (!currentUser || currentUser.id !== owner || logoutInProgress) throw failure('signed_out');
+          return api.updateUser(attributes);
+        });
+        if (!data?.user || data.user.id !== owner || currentUser?.id !== owner || logoutInProgress) throw failure('signed_out');
+        setUser(data.user);
+        return data.user;
+      };
+      const result = profileQueue.then(operation, operation);
+      profileQueue = result.catch(() => {});
+      return result;
     }
   };
 
@@ -177,6 +297,8 @@
       client = window.supabase.createClient(config.supabaseUrl.trim(), config.supabaseAnonKey.trim());
       auth.beschikbaar = true;
       client.auth.onAuthStateChange((event, session) => {
+        if (event === 'USER_UPDATED' && (logoutInProgress || !currentUser || session?.user?.id !== currentUser.id)) return;
+        if (event === 'SIGNED_OUT') clearUpdates();
         if (event === 'PASSWORD_RECOVERY') recoveryUserId = session?.user?.id || null;
         if (event === 'SIGNED_OUT' || !session || (recoveryUserId && session.user?.id !== recoveryUserId)) recoveryUserId = null;
         setUser(session?.user, event === 'SIGNED_OUT');

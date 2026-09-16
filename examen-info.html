@@ -5,15 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Antwoorden over deliberatie, tweede zit, punten, inzage en beroep met de bron uit het VUB-reglement.">
   <meta name="theme-color" content="#FFFFFF">
+  <script>
+    (() => {
+      let keuze;
+      try { keuze = window.localStorage.getItem('bes_thema'); } catch {}
+      const donker = keuze === 'donker' || (keuze !== 'licht' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.dataset.theme = donker ? 'dark' : 'light';
+      document.querySelector('meta[name="theme-color"]').content = donker ? '#0B0B0C' : '#FFFFFF';
+    })();
+  </script>
   <title>Examen-info | Berie's Exam Space</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=12">
-  <script src="assets/app.js?v=12"></script>
-  <script src="assets/config.js?v=12" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=13">
+  <script src="assets/app.js?v=13"></script>
+  <script src="assets/config.js?v=13" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=12" defer></script>
+  <script src="assets/auth.js?v=13" defer></script>
   <style>
     .info-wrap { max-width: 808px; }
     .info-wrap .pagina-kop .eyebrow { margin: 0 0 20px; color: var(--accent); font-size: .875rem; }
@@ -21,7 +30,7 @@
     .info-tabs { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0 0; }
     .info-tab { min-height: 44px; padding: 10px 22px; font-size: .9375rem; line-height: 22px; box-shadow: none; }
     .info-tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--white); }
-    .info-tab[aria-selected="false"] { background: var(--white); border-color: var(--line); color: var(--ink); box-shadow: none; }
+    .info-tab[aria-selected="false"] { background: var(--card); border-color: var(--line); color: var(--ink); box-shadow: none; }
     .info-resultaten:focus-visible { outline: 2px solid var(--accent); outline-offset: 6px; border-radius: 16px; }
     .info-kaart h2 { margin: 0; font-size: 1.0625rem; font-weight: 600; line-height: 1.45; }
     .info-antwoord { margin: 14px 0 0; color: var(--muted); font-size: .9375rem; line-height: 1.7; }
@@ -51,7 +60,7 @@
       <ul class="navigation-links" id="site-menu">
         <li><a href="hub.html#hoe-werkt-het">Hoe werkt het</a></li>
         <li><a href="hub.html#nieuw">Wat is nieuw</a></li>
-        <li><a href="#">Over ons</a></li>
+        <li><a href="over-ons.html">Over ons</a></li>
         <li><a href="whatsapp.html">WhatsApp-groep</a></li>
         <li><a href="#">Feedback</a></li>
       </ul>
@@ -304,7 +313,7 @@
     <p class="footer-brand">Berie's Exam Space</p>
     <div class="footer-details">
       <p>Duidelijk leren. Rustig groeien.</p>
-      <p class="project-label">A project of Berie Foundation</p>
+      <p class="project-label">A project of The Berie Foundation</p>
     </div>
   </footer>
 

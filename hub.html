@@ -5,53 +5,92 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script>
     (() => {
-      let opslagBeschikbaar = false;
-      for (const type of ['localStorage', 'sessionStorage']) {
-        try {
-          const opslag = window[type];
-          if (opslag.getItem('bes_nieuw_gezien')) return;
-          opslag.setItem('bes_nieuw_opslagtest', '1');
-          opslag.removeItem('bes_nieuw_opslagtest');
-          opslagBeschikbaar = true;
-        } catch {}
-      }
-      if (opslagBeschikbaar) window.location.replace('nieuw.html' + window.location.hash);
+      try {
+        const opslag = window.sessionStorage;
+        if (opslag.getItem('bes_nieuw_gezien')) return;
+        opslag.setItem('bes_nieuw_opslagtest', '1');
+        opslag.removeItem('bes_nieuw_opslagtest');
+        window.location.replace('nieuw.html' + window.location.hash);
+      } catch {}
     })();
   </script>
   <meta name="description" content="Kies je jaar, gebruik de tools en help mee met je eigen vak in Berie's Exam Space.">
   <meta name="theme-color" content="#FFFFFF">
+  <script>
+    (() => {
+      let keuze;
+      try { keuze = window.localStorage.getItem('bes_thema'); } catch {}
+      const donker = keuze === 'donker' || (keuze !== 'licht' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.dataset.theme = donker ? 'dark' : 'light';
+      document.querySelector('meta[name="theme-color"]').content = donker ? '#0B0B0C' : '#FFFFFF';
+    })();
+  </script>
   <meta name="robots" content="noindex">
   <title>Welkom | Berie's Exam Space</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=12">
-  <script src="assets/app.js?v=12"></script>
-  <script src="assets/updates.js?v=12"></script>
-  <script src="assets/config.js?v=12" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=13">
+  <script src="assets/app.js?v=13"></script>
+  <script src="assets/updates.js?v=13"></script>
+  <script src="assets/config.js?v=13" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=12" defer></script>
+  <script src="assets/auth.js?v=13" defer></script>
   <style>
     html { scroll-behavior: smooth; }
 
-    .jaar {
+    .kaart.jaar {
+      --jaar-schaduw: 0 14px 30px rgba(0,0,0,.14), 0 2px 6px rgba(0,0,0,.06);
+      --jaar-schaduw-hover: 0 22px 40px rgba(0,0,0,.18), 0 3px 8px rgba(0,0,0,.07);
       display: flex;
       flex-direction: column;
-      gap: 18px;
-      min-height: 168px;
+      gap: 0;
+      min-height: 0;
+      padding: 0;
+      overflow: hidden;
+      background: var(--card);
+      box-shadow: var(--jaar-schaduw);
+      transition: transform 220ms var(--ease), box-shadow 220ms var(--ease);
     }
 
-    .jaar-rij {
+    .jaar[data-jaar="1ba"] { --jaar: #3FB9B2; --jaar-licht: #8FDAD5; }
+    .jaar[data-jaar="2ba"] { --jaar: #8B7CF6; --jaar-licht: #C4BAFF; }
+    .jaar[data-jaar="3ba"] { --jaar: #E0A030; --jaar-licht: #F5D08A; }
+
+    html[data-theme="dark"] .kaart.jaar {
+      --jaar-schaduw: 0 14px 30px var(--shadow-far-color), 0 2px 6px var(--shadow-near-color);
+      --jaar-schaduw-hover: 0 22px 40px var(--shadow-far-color), 0 3px 8px var(--shadow-near-color);
+    }
+
+    .jaar-band {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      min-height: 36px;
+      flex: 0 0 96px;
+      height: 96px;
+      padding: 20px 24px;
+      background: linear-gradient(135deg, var(--jaar), var(--jaar-licht));
+      color: var(--white);
     }
 
-    .jaar .kaart-tekst { margin-top: auto; }
-    .jaar .label { visibility: hidden; }
+    .jaar-nummer { font-size: 44px; font-weight: 700; line-height: 1; }
+    .jaar .label {
+      visibility: hidden;
+      background: color-mix(in srgb, var(--white) 24%, transparent);
+      color: var(--white);
+    }
     .jaar.is-laatst .label { visibility: visible; }
+    .jaar-body { flex: 1; gap: 8px; padding: 24px; background: var(--card); }
+    .jaar-link { display: flex; align-items: center; gap: 8px; margin-top: 12px; color: var(--jaar); font-weight: 600; }
+    .jaar-pijl { display: inline-block; transition: transform 150ms var(--ease); }
+    a.kaart.jaar[data-jaar]:not([aria-disabled="true"]):active { transform: scale(.985); transition-duration: 80ms; }
+
+    @media (hover: hover) {
+      a.kaart.jaar[data-jaar]:not([aria-disabled="true"]):hover { transform: translateY(-4px); box-shadow: var(--jaar-schaduw-hover); }
+      a.kaart.jaar[data-jaar]:hover .jaar-pijl { transform: translateX(2px); }
+      a.kaart.jaar[data-jaar]:not([aria-disabled="true"]):active { transform: scale(.985); }
+    }
 
     .hub-sectie { scroll-margin-top: 88px; }
 
@@ -73,35 +112,22 @@
 
     .hub-update-datum { color: var(--muted); }
 
-    .hub-stap {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 16px;
-    }
-
-    .hub-stap-nummer {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: var(--teal-zacht);
-      color: var(--teal);
-      font-weight: 600;
-    }
-
-    .hub-stap .kaart-titel, .hub-stap .kaart-sub { margin: 0; }
+    .hub-handleiding { max-width: 760px; }
+    .handleiding-inleiding, .handleiding-stap p { color: var(--muted); font-size: .9375rem; line-height: 1.7; }
+    .handleiding-inleiding { margin: 0; }
+    .handleiding-stap { margin-top: 28px; }
+    .handleiding-stap h3 { margin: 0 0 12px; font-size: 1.125rem; line-height: 1.4; }
+    .handleiding-stap p { margin: 8px 0 0; }
+    .handleiding-stap strong { color: var(--ink); }
 
     @media (max-width: 767px) {
-      .jaar { min-height: 0; gap: 14px; }
       .hub-update { grid-template-columns: minmax(0, 1fr); gap: 4px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
+      .kaart.jaar, .jaar-pijl { transition: none; }
+      a.kaart.jaar:hover, a.kaart.jaar:active, a.kaart.jaar:hover .jaar-pijl { transform: none !important; }
     }
   </style>
 </head>
@@ -116,7 +142,7 @@
       <ul class="navigation-links" id="site-menu">
         <li><a href="hub.html#hoe-werkt-het">Hoe werkt het</a></li>
         <li><a href="hub.html#nieuw">Wat is nieuw</a></li>
-        <li><a href="#">Over ons</a></li>
+        <li><a href="over-ons.html">Over ons</a></li>
         <li><a href="whatsapp.html">WhatsApp-groep</a></li>
         <li><a href="#">Feedback</a></li>
       </ul>
@@ -134,33 +160,36 @@
       <section class="rijst" aria-label="Kies je jaar">
         <div class="rooster-3">
           <a class="kaart jaar" href="jaar-1ba.html" data-jaar="1ba">
-            <span class="jaar-rij">
+            <span class="jaar-band">
+              <span class="jaar-nummer">1</span>
               <span class="label">Laatst gekozen</span>
-              <span class="pijl" aria-hidden="true">→</span>
             </span>
-            <span class="kaart-tekst">
+            <span class="kaart-tekst jaar-body">
               <span class="kaart-titel">1ste bachelor</span>
               <span class="kaart-sub">Alle vakken van dit jaar</span>
+              <span class="jaar-link">Bekijk vakken <span class="jaar-pijl" aria-hidden="true">→</span></span>
             </span>
           </a>
           <a class="kaart jaar" href="jaar-2ba.html" data-jaar="2ba">
-            <span class="jaar-rij">
+            <span class="jaar-band">
+              <span class="jaar-nummer">2</span>
               <span class="label">Laatst gekozen</span>
-              <span class="pijl" aria-hidden="true">→</span>
             </span>
-            <span class="kaart-tekst">
+            <span class="kaart-tekst jaar-body">
               <span class="kaart-titel">2de bachelor</span>
               <span class="kaart-sub">Alle vakken van dit jaar</span>
+              <span class="jaar-link">Bekijk vakken <span class="jaar-pijl" aria-hidden="true">→</span></span>
             </span>
           </a>
           <a class="kaart jaar" href="jaar-3ba.html" data-jaar="3ba">
-            <span class="jaar-rij">
+            <span class="jaar-band">
+              <span class="jaar-nummer">3</span>
               <span class="label">Laatst gekozen</span>
-              <span class="pijl" aria-hidden="true">→</span>
             </span>
-            <span class="kaart-tekst">
+            <span class="kaart-tekst jaar-body">
               <span class="kaart-titel">3de bachelor</span>
               <span class="kaart-sub">Alle vakken van dit jaar</span>
+              <span class="jaar-link">Bekijk vakken <span class="jaar-pijl" aria-hidden="true">→</span></span>
             </span>
           </a>
         </div>
@@ -195,35 +224,68 @@
 
       <section class="sectie hub-sectie" id="hoe-werkt-het" aria-labelledby="hoe-werkt-het-kop">
         <h2 class="sectie-kop" id="hoe-werkt-het-kop">Hoe werkt het</h2>
-        <div class="rooster-2">
-          <div class="kaart hub-stap">
-            <span class="hub-stap-nummer">1</span>
-            <div class="kaart-tekst">
-              <h3 class="kaart-titel">Log in</h3>
-              <p class="kaart-sub">Eén account, je naam en je voortgang op elk toestel.</p>
-            </div>
-          </div>
-          <div class="kaart hub-stap">
-            <span class="hub-stap-nummer">2</span>
-            <div class="kaart-tekst">
-              <h3 class="kaart-titel">Kies je jaar en vak</h3>
-              <p class="kaart-sub">1ste, 2de of 3de bachelor, daarna het vak dat je wilt oefenen.</p>
-            </div>
-          </div>
-          <div class="kaart hub-stap">
-            <span class="hub-stap-nummer">3</span>
-            <div class="kaart-tekst">
-              <h3 class="kaart-titel">Kies hoofdstukken en modus</h3>
-              <p class="kaart-sub">Examen Training met uitleg na elke vraag, of Examensimulatie met de uitslag aan het einde.</p>
-            </div>
-          </div>
-          <div class="kaart hub-stap">
-            <span class="hub-stap-nummer">4</span>
-            <div class="kaart-tekst">
-              <h3 class="kaart-titel">Zie je voortgang groeien</h3>
-              <p class="kaart-sub">Per hoofdstuk zie je hoeveel je al goed had. Groen betekent: gelukt.</p>
-            </div>
-          </div>
+        <div class="hub-handleiding">
+          <p class="handleiding-inleiding">Berie's Exam Space helpt je om je leerstof te oefenen en te ontdekken wat je nog wilt herhalen. Je kiest eerst je jaar en vak. Daarna oefen je met vragen, bekijk je uitleg en volg je je voortgang. Hieronder staat de route, van je eerste bezoek tot het bekijken van je uitslag.</p>
+          <article class="handleiding-stap">
+            <h3>1. Maak een account of log in</h3>
+            <p><strong>Waar:</strong> Op de startpagina, onder de grote titel. Je hebt je naam, e-mailadres en een wachtwoord nodig om een account te maken.</p>
+            <p><strong>Klik op:</strong> "Aanmelden →". Heb je al een account, kies dan "Heb je al een account? Log in" en vervolgens "Inloggen →".</p>
+            <p><strong>Daarna:</strong> Vul de gevraagde gegevens in. Bij aanmelden geef je één antwoord per scherm en kies je een wachtwoord van minimaal acht tekens.</p>
+          </article>
+          <article class="handleiding-stap">
+            <h3>2. Lees wat er nieuw is</h3>
+            <p><strong>Waar:</strong> Op het scherm dat na het aanmelden of inloggen verschijnt. Hier staan de laatste veranderingen met hun datum.</p>
+            <p><strong>Klik op:</strong> "Begrepen →" zodra je naar beneden hebt gescrold. De knop wordt actief wanneer je het einde van de uitleg bereikt.</p>
+            <p><strong>Daarna:</strong> Je komt op de hub, je overzicht met jaren en tools. Tijdens dezelfde browsersessie hoef je dit scherm niet opnieuw door.</p>
+          </article>
+          <article class="handleiding-stap">
+            <h3>3. Kies je jaar</h3>
+            <p><strong>Waar:</strong> Bovenaan de hub, onder je begroeting. Je ziet drie gekleurde jaarkaarten.</p>
+            <p><strong>Klik op:</strong> "1ste bachelor", "2de bachelor" of "3de bachelor". Onderaan iedere kaart staat "Bekijk vakken →"; de hele kaart is klikbaar.</p>
+            <p><strong>Daarna:</strong> Je opent de vakken van dat jaar. De aanduiding "Laatst gekozen" helpt je bij een volgend bezoek.</p>
+          </article>
+          <article class="handleiding-stap">
+            <h3>4. Open je vak</h3>
+            <p><strong>Waar:</strong> Op de jaarpagina staan de vakken als kaarten, met telkens een naam en korte beschrijving.</p>
+            <p><strong>Klik op:</strong> De vakkaart van het vak waarvoor je wilt oefenen.</p>
+            <p><strong>Daarna:</strong> De vakpagina opent. Je ziet de hoofdstukken, je oefenmogelijkheden en de tabbladen. Via "Terug" kom je weer bij je jaar.</p>
+          </article>
+          <article class="handleiding-stap">
+            <h3>5. Kies hoofdstukken</h3>
+            <p><strong>Waar:</strong> Op de vakpagina, onder "Kies je hoofdstukken". Elke rij toont een hoofdstuk en je eerdere oefenstand.</p>
+            <p><strong>Klik op:</strong> De hoofdstukken die je wilt oefenen. Met "Alles" selecteer je alle beschikbare hoofdstukken; met "Niets" maak je de selectie leeg.</p>
+            <p><strong>Daarna:</strong> Voor Examen Training blijft minstens één hoofdstuk geselecteerd. Een hoofdstuk zonder vragen kun je nog niet oefenen.</p>
+          </article>
+          <article class="handleiding-stap">
+            <h3>6. Kies hoe je oefent</h3>
+            <p><strong>Waar:</strong> Onder "Hoe wil je oefenen?", op dezelfde vakpagina.</p>
+            <p><strong>Klik op:</strong> "Examen Training" voor uitleg na elke vraag, of "Examensimulatie" voor een uitslag aan het einde. Kies daarna "Start →".</p>
+            <p><strong>Daarna:</strong> Training gebruikt je gekozen hoofdstukken. Een simulatie gebruikt alle hoofdstukken en maximaal twintig willekeurige vragen; bij minder beschikbare vragen krijg je er minder.</p>
+          </article>
+          <article class="handleiding-stap">
+            <h3>7. Beantwoord de vragen</h3>
+            <p><strong>Waar:</strong> Onder de vraag. Bij meerdere keuzes staat bijvoorbeeld "Kies 2 antwoorden." of "Kies de 2 foute antwoorden." Volg wat de hint vraagt.</p>
+            <p><strong>Klik op:</strong> Eén antwoord, of vink het gevraagde aantal aan en kies "Controleer →". Vervolgens: "Volgende →" of bij de laatste vraag "Bekijk je uitslag →".</p>
+            <p><strong>Daarna:</strong> Lees bij training de uitleg. Kies "Fouten opnieuw →" om fouten te oefenen, of "Opnieuw" voor een nieuwe ronde. Stoppen kan met "Stop" en "Ja, stoppen".</p>
+          </article>
+          <article class="handleiding-stap">
+            <h3>8. Bekijk je voortgang</h3>
+            <p><strong>Waar:</strong> Bij de hoofdstukken en op je uitslagscherm zie je hoeveel antwoorden goed waren.</p>
+            <p><strong>Klik op:</strong> "Terug naar het vak" om de hoofdstukstanden weer te bekijken.</p>
+            <p><strong>Daarna:</strong> Trainingsantwoorden werken je hoofdstukstand bij. Met een account wordt die voortgang gesynchroniseerd, zodat je op een ander toestel kunt verdergaan. Zonder verbinding blijft je stand lokaal bewaard.</p>
+          </article>
+          <article class="handleiding-stap">
+            <h3>9. Herhaal uitleg en theorie</h3>
+            <p><strong>Waar:</strong> Bovenaan de vakpagina staan "Studie-hacks" en "Theorie" naast "Oefenen".</p>
+            <p><strong>Klik op:</strong> Het tabblad dat je wilt lezen. Na een afgeronde examensimulatie kun je ook "Bekijk alle vragen" openen.</p>
+            <p><strong>Daarna:</strong> Lees beschikbare studietips of theorie. Het simulatieoverzicht laat je antwoorden, de juiste keuzes en uitleg zien, zodat je gericht kunt herhalen.</p>
+          </article>
+          <article class="handleiding-stap">
+            <h3>10. Gebruik de extra hulpmiddelen</h3>
+            <p><strong>Waar:</strong> Op de hub staan onder "Tools" de kaarten "Reken je punten" en "Examen-info".</p>
+            <p><strong>Klik op:</strong> Een tool, of open "WhatsApp-groep" via het menu voor uitleg en de link naar de groep.</p>
+            <p><strong>Daarna:</strong> Bereken je punten, lees exameninformatie of ontvang updates. "Feedback" staat ook in het menu; deze mogelijkheid komt binnenkort.</p>
+          </article>
         </div>
       </section>
 
@@ -234,7 +296,7 @@
     <p class="footer-brand">Berie's Exam Space</p>
     <div class="footer-details">
       <p>Duidelijk leren. Rustig groeien.</p>
-      <p class="project-label">A project of Berie Foundation</p>
+      <p class="project-label">A project of The Berie Foundation</p>
     </div>
   </footer>
 

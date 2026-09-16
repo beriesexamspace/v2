@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Beheer je naam, profielfoto en wachtwoord bij Berie's Exam Space.">
+  <meta name="theme-color" content="#FFFFFF">
+  <script>
+    (() => {
+      let keuze;
+      try { keuze = window.localStorage.getItem('bes_thema'); } catch {}
+      const donker = keuze === 'donker' || (keuze !== 'licht' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.dataset.theme = donker ? 'dark' : 'light';
+      document.querySelector('meta[name="theme-color"]').content = donker ? '#0B0B0C' : '#FFFFFF';
+    })();
+  </script>
+  <meta name="robots" content="noindex">
+  <title>Jouw profiel | Berie's Exam Space</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css?v=13">
+  <script src="assets/app.js?v=13" defer></script>
+  <script src="assets/config.js?v=13" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
+  <script src="assets/auth.js?v=13" defer></script>
+  <style>
+    .profiel-wrap { max-width: 640px; }
+    .profiel-kop { display: grid; justify-items: start; gap: 20px; }
+    .profiel-kop h1 { margin: 0; }
+    .profiel-avatar-groot { width: 96px; height: 96px; font-size: 2rem; }
+    .profiel-form { display: grid; gap: 28px; padding: clamp(22px, 5vw, 36px); }
+    .profiel-veld { display: grid; gap: 10px; }
+    .profiel-veld label, .profiel-veld > .profiel-label { font-size: .9375rem; font-weight: 600; }
+    .profiel-veld .auth-input { width: 100%; max-width: none; }
+    .profiel-veld .auth-help, .profiel-veld .auth-error { margin: 0; }
+    .profiel-foto-acties, .profiel-opslaan { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; }
+    .profiel-email { min-height: 56px; margin: 0; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); color: var(--ink-soft); overflow-wrap: anywhere; }
+    .profiel-opgeslagen { display: inline-flex; align-items: center; gap: 10px; color: var(--teal); font-size: .9375rem; opacity: 1; transition: opacity 200ms var(--ease); }
+    .profiel-opgeslagen.is-fading { opacity: 0; }
+    .profiel-opgeslagen .vinkje { width: 40px; height: 40px; margin: 0; }
+    @media (prefers-reduced-motion: reduce) { .profiel-opgeslagen { transition: none; } }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navigation" aria-label="Hoofdnavigatie">
+      <a class="brand" href="index.html" aria-label="Berie's Exam Space, startpagina">
+        <span class="brand-symbol" aria-hidden="true">B</span>
+        <span class="brand-name"><span>Berie's</span> <span>Exam Space</span></span>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu">Menu</button>
+      <ul class="navigation-links" id="site-menu">
+        <li><a href="hub.html#hoe-werkt-het">Hoe werkt het</a></li>
+        <li><a href="hub.html#nieuw">Wat is nieuw</a></li>
+        <li><a href="over-ons.html">Over ons</a></li>
+        <li><a href="whatsapp.html">WhatsApp-groep</a></li>
+        <li><a href="#">Feedback</a></li>
+      </ul>
+      <a class="pill login-button" href="inloggen.html">Inloggen →</a>
+    </nav>
+  </header>
+
+  <main class="pagina" aria-labelledby="profiel-titel">
+    <div class="wrap profiel-wrap">
+      <a class="terug tekstlink" href="hub.html" data-terug="hub.html" data-terug-tekst="Terug">← Terug</a>
+      <header class="pagina-kop profiel-kop">
+        <span class="profiel-avatar profiel-avatar-groot" id="profiel-avatar" aria-hidden="true"></span>
+        <h1 id="profiel-titel">Jouw profiel</h1>
+      </header>
+
+      <form class="kaart profiel-form" id="profiel-form" novalidate hidden>
+        <div class="profiel-veld">
+          <span class="profiel-label" id="foto-label">Profielfoto</span>
+          <div class="profiel-foto-acties" aria-labelledby="foto-label">
+            <button class="knop-secundair" id="foto-kiezen" type="button">Foto kiezen</button>
+            <input id="foto-bestand" type="file" accept="image/*" aria-label="Profielfoto kiezen" hidden>
+            <button class="tekstlink" id="foto-verwijderen" type="button" hidden>Foto verwijderen</button>
+          </div>
+          <p class="auth-error" id="foto-fout" role="alert" hidden></p>
+        </div>
+
+        <div class="profiel-veld">
+          <label for="profiel-naam">Naam</label>
+          <input class="auth-input" id="profiel-naam" type="text" placeholder="Je voornaam of bijnaam" maxlength="24" autocomplete="given-name" autocapitalize="words" spellcheck="false" aria-describedby="profiel-fout">
+        </div>
+
+        <div class="profiel-veld">
+          <span class="profiel-label" id="email-label">E-mailadres</span>
+          <p class="profiel-email" id="profiel-email" aria-labelledby="email-label" aria-describedby="email-uitleg"></p>
+          <p class="auth-help" id="email-uitleg">Je e-mailadres wijzigen kan nog niet.</p>
+        </div>
+
+        <div class="profiel-veld">
+          <label for="profiel-wachtwoord">Nieuw wachtwoord (optioneel)</label>
+          <div class="auth-password">
+            <input class="auth-input" id="profiel-wachtwoord" type="password" minlength="8" autocomplete="new-password" placeholder="Laat leeg om je wachtwoord te behouden" aria-describedby="wachtwoord-uitleg profiel-fout">
+            <button class="auth-toggle" id="wachtwoord-tonen" type="button" aria-controls="profiel-wachtwoord" aria-pressed="false">Toon</button>
+          </div>
+          <p class="auth-help" id="wachtwoord-uitleg">Minimaal 8 tekens. Laat het veld leeg als je niets wilt wijzigen.</p>
+        </div>
+
+        <p class="auth-error" id="profiel-fout" role="alert" hidden></p>
+        <div class="profiel-opslaan">
+          <button class="knop" id="profiel-opslaan" type="submit">Opslaan →</button>
+          <span class="profiel-opgeslagen" id="profiel-opgeslagen" role="status" hidden>
+            <svg class="vinkje" viewBox="0 0 64 64" width="40" height="40" aria-hidden="true">
+              <circle cx="32" cy="32" r="30" fill="none" stroke="var(--teal)" stroke-width="2"></circle>
+              <path d="M20 33 l9 9 l17 -18" fill="none" stroke="var(--teal)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+            <span>Opgeslagen.</span>
+          </span>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p class="footer-brand">Berie's Exam Space</p>
+    <div class="footer-details">
+      <p>Duidelijk leren. Rustig groeien.</p>
+      <p class="project-label">A project of The Berie Foundation</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const auth = window.BES.auth;
+      const form = document.getElementById('profiel-form');
+      const name = document.getElementById('profiel-naam');
+      const password = document.getElementById('profiel-wachtwoord');
+      const submit = document.getElementById('profiel-opslaan');
+      const choose = document.getElementById('foto-kiezen');
+      const remove = document.getElementById('foto-verwijderen');
+      const fileInput = document.getElementById('foto-bestand');
+      const error = document.getElementById('profiel-fout');
+      const photoError = document.getElementById('foto-fout');
+      const success = document.getElementById('profiel-opgeslagen');
+      const toggle = document.getElementById('wachtwoord-tonen');
+      let user = null;
+      let busy = false;
+      let nameChanged = false;
+      let successTimer = 0;
+      let hideTimer = 0;
+      let leaving = false;
+      const cleanName = value => Array.from(value.normalize('NFC').replace(/[^\p{L}\p{M}\p{Nd} '\u2019-]/gu, '')).slice(0, 24).join('');
+      const leaveForLogin = () => {
+        if (leaving) return;
+        leaving = true;
+        const style = document.createElement('style');
+        style.textContent = '@view-transition { navigation: none; }';
+        document.head.append(style);
+        void document.documentElement.offsetWidth;
+        window.location.replace('inloggen.html');
+      };
+
+      const render = current => {
+        if (!current) {
+          user = null;
+          password.value = '';
+          leaveForLogin();
+          return;
+        }
+        if (user && user.id !== current.id) {
+          nameChanged = false;
+          password.value = '';
+          password.type = 'password';
+          toggle.textContent = 'Toon';
+          toggle.setAttribute('aria-pressed', 'false');
+          name.removeAttribute('aria-invalid');
+          password.removeAttribute('aria-invalid');
+          error.hidden = true;
+          photoError.hidden = true;
+          fileInput.value = '';
+          hideSuccess();
+        }
+        user = current;
+        auth.avatarVullen(document.getElementById('profiel-avatar'), current);
+        if (!nameChanged) name.value = cleanName(typeof current.user_metadata?.naam === 'string' ? current.user_metadata.naam : '');
+        document.getElementById('profiel-email').textContent = current.email || '';
+        remove.hidden = !current.user_metadata?.foto;
+        form.hidden = false;
+      };
+
+      const setBusy = value => {
+        busy = value;
+        form.setAttribute('aria-busy', String(value));
+        [choose, remove, fileInput, name, password, toggle, submit].forEach(control => { control.disabled = value; });
+      };
+
+      const hideSuccess = () => {
+        window.clearTimeout(successTimer);
+        window.clearTimeout(hideTimer);
+        success.hidden = true;
+        success.classList.remove('is-fading');
+      };
+
+      const saved = () => {
+        hideSuccess();
+        success.hidden = false;
+        successTimer = window.setTimeout(() => {
+          success.classList.add('is-fading');
+          hideTimer = window.setTimeout(() => { success.hidden = true; }, 200);
+        }, 3000);
+      };
+
+      const showError = (target, message, field) => {
+        target.textContent = message;
+        target.hidden = false;
+        if (field) {
+          field.setAttribute('aria-invalid', 'true');
+          field.focus({ preventScroll: true });
+        }
+      };
+
+      const photoMessage = failure => {
+        const code = String(failure?.code || failure?.error || '').toLowerCase();
+        const message = String(failure?.message || '').toLowerCase();
+        if (code === 'nosuchbucket' || /bucket.*not found|bucket.*does not exist/.test(message)) return "Foto's zijn nog niet ingeschakeld.";
+        if (code === 'photo_invalid') return 'Deze foto kan niet worden gelezen. Kies een andere foto.';
+        if (code === 'photo_large') return 'Deze foto is na verkleinen nog te groot. Kies een andere foto.';
+        if (code === 'network' || navigator.onLine === false || failure?.name === 'StorageUnknownError' || /failed to fetch|network|load failed/.test(message)) return 'Even geen verbinding. Probeer het opnieuw.';
+        if (code === 'rate_limit' || Number(failure?.statusCode || failure?.status) === 429) return 'Even wachten, probeer het over een minuut opnieuw.';
+        if (code === 'signed_out' || Number(failure?.statusCode || failure?.status) === 401) return 'Je bent niet meer ingelogd. Log opnieuw in.';
+        return 'Je foto kon niet worden opgeslagen. Probeer het opnieuw.';
+      };
+
+      const localFailure = code => Object.assign(new Error(), { code });
+
+      const makePhoto = async file => {
+        if (!file || !file.type.startsWith('image/')) throw localFailure('photo_invalid');
+        let source;
+        let objectUrl;
+        try {
+          if ('createImageBitmap' in window) source = await createImageBitmap(file, { imageOrientation: 'from-image' });
+          else {
+            objectUrl = URL.createObjectURL(file);
+            source = await new Promise((resolve, reject) => {
+              const image = new Image();
+              image.onload = () => resolve(image);
+              image.onerror = () => reject(localFailure('photo_invalid'));
+              image.src = objectUrl;
+            });
+          }
+          const width = source.width || source.naturalWidth;
+          const height = source.height || source.naturalHeight;
+          if (!width || !height) throw localFailure('photo_invalid');
+          const canvas = document.createElement('canvas');
+          canvas.width = 256;
+          canvas.height = 256;
+          const context = canvas.getContext('2d');
+          if (!context) throw localFailure('photo_invalid');
+          context.fillStyle = '#ffffff';
+          context.fillRect(0, 0, 256, 256);
+          const side = Math.min(width, height);
+          context.drawImage(source, (width - side) / 2, (height - side) / 2, side, side, 0, 0, 256, 256);
+          const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', .85));
+          if (!blob || blob.type !== 'image/jpeg') throw localFailure('photo_invalid');
+          if (blob.size > 150 * 1024) throw localFailure('photo_large');
+          return blob;
+        } catch (failure) {
+          if (failure.code === 'photo_large') throw failure;
+          throw localFailure('photo_invalid');
+        } finally {
+          source?.close?.();
+          if (objectUrl) URL.revokeObjectURL(objectUrl);
+        }
+      };
+
+      const photoOperation = async operation => {
+        if (busy || !user) return;
+        const owner = user.id;
+        photoError.hidden = true;
+        hideSuccess();
+        setBusy(true);
+        try {
+          await operation(owner);
+        } catch (failure) {
+          if (user?.id === owner) showError(photoError, photoMessage(failure));
+        } finally {
+          setBusy(false);
+          fileInput.value = '';
+        }
+      };
+
+      choose.addEventListener('click', () => { if (!busy) fileInput.click(); });
+      fileInput.addEventListener('change', () => {
+        const file = fileInput.files?.[0];
+        if (!file) return;
+        photoOperation(async owner => {
+          const blob = await makePhoto(file);
+          const current = await auth.gebruiker();
+          if (!current || current.id !== owner) throw localFailure('signed_out');
+          const bucket = auth.client.storage.from('avatars');
+          const path = owner + '.jpg';
+          const { error: uploadError } = await bucket.upload(path, blob, { contentType: 'image/jpeg', upsert: true });
+          if (uploadError) throw uploadError;
+          const { data } = bucket.getPublicUrl(path);
+          const url = new URL(data.publicUrl);
+          url.searchParams.set('t', String(Date.now()));
+          const active = await auth.gebruiker();
+          if (!active || active.id !== owner) throw localFailure('signed_out');
+          render(await auth.profielBijwerken({ foto: url.href }));
+        });
+      });
+
+      remove.addEventListener('click', () => photoOperation(async owner => {
+        const current = await auth.gebruiker();
+        if (!current || current.id !== owner) throw localFailure('signed_out');
+        const { error: removeError } = await auth.client.storage.from('avatars').remove([owner + '.jpg']);
+        if (removeError) throw removeError;
+        const active = await auth.gebruiker();
+        if (!active || active.id !== owner) throw localFailure('signed_out');
+        render(await auth.profielBijwerken({ foto: null }));
+      }));
+
+      const cleanInput = () => {
+        const previous = name.value;
+        const start = name.selectionStart ?? previous.length;
+        const end = name.selectionEnd ?? start;
+        const cleaned = cleanName(previous);
+        if (cleaned !== previous) {
+          name.value = cleaned;
+          name.setSelectionRange(Math.min(cleanName(previous.slice(0, start)).length, cleaned.length), Math.min(cleanName(previous.slice(0, end)).length, cleaned.length));
+        }
+      };
+      name.addEventListener('input', event => {
+        nameChanged = true;
+        if (!event.isComposing) cleanInput();
+        name.removeAttribute('aria-invalid');
+        error.hidden = true;
+        hideSuccess();
+      });
+      name.addEventListener('compositionend', cleanInput);
+      password.addEventListener('input', () => {
+        password.removeAttribute('aria-invalid');
+        error.hidden = true;
+        hideSuccess();
+      });
+      toggle.addEventListener('click', () => {
+        const show = password.type === 'password';
+        password.type = show ? 'text' : 'password';
+        toggle.textContent = show ? 'Verberg' : 'Toon';
+        toggle.setAttribute('aria-pressed', String(show));
+      });
+
+      form.addEventListener('submit', async event => {
+        event.preventDefault();
+        if (busy || !user) return;
+        error.hidden = true;
+        name.removeAttribute('aria-invalid');
+        password.removeAttribute('aria-invalid');
+        hideSuccess();
+        cleanInput();
+        if (!name.value.trim()) return showError(error, 'Vul je naam in om verder te gaan.', name);
+        if (password.value && password.value.length < 8) return showError(error, 'Je wachtwoord is te kort. Kies minimaal 8 tekens.', password);
+        const owner = user.id;
+        setBusy(true);
+        submit.textContent = 'Even geduld…';
+        let failure;
+        try {
+          const updated = await auth.profielBijwerken({ naam: name.value.trim() }, password.value);
+          nameChanged = false;
+          password.value = '';
+          password.type = 'password';
+          toggle.textContent = 'Toon';
+          toggle.setAttribute('aria-pressed', 'false');
+          render(updated);
+          saved();
+        } catch (caught) {
+          failure = caught;
+        } finally {
+          setBusy(false);
+          submit.textContent = 'Opslaan →';
+        }
+        if (failure && user?.id === owner) showError(error, failure.message || 'Opslaan is niet gelukt. Probeer het opnieuw.', failure.code === 'invalid_name' ? name : ['weak_password', 'same_password'].includes(failure.code) ? password : null);
+      });
+
+      window.addEventListener('bes:auth', event => {
+        if (!event.detail?.user && event.detail?.uitloggen) return;
+        render(event.detail?.user);
+      });
+      auth.gebruiker().then(render).catch(leaveForLogin);
+    });
+  </script>
+</body>
+</html>

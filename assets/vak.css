@@ -1,4 +1,3 @@
-.vak-pagina { --fout: #b42318; --fout-zacht: rgba(180,35,24,.06); }
 .vak-pagina .wrap { max-width: 920px; }
 .vak-pagina button { font-family: var(--font-family); }
 .vak-pagina .pagina-kop .label { margin-bottom: 16px; }
@@ -8,16 +7,16 @@
 .vak-tabs { display: flex; flex-wrap: wrap; gap: 10px; margin: 32px 0 40px; }
 .vak-tab { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 22px; border: 1px solid var(--line); border-radius: var(--pill); font-size: .9375rem; font-weight: 600; line-height: 22px; box-shadow: none; cursor: pointer; transition: background-color 200ms var(--ease); }
 .vak-tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--white); }
-.vak-tab[aria-selected="false"] { background: var(--white); border-color: var(--line); color: var(--ink); box-shadow: none; }
+.vak-tab[aria-selected="false"] { background: var(--card); border-color: var(--line); color: var(--ink); box-shadow: none; }
 .vak-sectie-kop { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
 .vak-sectie-kop .sectie-kop { margin: 0; }
 .vak-pagina [role="tabpanel"] .sectie:first-child { margin-top: 0; }
 .hoofdstuk-acties { display: flex; gap: 20px; }
-.vak-tekstknop { border: 0; padding: 0; background: transparent; color: var(--accent); font-size: .9375rem; font-weight: 500; line-height: 1.5; cursor: pointer; }
+.vak-tekstknop { border: 0; padding: 0; background: var(--transparent); color: var(--accent); font-size: .9375rem; font-weight: 500; line-height: 1.5; cursor: pointer; }
 .hoofdstuk-acties .vak-tekstknop { min-height: 40px; }
 .vak-pagina .vak-tekstknop.terug { color: var(--muted); }
 .hoofdstuk { display: flex; align-items: flex-start; width: 100%; gap: 16px; text-align: left; cursor: pointer; }
-.vinkvak { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; flex: 0 0 24px; border: 1px solid var(--line); border-radius: 50%; background: var(--surface); color: transparent; font-size: 15px; line-height: 1; }
+.vinkvak { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; flex: 0 0 24px; border: 1px solid var(--line); border-radius: 50%; background: var(--surface); color: var(--transparent); font-size: 15px; line-height: 1; }
 .hoofdstuk.is-gekozen .vinkvak, .hoofdstuk[aria-checked="true"] .vinkvak { border-color: var(--accent); background: var(--accent); color: var(--white); }
 .hoofdstuk-inhoud { flex: 1; min-width: 0; }
 .hoofdstuk-boven, .score-boven { display: flex; justify-content: space-between; gap: 16px; align-items: baseline; }
@@ -33,7 +32,7 @@
 #hoofdstuk-selectie.is-gedimd { opacity: .5; }
 .modus { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; width: 100%; border-width: 2px; text-align: left; cursor: pointer; }
 .modus .kaart-titel { font-size: 1.125rem; }
-.modus.is-gekozen, .modus[aria-checked="true"] { border-color: var(--accent); background: rgba(0,113,227,.06); }
+.modus.is-gekozen, .modus[aria-checked="true"] { border-color: var(--accent); background: var(--accent-zacht); }
 .vak-hint { margin: 12px 0 0; color: var(--muted); font-size: .875rem; }
 .vak-pagina .gedimde-tekst { color: var(--muted); }
 .vak-pagina :is(#oefenscherm, #eindscherm, #vraag-tekst, #score-kop, #start-oefening) { scroll-margin-top: 100px; }
@@ -45,21 +44,21 @@
 .oefenscherm .eyebrow { margin: 24px 0 12px; color: var(--accent); font-size: .875rem; font-weight: 600; line-height: 1.5; }
 .oefenscherm h2, .eindscherm h2 { margin: 20px 0 28px; font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 600; line-height: 1.35; text-wrap: balance; }
 .opties { display: flex; flex-direction: column; gap: 12px; }
-.optie { display: flex; align-items: center; width: 100%; gap: 16px; padding: 18px 20px; border: 1px solid var(--line); border-radius: 16px; color: var(--ink); background: var(--white); font-size: 1rem; text-align: left; line-height: 1.6; cursor: pointer; transition: background-color 150ms var(--ease), border-color 150ms var(--ease); }
+.optie { display: flex; align-items: center; width: 100%; gap: 16px; padding: 18px 20px; border: 1px solid var(--line); border-radius: 16px; color: var(--ink); background: var(--card); font-size: 1rem; text-align: left; line-height: 1.6; cursor: pointer; transition: background-color 150ms var(--ease), border-color 150ms var(--ease); }
 .optie-letter { display: flex; align-items: center; justify-content: center; flex: 0 0 32px; width: 32px; height: 32px; border-radius: 50%; background: var(--surface); color: var(--muted); font-weight: 600; font-size: .875rem; }
 .optie-tekst { min-width: 0; }
 .vraag-keuze-hint { margin-bottom: 16px; }
 .optie-meervoudig .optie-letter { border: 1px solid var(--line); border-radius: 8px; }
 .optie-meervoudig.is-gekozen .optie-letter { border-color: var(--accent); }
-.optie-meervoudig.is-goed .optie-letter { border-color: transparent; }
+.optie-meervoudig.is-goed .optie-letter { border-color: var(--transparent); }
 .optie-meervoudig.is-fout .optie-letter { border-color: var(--fout); }
 .optie:disabled { opacity: 1; cursor: default; }
-.optie.is-gekozen { border-color: var(--accent); background: rgba(0,113,227,.06); }
+.optie.is-gekozen { border-color: var(--accent); background: var(--accent-zacht); }
 .optie.is-gekozen .optie-letter { color: var(--white); background: var(--accent); }
 .optie.is-goed { border-color: var(--teal); background: var(--teal-zacht); }
-.optie.is-goed .optie-letter { background: transparent; }
+.optie.is-goed .optie-letter { background: var(--transparent); }
 .optie.is-fout { border-color: var(--fout); background: var(--fout-zacht); }
-.optie.is-fout .optie-letter { color: var(--fout); background: transparent; }
+.optie.is-fout .optie-letter { color: var(--fout); background: var(--transparent); }
 .vinkje.vinkje-klein { width: 24px; height: 24px; margin: 0; }
 .uitleg { margin-top: 24px; }
 .uitleg h3 { margin: 0 0 10px; font-size: 1rem; font-weight: 600; }
@@ -101,6 +100,7 @@
   .optie:not(:disabled):hover { border-color: var(--accent); background: var(--surface); }
 }
 @media (max-width: 767px) {
+  .vak-pagina .pagina-kop h1 { overflow-wrap: anywhere; hyphens: auto; }
   .vak-pagina .wrap { padding-inline: 20px; }
   .vak-tabs { gap: 8px; margin-bottom: 32px; }
   .vak-tab { flex: 1 1 auto; padding: 0 12px; font-size: .8125rem; }
