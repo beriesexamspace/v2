@@ -18,13 +18,18 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=15">
-  <script src="assets/app.js?v=15"></script>
-  <script src="assets/config.js?v=15" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=16">
+  <script src="assets/app.js?v=16"></script>
+  <script src="assets/config.js?v=16" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=15" defer></script>
+  <script src="assets/auth.js?v=16" defer></script>
   <style>
     .whatsapp-kaart { max-width: 640px; margin-inline: auto; }
+    .whatsapp-uitleg { margin-bottom: 28px; }
+    .whatsapp-uitleg p, .whatsapp-uitleg ul { margin: 0; font-size: .9375rem; line-height: 1.6; }
+    .whatsapp-uitleg ul { padding-left: 20px; }
+    .whatsapp-uitleg li + li { margin-top: 8px; }
+    .whatsapp-lijstkop { margin: 24px 0 12px; font-size: 1rem; font-weight: 600; }
 
     .whatsapp-regel {
       display: flex;
@@ -75,11 +80,14 @@
         <span class="brand-symbol" aria-hidden="true">B</span>
         <span class="brand-name"><span>Berie's</span> <span>Exam Space</span></span>
       </a>
+      <a class="home-knop" href="hub.html" aria-label="Home" title="Home">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5M5 9v12h5v-7h4v7h5V9"/></svg>
+      </a>
       <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu">Menu</button>
       <ul class="navigation-links" id="site-menu">
         <li><a href="hub.html#hoe-werkt-het">Hoe werkt het</a></li>
         <li><a href="hub.html#nieuw">Wat is nieuw</a></li>
-        <li><a href="over-ons.html">Over ons</a></li>
+        <li><a href="over-mij.html">Over mij</a></li>
         <li><a href="whatsapp.html">WhatsApp-groep</a></li>
         <li><a href="#">Feedback</a></li>
       </ul>
@@ -95,6 +103,18 @@
         <h1 id="whatsapp-titel">De WhatsApp-groep</h1>
         <p>Eén groep voor iedereen die met Berie's Exam Space leert.</p>
       </header>
+
+      <section class="kaart whatsapp-kaart whatsapp-uitleg" aria-labelledby="whatsapp-uitleg-titel">
+        <h2 class="sectie-kop" id="whatsapp-uitleg-titel">Waarvoor is de groep?</h2>
+        <p>In de groep hoor je als eerste wat er nieuw is op Berie's Exam Space. Alleen de beheerder plaatst berichten, dus je krijgt geen gespam, alleen updates. Er zitten al bijna 200 studenten in.</p>
+        <h3 class="whatsapp-lijstkop">Wat je ontvangt</h3>
+        <ul>
+          <li>Nieuwe vakken en nieuwe vragen</li>
+          <li>Verbeteringen aan de site</li>
+          <li>Handige leertips voor de examens</li>
+          <li>Belangrijke examen-info, zoals deliberatie en tweede zit</li>
+        </ul>
+      </section>
 
       <div class="kaart whatsapp-kaart">
         <p class="whatsapp-regel"><span class="whatsapp-vink" aria-hidden="true">✓</span><span>Waarvoor: je blijft op de hoogte van alles wat er op de site bij komt.</span></p>

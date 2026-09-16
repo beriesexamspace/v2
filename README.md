@@ -16,7 +16,7 @@ inloggen.html         inloggen en herstelmail aanvragen
 wachtwoord.html       wachtwoord instellen via een herstel-link
 nieuw.html            updates na iedere nieuwe login, vóór de hub
 hub.html              jaren + tools
-over-ons.html         lege pagina voor latere inhoud
+over-mij.html         kennismaking, sociale links en het ontstaan van de site
 profiel.html          accountnaam, profielfoto en wachtwoord aanpassen
 jaar-1ba.html         vakken 1ste bachelor
 jaar-2ba.html         vakken 2de bachelor
@@ -40,16 +40,18 @@ assets/updates.js     updates voor de sectie Wat is nieuw op de hub
 - Reken je punten en Examen-info staan nu in v2 (`reken.html` en `examen-info.html`), bereikbaar via de tool-kaarten op de hub.
 - De startpagina (`index.html`) heeft bewust geen navigatiebalk en past in één schermhoogte. De getekende grijze muisaanwijzer (overgenomen uit Helder) zit in `style.css` en `app.js` en werkt op elke pagina; op touch verschijnt hij niet.
 - Gedeelde helpers staan op `window.BES` (`naamOpslaan`, `naamOphalen`, `jaarOpslaan`, `jaarOphalen`); de losse `window.naamOpslaan` enz. blijven als alias bestaan.
-- Navigatiebalk: `<nav class="navigation">` of `<nav class="nav-vol">` krijgt het Helder-gedrag (recht bovenaan, pill bij scrollen). De startpagina heeft geen balk.
+- Navigatiebalk: `<nav class="navigation">` of `<nav class="nav-vol">` krijgt het Helder-gedrag (recht bovenaan, pill bij scrollen). De startpagina heeft geen balk. Elke binnenpagina heeft direct naast het logo een Home-knop naar de hub. Op `profiel.html` houdt `data-nav="vast"` de balk volledig breed en stil, ook tijdens scrollen.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 15), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 16), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.
 - Relatieve links, zodat alles lokaal en op GitHub Pages werkt.
 - De live site (beriesexamspace.github.io) wordt niet aangeraakt tot v2 klaar is.
+
+Elke regel in `assets/updates.js` heeft `soort: 'nieuw'` of `soort: 'verbeterd'`, een datum en tekst. De hub toont eerst vier regels; bij meer regels wisselt de knop tussen Alles bekijken en Minder tonen. Het updatescherm na inloggen toont altijd alle regels. Beide gebruiken dezelfde labels en veilige tekstweergave.
 
 In `assets/updates.js` mogen korte belangrijke stukjes in `tekst` tussen `**dubbele sterretjes**` staan. Ze verschijnen als vetgedrukte tekst op de hub en het updatescherm. De rest blijft gewone tekst; HTML wordt niet uitgevoerd. Gebruik nadruk voor de naam van een veranderd onderdeel, niet voor hele alinea's.
 

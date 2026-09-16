@@ -30,12 +30,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=15">
-  <script src="assets/app.js?v=15"></script>
-  <script src="assets/updates.js?v=15"></script>
-  <script src="assets/config.js?v=15" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=16">
+  <script src="assets/app.js?v=16"></script>
+  <script src="assets/updates.js?v=16"></script>
+  <script src="assets/config.js?v=16" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=15" defer></script>
+  <script src="assets/auth.js?v=16" defer></script>
   <style>
     html { scroll-behavior: smooth; }
 
@@ -108,7 +108,17 @@
       line-height: 1.6;
     }
 
-    .hub-update-datum { color: var(--muted); }
+    .update-meta { display: flex; flex-wrap: wrap; align-content: start; align-items: center; gap: 6px 8px; }
+    .update-datum { color: var(--ink-soft); }
+    .update-label { display: inline-flex; padding: 2px 8px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 600; line-height: 1.5; }
+    .update-label-nieuw { background: var(--teal-zacht); color: var(--teal); }
+    .update-label-verbeterd { background: var(--surface); color: var(--ink-soft); }
+    .hub-updates-knop { margin-top: 24px; }
+    .hub-update.is-net-zichtbaar { animation: hub-update-binnen 150ms var(--ease) both; }
+    @keyframes hub-update-binnen {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
     .hub-handleiding { max-width: 760px; }
     .handleiding-inleiding, .handleiding-stap p { color: var(--muted); font-size: .9375rem; line-height: 1.7; }
@@ -125,6 +135,7 @@
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
       .kaart.jaar, .jaar-pijl { transition: none; }
+      .hub-update.is-net-zichtbaar { animation: none; }
       a.kaart.jaar:hover, a.kaart.jaar:active, a.kaart.jaar:hover .jaar-pijl { transform: none !important; }
     }
   </style>
@@ -136,11 +147,14 @@
         <span class="brand-symbol" aria-hidden="true">B</span>
         <span class="brand-name"><span>Berie's</span> <span>Exam Space</span></span>
       </a>
+      <a class="home-knop" href="hub.html" aria-label="Home" title="Home">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5M5 9v12h5v-7h4v7h5V9"/></svg>
+      </a>
       <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu">Menu</button>
       <ul class="navigation-links" id="site-menu">
         <li><a href="hub.html#hoe-werkt-het">Hoe werkt het</a></li>
         <li><a href="hub.html#nieuw">Wat is nieuw</a></li>
-        <li><a href="over-ons.html">Over ons</a></li>
+        <li><a href="over-mij.html">Over mij</a></li>
         <li><a href="whatsapp.html">WhatsApp-groep</a></li>
         <li><a href="#">Feedback</a></li>
       </ul>
@@ -217,6 +231,7 @@
         <h2 class="sectie-kop" id="nieuw-kop">Wat is nieuw</h2>
         <div class="kaart">
           <ul class="hub-updates" id="hub-updates"></ul>
+          <button class="knop-secundair hub-updates-knop" id="hub-updates-knop" type="button" aria-expanded="false" aria-controls="hub-updates" hidden>Alles bekijken →</button>
         </div>
       </section>
 
@@ -306,8 +321,9 @@
       const updateBegroeting = user => {
         const opgeslagen = typeof bes.naamOphalen === 'function' ? bes.naamOphalen() : '';
         const naam = String(user?.user_metadata?.naam || opgeslagen || '').trim();
-        begroeting.textContent = naam ? 'Welkom terug, ' + naam + '.' : 'Welkom.';
-        vraag.textContent = naam ? 'Wat gaan we vandaag oefenen?' : 'In welk jaar zit je?';
+        const voornaam = naam.split(/\s+/u)[0];
+        begroeting.textContent = voornaam ? 'Welkom terug, ' + voornaam + '.' : 'Welkom.';
+        vraag.textContent = voornaam ? 'Wat gaan we vandaag oefenen?' : 'In welk jaar zit je?';
       };
       updateBegroeting();
       window.addEventListener('bes:auth', event => updateBegroeting(event.detail?.user));
@@ -322,17 +338,26 @@
       });
 
       const updates = document.getElementById('hub-updates');
-      for (const update of window.BES_UPDATES || []) {
-        const item = document.createElement('li');
-        item.className = 'hub-update';
-        const datum = document.createElement('span');
-        datum.className = 'hub-update-datum';
-        datum.textContent = update.datum;
-        const tekst = document.createElement('span');
-        tekst.append(window.BES.updateTekst(update.tekst));
-        item.append(datum, tekst);
+      const updatesKnop = document.getElementById('hub-updates-knop');
+      const extraUpdates = [];
+      (window.BES_UPDATES || []).forEach((update, index) => {
+        const item = window.BES.updateRij(update, 'hub');
+        if (index >= 4) {
+          item.hidden = true;
+          extraUpdates.push(item);
+        }
         updates.append(item);
-      }
+      });
+      updatesKnop.hidden = extraUpdates.length === 0;
+      updatesKnop.addEventListener('click', () => {
+        const uitgevouwen = updatesKnop.getAttribute('aria-expanded') !== 'true';
+        extraUpdates.forEach(item => {
+          item.hidden = !uitgevouwen;
+          item.classList.toggle('is-net-zichtbaar', uitgevouwen);
+        });
+        updatesKnop.setAttribute('aria-expanded', String(uitgevouwen));
+        updatesKnop.textContent = uitgevouwen ? 'Minder tonen' : 'Alles bekijken →';
+      });
 
       const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
       const sectionForHash = hash => {

@@ -19,15 +19,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=15">
-  <script src="assets/app.js?v=15" defer></script>
-  <script src="assets/config.js?v=15" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=16">
+  <script src="assets/app.js?v=16" defer></script>
+  <script src="assets/config.js?v=16" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=15" defer></script>
+  <script src="assets/auth.js?v=16" defer></script>
   <style>
     .profiel-wrap { max-width: 640px; }
-    .profiel-kop { display: grid; justify-items: start; gap: 20px; }
-    .profiel-kop h1 { margin: 0; }
+    .profiel-kop { display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: start; gap: 20px; }
+    .profiel-kop h1 { margin: 0; overflow-wrap: anywhere; }
+    .profiel-extra { min-height: 24px; }
     .profiel-avatar-groot { width: 96px; height: 96px; font-size: 2rem; }
     .profiel-form { display: grid; gap: 28px; padding: clamp(22px, 5vw, 36px); }
     .profiel-veld { display: grid; gap: 10px; }
@@ -42,18 +43,21 @@
     @media (prefers-reduced-motion: reduce) { .profiel-opgeslagen { transition: none; } }
   </style>
 </head>
-<body>
+<body data-nav="vast">
   <header class="site-header">
     <nav class="navigation" aria-label="Hoofdnavigatie">
       <a class="brand" href="index.html" aria-label="Berie's Exam Space, startpagina">
         <span class="brand-symbol" aria-hidden="true">B</span>
         <span class="brand-name"><span>Berie's</span> <span>Exam Space</span></span>
       </a>
+      <a class="home-knop" href="hub.html" aria-label="Home" title="Home">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5M5 9v12h5v-7h4v7h5V9"/></svg>
+      </a>
       <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu">Menu</button>
       <ul class="navigation-links" id="site-menu">
         <li><a href="hub.html#hoe-werkt-het">Hoe werkt het</a></li>
         <li><a href="hub.html#nieuw">Wat is nieuw</a></li>
-        <li><a href="over-ons.html">Over ons</a></li>
+        <li><a href="over-mij.html">Over mij</a></li>
         <li><a href="whatsapp.html">WhatsApp-groep</a></li>
         <li><a href="#">Feedback</a></li>
       </ul>
@@ -66,7 +70,11 @@
       <a class="terug tekstlink" href="hub.html" data-terug="hub.html" data-terug-tekst="Terug">← Terug</a>
       <header class="pagina-kop profiel-kop">
         <span class="profiel-avatar profiel-avatar-groot" id="profiel-avatar" aria-hidden="true"></span>
-        <h1 id="profiel-titel">Jouw profiel</h1>
+        <div>
+          <h1 id="profiel-titel">Profiel</h1>
+          <p class="pagina-sub">Jouw profiel</p>
+          <div class="profiel-extra"></div>
+        </div>
       </header>
 
       <form class="kaart profiel-form" id="profiel-form" novalidate hidden>
@@ -127,6 +135,8 @@
     document.addEventListener('DOMContentLoaded', () => {
       const auth = window.BES.auth;
       const form = document.getElementById('profiel-form');
+      const title = document.getElementById('profiel-titel');
+      const avatar = document.getElementById('profiel-avatar');
       const name = document.getElementById('profiel-naam');
       const password = document.getElementById('profiel-wachtwoord');
       const submit = document.getElementById('profiel-opslaan');
@@ -143,6 +153,7 @@
       let successTimer = 0;
       let hideTimer = 0;
       let leaving = false;
+      let authRevision = 0;
       const cleanName = value => Array.from(value.normalize('NFC').replace(/[^\p{L}\p{M}\p{Nd} '\u2019-]/gu, '')).slice(0, 24).join('');
       const leaveForLogin = () => {
         if (leaving) return;
@@ -154,14 +165,8 @@
         window.location.replace('inloggen.html');
       };
 
-      const render = current => {
-        if (!current) {
-          user = null;
-          password.value = '';
-          leaveForLogin();
-          return;
-        }
-        if (user && user.id !== current.id) {
+      const render = (current, redirect = true) => {
+        if (!current || (user && user.id !== current.id)) {
           nameChanged = false;
           password.value = '';
           password.type = 'password';
@@ -174,8 +179,21 @@
           fileInput.value = '';
           hideSuccess();
         }
+        if (!current) {
+          user = null;
+          title.textContent = 'Profiel';
+          auth.avatarVullen(avatar, null);
+          name.value = '';
+          document.getElementById('profiel-email').textContent = '';
+          remove.hidden = true;
+          form.hidden = true;
+          if (redirect) leaveForLogin();
+          return;
+        }
         user = current;
-        auth.avatarVullen(document.getElementById('profiel-avatar'), current);
+        const fullName = typeof current.user_metadata?.naam === 'string' ? current.user_metadata.naam.trim() : '';
+        title.textContent = fullName || 'Profiel';
+        auth.avatarVullen(avatar, current);
         if (!nameChanged) name.value = cleanName(typeof current.user_metadata?.naam === 'string' ? current.user_metadata.naam : '');
         document.getElementById('profiel-email').textContent = current.email || '';
         remove.hidden = !current.user_metadata?.foto;
@@ -300,7 +318,8 @@
           url.searchParams.set('t', String(Date.now()));
           const active = await auth.gebruiker();
           if (!active || active.id !== owner) throw localFailure('signed_out');
-          render(await auth.profielBijwerken({ foto: url.href }));
+          const updated = await auth.profielBijwerken({ foto: url.href });
+          if (user?.id === owner && updated?.id === owner) render(updated);
         });
       });
 
@@ -311,7 +330,8 @@
         if (removeError) throw removeError;
         const active = await auth.gebruiker();
         if (!active || active.id !== owner) throw localFailure('signed_out');
-        render(await auth.profielBijwerken({ foto: null }));
+        const updated = await auth.profielBijwerken({ foto: null });
+        if (user?.id === owner && updated?.id === owner) render(updated);
       }));
 
       const cleanInput = () => {
@@ -360,6 +380,7 @@
         let failure;
         try {
           const updated = await auth.profielBijwerken({ naam: name.value.trim() }, password.value);
+          if (user?.id !== owner || updated?.id !== owner) return;
           nameChanged = false;
           password.value = '';
           password.type = 'password';
@@ -377,10 +398,15 @@
       });
 
       window.addEventListener('bes:auth', event => {
-        if (!event.detail?.user && event.detail?.uitloggen) return;
-        render(event.detail?.user);
+        authRevision += 1;
+        render(event.detail?.user, !event.detail?.uitloggen);
       });
-      auth.gebruiker().then(render).catch(leaveForLogin);
+      const initialAuthRevision = authRevision;
+      auth.gebruiker().then(current => {
+        if (authRevision === initialAuthRevision) render(current);
+      }).catch(() => {
+        if (authRevision === initialAuthRevision) render(null);
+      });
     });
   </script>
 </body>

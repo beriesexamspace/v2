@@ -165,6 +165,9 @@ a:focus-visible, button:focus-visible {
 
 .menu-toggle { display: none; }
 
+body[data-nav="vast"] .site-header { animation: none; }
+body[data-nav="vast"] :is(.navigation, .nav-vol) { transition: none; }
+
 .brand {
   display: inline-flex;
   align-items: center;
@@ -209,8 +212,8 @@ a:focus-visible, button:focus-visible {
   font-size: .9375rem;
   font-weight: 500;
   white-space: nowrap;
-  text-underline-offset: 4px;
-  transition: color 180ms var(--ease), background-color 180ms var(--ease), transform 180ms var(--ease);
+  text-decoration: none;
+  transition: color 150ms var(--ease), background-color 150ms var(--ease), transform 150ms var(--ease);
 }
 
 .pill, .knop, .knop-secundair {
@@ -233,7 +236,7 @@ a:focus-visible, button:focus-visible {
   line-height: 20px;
 }
 
-.thema-knop {
+.thema-knop, .home-knop {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -248,7 +251,7 @@ a:focus-visible, button:focus-visible {
   cursor: pointer;
 }
 
-.thema-knop svg { display: block; width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.thema-knop svg, .home-knop svg { display: block; width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .thema-knop .thema-maan { display: none; }
 html[data-theme="dark"] .thema-knop .thema-zon { display: none; }
 html[data-theme="dark"] .thema-knop .thema-maan { display: block; }
@@ -634,11 +637,14 @@ html.page-fade.page-ready body { animation: page-in 250ms ease-out both; }
 :where(html.has-hover) .terug.tekstlink:hover,
 :where(html.has-hover) .vak-pagina .vak-tekstknop.terug:hover { color: var(--ink); text-decoration: underline; }
 :where(html.has-hover) .terug:hover .terug-pijl { transform: translateX(-2px); }
-:where(html.has-hover) .navigation-links a:hover {
+:where(html.has-hover) .navigation-links a:hover,
+.navigation-links a:focus-visible {
   background-color: var(--surface);
-  color: var(--accent);
-  text-decoration: underline;
+  color: var(--ink);
+  text-decoration: none;
 }
+:where(html.has-hover) .navigation-links a:hover:not(:active),
+.navigation-links a:focus-visible:not(:active) { transform: scale(1.04); }
 :where(html.has-hover) .pill:not(:disabled):not([aria-disabled="true"]):hover { background: var(--accent-dark); }
 :where(html.has-hover) .primary-button:hover { box-shadow: var(--shadow-primary-hover); }
 :where(html.has-hover) .tekstlink:hover { text-decoration: underline; }
@@ -723,6 +729,10 @@ html.page-fade.page-ready body { animation: page-in 250ms ease-out both; }
   .brand-name span { display: block; white-space: nowrap; }
   :is(.navigation, .nav-vol):has(.thema-knop) { gap: 8px; }
   :is(.navigation, .nav-vol):has(.thema-knop) .brand-name { display: none; }
+}
+
+@media (max-width: 600px) {
+  :is(.navigation, .nav-vol):has(.home-knop) .brand-name { display: none; }
 }
 
 @media (max-width: 360px) {
@@ -949,7 +959,7 @@ html.page-fade.page-ready body { animation: page-in 250ms ease-out both; }
   touch-action: manipulation;
 }
 :where(a[href], button, summary, [role="button"], [role="tab"], [role="checkbox"], [role="radio"]):not(:disabled):not([aria-disabled="true"]):active { opacity: .8; }
-:is(.menu-toggle, .auth-toggle, .thema-knop, .profiel-knop):not(:disabled):not([aria-disabled="true"]):active { transform: scale(.97); }
+:is(.menu-toggle, .auth-toggle, .thema-knop, .home-knop, .profiel-knop):not(:disabled):not([aria-disabled="true"]):active { transform: scale(.97); }
 :is(input, textarea, select) {
   accent-color: var(--accent);
   transition: border-color 150ms var(--ease), box-shadow 150ms var(--ease);
@@ -963,8 +973,8 @@ summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 :where(html.has-hover) .terug.tekstlink:hover { text-decoration: underline; }
 :where(html.has-hover) .brand:hover { opacity: .8; }
 :where(html.has-hover) :is(.account a, .info-bron, .vak-reco a):hover { text-decoration: underline; text-underline-offset: 4px; }
-:where(html.has-hover) :is(.menu-toggle, .auth-toggle, .thema-knop, .profiel-knop):not(:disabled):not([aria-disabled="true"]):hover { background-color: var(--surface); border-color: var(--accent); box-shadow: var(--shadow-soft); }
-:where(html.has-hover) :is(.menu-toggle, .auth-toggle, .thema-knop, .profiel-knop):not(:disabled):not([aria-disabled="true"]):hover:not(:active) { transform: translateY(-1px); }
+:where(html.has-hover) :is(.menu-toggle, .auth-toggle, .thema-knop, .home-knop, .profiel-knop):not(:disabled):not([aria-disabled="true"]):hover { background-color: var(--surface); border-color: var(--accent); box-shadow: var(--shadow-soft); }
+:where(html.has-hover) :is(.menu-toggle, .auth-toggle, .thema-knop, .home-knop, .profiel-knop):not(:disabled):not([aria-disabled="true"]):hover:not(:active) { transform: translateY(-1px); }
 :where(html.has-hover) summary:hover { background-color: var(--surface); text-decoration: underline; }
 :where(html.has-hover) :is(input, textarea, select):not(:disabled):not([readonly]):not([aria-invalid="true"]):hover { border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
 :where(html.has-hover) .vak-pagina .vak-tab[aria-selected="true"]:hover { background-color: var(--accent-dark); border-color: var(--accent-dark); }
@@ -973,8 +983,8 @@ summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 @media (prefers-reduced-motion: reduce) {
   .knop:is(:hover, :active), .knop-secundair:is(:hover, :active), .pill:is(:hover, :active),
   .kaart:is(:hover, :active), .kaart:is(:hover, :active) .pijl,
-  .terug:active, .terug:hover .terug-pijl, .navigation-links a:active,
-  :is(.menu-toggle, .auth-toggle, .thema-knop, .profiel-knop):is(:hover, :active),
+  .terug:active, .terug:hover .terug-pijl, .navigation-links a:is(:hover, :focus-visible, :active),
+  :is(.menu-toggle, .auth-toggle, .thema-knop, .home-knop, .profiel-knop):is(:hover, :active),
   .vak-pagina :is(.vak-tab, .optie, [role="checkbox"], [role="radio"]):active { transform: none !important; }
   .vinkje circle, .vinkje path { animation: none; stroke-dashoffset: 0; }
 }
