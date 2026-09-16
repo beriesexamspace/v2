@@ -5,17 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Alle vakken van de 1ste bachelor in Berie's Exam Space. Kies een vak en begin met oefenen.">
   <meta name="theme-color" content="#FFFFFF">
+  <script>
+    (() => {
+      let keuze;
+      try { keuze = window.localStorage.getItem('bes_thema'); } catch {}
+      const donker = keuze === 'donker' || (keuze !== 'licht' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.dataset.theme = donker ? 'dark' : 'light';
+      document.querySelector('meta[name="theme-color"]').content = donker ? '#0B0B0C' : '#FFFFFF';
+    })();
+  </script>
   <meta name="robots" content="noindex">
   <title>1ste bachelor | Berie's Exam Space</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=12">
-  <script src="assets/app.js?v=12"></script>
-  <script src="assets/config.js?v=12" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=15">
+  <script src="assets/app.js?v=15"></script>
+  <script src="assets/config.js?v=15" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=12" defer></script>
-  <script src="assets/vakken.js?v=12"></script>
+  <script src="assets/auth.js?v=15" defer></script>
+  <script src="assets/vakken.js?v=15"></script>
   <style>
     .vak {
       animation: rise 500ms var(--ease) both;
@@ -50,7 +59,7 @@
       <ul class="navigation-links" id="site-menu">
         <li><a href="hub.html#hoe-werkt-het">Hoe werkt het</a></li>
         <li><a href="hub.html#nieuw">Wat is nieuw</a></li>
-        <li><a href="#">Over ons</a></li>
+        <li><a href="over-ons.html">Over ons</a></li>
         <li><a href="whatsapp.html">WhatsApp-groep</a></li>
         <li><a href="#">Feedback</a></li>
       </ul>
@@ -77,7 +86,7 @@
     <p class="footer-brand">Berie's Exam Space</p>
     <div class="footer-details">
       <p>Duidelijk leren. Rustig groeien.</p>
-      <p class="project-label">A project of Berie Foundation</p>
+      <p class="project-label">A project of The Berie Foundation</p>
     </div>
   </footer>
 

@@ -5,19 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Bereken je cijfer voor een vak, je gewogen gemiddelde en de deliberatievoorwaarden in Berie's Exam Space.">
   <meta name="theme-color" content="#FFFFFF">
+  <script>
+    (() => {
+      let keuze;
+      try { keuze = window.localStorage.getItem('bes_thema'); } catch {}
+      const donker = keuze === 'donker' || (keuze !== 'licht' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.dataset.theme = donker ? 'dark' : 'light';
+      document.querySelector('meta[name="theme-color"]').content = donker ? '#0B0B0C' : '#FFFFFF';
+    })();
+  </script>
   <meta name="robots" content="noindex">
   <title>Reken je punten | Berie's Exam Space</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=12">
-  <script src="assets/app.js?v=12"></script>
-  <script src="assets/config.js?v=12" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=15">
+  <script src="assets/app.js?v=15"></script>
+  <script src="assets/config.js?v=15" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=12" defer></script>
-  <script src="assets/reken.js" defer></script>
+  <script src="assets/auth.js?v=15" defer></script>
+  <script src="assets/reken.js?v=15" defer></script>
   <style>
-    .reken-pagina { --fout: #b42318; --fout-zacht: rgba(180,35,24,.06); }
+
     .reken-pagina .wrap { max-width: 808px; }
     .reken-pagina .pagina-kop .eyebrow { margin: 0 0 16px; color: var(--accent); font-size: .875rem; font-weight: 600; line-height: 1.5; }
     .reken-pagina .pagina-kop > p:last-child { max-width: 640px; }
@@ -27,7 +36,6 @@
     .calcsub { max-width: 590px; margin: 12px 0 28px; color: var(--muted); font-size: .9375rem; line-height: 1.6; }
     .wis-rij { display: flex; justify-content: flex-end; margin: 0 0 16px; }
     .reken-pagina .tekstlink { padding: 0; border: 0; background: transparent; color: var(--accent); font: 500 .9375rem/1.5 var(--font-family); text-underline-offset: 4px; cursor: pointer; }
-    .reken-pagina .tekstlink:hover { text-decoration: underline; }
     .chead, .crow { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 126px) minmax(0, 126px) 40px; align-items: center; gap: 12px; }
     .chead { margin-bottom: 10px; color: var(--muted); font-size: .8125rem; line-height: 1.5; }
     .rows { display: grid; gap: 12px; }
@@ -35,8 +43,7 @@
     .reken-veld .auth-input { min-width: 0; }
     .veld-label { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
     .num { font-variant-numeric: tabular-nums; }
-    .delbtn { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 50%; background: var(--white); color: var(--muted); font: 400 1.5rem/1 var(--font-family); cursor: pointer; }
-    .delbtn:hover:not(:disabled) { background: var(--surface); color: var(--ink); }
+    .delbtn { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 50%; background: var(--card); color: var(--muted); font: 400 1.5rem/1 var(--font-family); cursor: pointer; }
     .delbtn:disabled { opacity: .4; cursor: default; }
     .reken-pagina .addbtn { min-height: 44px; padding: 8px 22px; margin-top: 20px; font-size: .9375rem; line-height: 26px; }
     .metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin-top: 32px; padding: 24px 0; border-top: 1px solid var(--line); }
@@ -73,6 +80,8 @@
     .verdict[data-state="fout"] .verdict-teken { background: transparent; }
     .reken-noot { max-width: 760px; margin: 24px auto 0; color: var(--muted); font-size: .8125rem; line-height: 1.7; }
     .reken-noot + .reken-noot { margin-top: 10px; }
+    :where(html.has-hover) .reken-pagina .tekstlink:hover { text-decoration: underline; }
+    :where(html.has-hover) .delbtn:hover:not(:disabled) { background: var(--surface); color: var(--ink); }
     @media (max-width: 767px) {
       .reken-pagina .wrap { padding-inline: 20px; }
       .reken-kaart { padding: 20px; }
@@ -103,7 +112,7 @@
       <ul class="navigation-links" id="site-menu">
         <li><a href="hub.html#hoe-werkt-het">Hoe werkt het</a></li>
         <li><a href="hub.html#nieuw">Wat is nieuw</a></li>
-        <li><a href="#">Over ons</a></li>
+        <li><a href="over-ons.html">Over ons</a></li>
         <li><a href="whatsapp.html">WhatsApp-groep</a></li>
         <li><a href="#">Feedback</a></li>
       </ul>
@@ -172,7 +181,7 @@
     <p class="footer-brand">Berie's Exam Space</p>
     <div class="footer-details">
       <p>Duidelijk leren. Rustig groeien.</p>
-      <p class="project-label">A project of Berie Foundation</p>
+      <p class="project-label">A project of The Berie Foundation</p>
     </div>
   </footer>
 </body>

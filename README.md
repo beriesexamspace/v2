@@ -14,8 +14,10 @@ index.html            startpagina (de deur)
 aanmelden.html        account maken, één vraag per stap
 inloggen.html         inloggen en herstelmail aanvragen
 wachtwoord.html       wachtwoord instellen via een herstel-link
-nieuw.html            eenmalig overzicht vóór de hub
+nieuw.html            updates na iedere nieuwe login, vóór de hub
 hub.html              jaren + tools
+over-ons.html         lege pagina voor latere inhoud
+profiel.html          accountnaam, profielfoto en wachtwoord aanpassen
 jaar-1ba.html         vakken 1ste bachelor
 jaar-2ba.html         vakken 2de bachelor
 jaar-3ba.html         vakken 3de bachelor
@@ -42,12 +44,16 @@ assets/updates.js     updates voor de sectie Wat is nieuw op de hub
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 12), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 15), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.
 - Relatieve links, zodat alles lokaal en op GitHub Pages werkt.
 - De live site (beriesexamspace.github.io) wordt niet aangeraakt tot v2 klaar is.
+
+In `assets/updates.js` mogen korte belangrijke stukjes in `tekst` tussen `**dubbele sterretjes**` staan. Ze verschijnen als vetgedrukte tekst op de hub en het updatescherm. De rest blijft gewone tekst; HTML wordt niet uitgevoerd. Gebruik nadruk voor de naam van een veranderd onderdeel, niet voor hele alinea's.
+
+Hover volgt de werkelijk gebruikte invoer via `html.has-hover`: muisbewegingen schakelen de effecten in, aanraken schakelt ze uit. Dit werkt ook in ingebouwde browsers die geen hovermogelijkheid melden. Knoppen bewegen maximaal 2 px met een kleine vergroting; bij verminderde beweging blijven alleen kleur en schaduw veranderen.
 
 ## Accounts (Supabase)
 1. De beheerder vult `assets/config.js` in met de project-URL en publieke anon key uit Supabase, via Settings → API. Vervang `[SUPABASE_URL]` en `[SUPABASE_ANON_KEY]`. De anon key mag publiek zijn; voeg nooit een geheime sleutel of service-role key toe.
@@ -60,7 +66,25 @@ De accountnaam staat in Supabase onder user metadata `naam` en wordt lokaal opge
 
 Een project op het instapplan kan na een week zonder voldoende gebruik pauzeren. Open dan het project in het Supabase-dashboard en kies "Resume project". Zie de [Supabase-uitleg over projectpauzes](https://supabase.com/docs/guides/platform/free-project-pausing).
 
-De enige toegangspoort naar `nieuw.html` staat vóór het renderen in de head van `hub.html`. `bes_nieuw_gezien` wordt na "Begrepen" in zowel localStorage als sessionStorage opgeslagen. Als beide opslagmogelijkheden ontbreken of geen gegevens kunnen opslaan, blijft de hub bereikbaar om een doorverwijslus te voorkomen.
+Na een geslaagde aanmelding of login wordt `sessionStorage.bes_nieuw_gezien` gewist en opent `nieuw.html`. Uitloggen wist de sleutel ook. De toegangspoort in de head van `hub.html` controleert uitsluitend sessionStorage; oude waarden in localStorage worden niet meer gebruikt. "Begrepen →" bewaart de sleutel voor deze browsersessie en opent de hub, met behoud van een eventuele sectiehash. Tijdens dezelfde sessie verschijnt het scherm niet opnieuw bij paginawissels. Een nieuwe login toont de updates opnieuw. Als sessionStorage geblokkeerd is, blijft de hub bereikbaar om een doorverwijslus te voorkomen.
+
+De licht/donkerkeuze staat in `localStorage.bes_thema` (`licht` of `donker`). Zonder keuze volgt de pagina het systeem. Bij ingelogde accounts wordt de keuze ook opgeslagen in `user_metadata.thema`; de accountkeuze wordt toegepast zodra de sessie geladen is. Het kleine script vóór de stylesheet past de lokaal bekende keuze al vóór het eerste beeld toe. Op een nieuw toestel kan de accountkeuze pas worden toegepast zodra de accountgegevens beschikbaar zijn. `BES.themaToepassen()` past een keuze toe en bewaart die lokaal.
+
+### Profielfoto's inschakelen
+
+Voer onderstaande SQL één keer uit via **SQL Editor → Run**. De bucket is publiek leesbaar zodat avatars kunnen worden weergegeven. Elk ingelogd account kan alleen het eigen bestand schrijven, bijwerken of verwijderen. Profielfoto's worden in de browser vierkant bijgesneden, verkleind tot 256 × 256 pixels en als JPEG opgeslagen. De pagina weigert een resultaat groter dan 150 KB; de bucketlimiet is 200 KB.
+
+```sql
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('avatars', 'avatars', true, 204800, array['image/jpeg'])
+on conflict (id) do nothing;
+create policy "avatar lezen" on storage.objects for select using (bucket_id = 'avatars');
+create policy "eigen avatar uploaden" on storage.objects for insert with check (bucket_id = 'avatars' and auth.uid()::text = split_part(name, '.', 1));
+create policy "eigen avatar bijwerken" on storage.objects for update using (bucket_id = 'avatars' and auth.uid()::text = split_part(name, '.', 1));
+create policy "eigen avatar verwijderen" on storage.objects for delete using (bucket_id = 'avatars' and auth.uid()::text = split_part(name, '.', 1));
+```
+
+Zolang de bucket ontbreekt, meldt de profielpagina "Foto's zijn nog niet ingeschakeld." bij een fotobewerking. Naam, wachtwoord en thema blijven zelfstandig werken. De publieke foto-URL met tijdparameter staat in `user_metadata.foto`. Een upload en de daaropvolgende metadatawijziging zijn aparte verzoeken; bij een storing toont de pagina een fout en kan de gebruiker opnieuw proberen. Voer na het aanmaken van de bucket een echte upload en verwijdering uit en controleer met een tweede account dat alleen het eigen bestand aangepast kan worden. De browsercontroles bij deze wijziging gebruiken een nagebootste account- en opslagdienst en veranderen geen bestaande accounts of bestanden.
 
 ## Vakpagina
 

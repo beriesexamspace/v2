@@ -5,12 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="description" content="Oefenvragen, theorie en examensimulaties voor psychologiestudenten aan de VUB.">
 <meta name="theme-color" content="#FFFFFF">
+  <script>
+    (() => {
+      let keuze;
+      try { keuze = window.localStorage.getItem('bes_thema'); } catch {}
+      const donker = keuze === 'donker' || (keuze !== 'licht' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.dataset.theme = donker ? 'dark' : 'light';
+      document.querySelector('meta[name="theme-color"]').content = donker ? '#0B0B0C' : '#FFFFFF';
+    })();
+  </script>
 <title>Berie's Exam Space</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='%230071e3'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='Inter,Arial,sans-serif' font-size='34' font-weight='700' fill='%23fff'%3EB%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=12">
+<link rel="stylesheet" href="assets/style.css?v=15">
 <style>
   *{margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -141,7 +150,7 @@
   <p class="footer-brand">Berie's Exam Space</p>
   <div class="footer-details">
     <p>Duidelijk leren. Rustig groeien.</p>
-    <p class="project-label">A project of Berie Foundation</p>
+    <p class="project-label">A project of The Berie Foundation</p>
   </div>
 </footer>
 
@@ -185,9 +194,9 @@
   setTimeout(schrijf, 400);
 })();
 </script>
-<script src="assets/app.js?v=12"></script>
-<script src="assets/config.js?v=12" defer></script>
+<script src="assets/app.js?v=15"></script>
+<script src="assets/config.js?v=15" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-<script src="assets/auth.js?v=12" defer></script>
+<script src="assets/auth.js?v=15" defer></script>
 </body>
 </html>
