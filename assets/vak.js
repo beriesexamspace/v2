@@ -75,15 +75,18 @@
       if (!chapter || typeof chapter.id !== 'string' || !chapter.id || chapters.has(chapter.id) || typeof chapter.naam !== 'string' || !chapter.naam.trim()) return null;
       chapters.add(chapter.id);
     }
-    if (raw.vragen.some(question => {
+    const invalidQuestion = question => {
       if (!question || !chapters.has(question.h) || typeof question.q !== 'string' || !question.q.trim() || typeof question.u !== 'string' || !Array.isArray(question.o)) return true;
       const multiple = Array.isArray(question.a);
       const answers = multiple ? question.a : [question.a];
       return question.o.length < 2 || question.o.length > (multiple ? 10 : 5) || question.o.some(option => typeof option !== 'string' || !option.trim()) || new Set(question.o.map(option => option.trim())).size !== question.o.length || !answers.length || new Set(answers).size !== answers.length || answers.some(index => !Number.isInteger(index) || index < 0 || index >= question.o.length) || (question.kies !== undefined && question.kies !== 'fout');
-    })) return null;
+    };
+    if (raw.vragen.some(invalidQuestion)) return null;
+    const hardQuestions = Array.isArray(raw.hardVragen) && !raw.hardVragen.some(invalidQuestion) ? raw.hardVragen : [];
     return {
       ...raw,
       vragen: raw.vragen.map((question, id) => ({ ...question, id })),
+      hardVragen: hardQuestions.map((question, id) => ({ ...question, id: `hard:${id}` })),
       hacks: (Array.isArray(raw.hacks) ? raw.hacks : []).filter(item => item && (item.h === 'algemeen' || chapters.has(item.h)) && typeof item.t === 'string'),
       theorie: (Array.isArray(raw.theorie) ? raw.theorie : []).filter(item => item && (item.h === 'algemeen' || chapters.has(item.h)) && typeof item.kop === 'string' && Array.isArray(item.items) && item.items.every(point => typeof point === 'string'))
     };
@@ -100,11 +103,19 @@
       return;
     }
 
-    const storageKey = `bes_voortgang_${data.id}`;
-    const counts = Object.fromEntries(data.hoofdstukken.map(chapter => [chapter.id, data.vragen.filter(question => question.h === chapter.id).length]));
+    const hasLevels = Boolean(document.querySelector('main.vak-pagina[data-niveaus]'));
+    const levels = hasLevels ? ['normaal', 'hard'] : ['normaal'];
+    const levelLabel = value => value === 'hard' ? 'Hard mode' : 'Normaal';
+    const modeLabel = value => value === 'simulatie' ? 'Examensimulatie' : 'Examen Training';
+    const courseKey = value => value === 'hard' ? `${data.id}__hard` : data.id;
+    const questionsFor = value => value === 'hard' && hasLevels ? data.hardVragen : data.vragen;
+    const countsFor = value => Object.fromEntries(data.hoofdstukken.map(chapter => [chapter.id, questionsFor(value).filter(question => question.h === chapter.id).length]));
+    const selections = new Map(levels.map(value => [value, new Set(questionsFor(value).map(question => question.h))]));
+    const banks = new Map(levels.map(value => [value, new Map()]));
+    let level = 'normaal';
+    let counts = countsFor(level);
     const chapterNames = Object.fromEntries(data.hoofdstukken.map(chapter => [chapter.id, chapter.naam]));
-    const selected = new Set(data.hoofdstukken.filter(chapter => counts[chapter.id]).map(chapter => chapter.id));
-    const contexts = new Map();
+    let selected = selections.get(level);
     let context = null;
     let authGeneration = 0;
     let mode = 'training';
@@ -147,33 +158,38 @@
       return { goed: Math.min(integer(raw.goed), raw.totaal), totaal: raw.totaal, bijgewerkt: new Date(timestamp(raw.bijgewerkt)).toISOString() };
     }
 
-    function newContext(owner, chapters = {}, simulation = null) {
-      return { owner, chapters: cleanProgress(chapters), simulation: cleanSimulation(simulation), pending: new Map(), timer: 0, sending: false, loaded: !owner };
+    function newContext(owner, value, chapters = {}, simulation = null) {
+      return { owner, level: value, chapters: cleanProgress(chapters), simulation: cleanSimulation(simulation), pending: new Map(), timer: 0, sending: false, loaded: !owner };
     }
 
-    let stored = null;
-    try { stored = JSON.parse(window.localStorage.getItem(storageKey)); } catch {}
-    if (stored && typeof stored === 'object') {
-      if (stored.profielen && typeof stored.profielen === 'object') {
-        Object.values(stored.profielen).forEach(profile => {
-          if (!profile || typeof profile !== 'object' || !(profile.eigenaar === null || typeof profile.eigenaar === 'string')) return;
-          contexts.set(profile.eigenaar, newContext(profile.eigenaar, profile.hoofdstukken, profile.laatsteSimulatie));
-        });
+    levels.forEach(value => {
+      const bank = banks.get(value);
+      let stored = null;
+      try { stored = JSON.parse(window.localStorage.getItem(`bes_voortgang_${courseKey(value)}`)); } catch {}
+      if (stored && typeof stored === 'object') {
+        if (stored.profielen && typeof stored.profielen === 'object') {
+          Object.values(stored.profielen).forEach(profile => {
+            if (!profile || typeof profile !== 'object' || !(profile.eigenaar === null || typeof profile.eigenaar === 'string')) return;
+            bank.set(profile.eigenaar, newContext(profile.eigenaar, value, profile.hoofdstukken, profile.laatsteSimulatie));
+          });
+        }
+        const owner = typeof stored.eigenaar === 'string' ? stored.eigenaar : null;
+        const active = newContext(owner, value, stored.hoofdstukken || stored, stored.laatsteSimulatie);
+        bank.set(owner, active);
+        if (value === level) context = active;
+      } else {
+        const guest = newContext(null, value);
+        bank.set(null, guest);
+        if (value === level) context = guest;
       }
-      const owner = typeof stored.eigenaar === 'string' ? stored.eigenaar : null;
-      context = newContext(owner, stored.hoofdstukken || stored, stored.laatsteSimulatie);
-      contexts.set(owner, context);
-    } else {
-      context = newContext(null);
-      contexts.set(null, context);
-    }
+    });
 
-    function save() {
+    function save(target = context) {
       try {
-        const profiles = Object.fromEntries([...contexts].map(([owner, profile]) => [owner === null ? 'gast' : `account:${owner}`, {
+        const profiles = Object.fromEntries([...banks.get(target.level)].map(([owner, profile]) => [owner === null ? 'gast' : `account:${owner}`, {
           eigenaar: owner, hoofdstukken: profile.chapters, laatsteSimulatie: profile.simulation
         }]));
-        window.localStorage.setItem(storageKey, JSON.stringify({ eigenaar: context.owner, hoofdstukken: context.chapters, laatsteSimulatie: context.simulation, profielen: profiles }));
+        window.localStorage.setItem(`bes_voortgang_${courseKey(target.level)}`, JSON.stringify({ eigenaar: target.owner, hoofdstukken: target.chapters, laatsteSimulatie: target.simulation, profielen: profiles }));
       } catch {}
     }
 
@@ -184,7 +200,7 @@
     }
 
     function scheduleSync(target = context) {
-      if (!target.owner || !target.loaded || !target.pending.size || target.sending || target.timer || target !== context || !BES.auth?.client) return;
+      if (!target.owner || !target.loaded || !target.pending.size || target.sending || target.timer || target.owner !== context.owner || !BES.auth?.client) return;
       const delay = Math.max(0, 2000 - (Date.now() - lastSyncSent));
       target.timer = window.setTimeout(() => {
         target.timer = 0;
@@ -193,12 +209,12 @@
     }
 
     async function flush(target) {
-      if (target !== context || !target.owner || target.sending || !target.pending.size || !BES.auth?.client) return;
+      if (target.owner !== context.owner || !target.owner || !target.loaded || target.sending || !target.pending.size || !BES.auth?.client) return;
       if (Date.now() - lastSyncSent < 2000) { scheduleSync(target); return; }
       const generation = authGeneration;
       const batch = [...target.pending.entries()];
       const rows = batch.map(([chapter, record]) => ({
-        user_id: target.owner, vak: data.id, hoofdstuk: chapter,
+        user_id: target.owner, vak: courseKey(target.level), hoofdstuk: chapter,
         beantwoord: record.beantwoord, goed: record.goed,
         laatst_goed: record.laatstGoed, laatst_totaal: record.laatstTotaal, bijgewerkt: record.bijgewerkt
       }));
@@ -209,7 +225,7 @@
         const { error } = await BES.auth.client.from('voortgang').upsert(rows, { onConflict: 'user_id,vak,hoofdstuk' });
         if (error) throw error;
         succeeded = true;
-        if (generation !== authGeneration || target !== context) return;
+        if (generation !== authGeneration || target.owner !== context.owner) return;
         batch.forEach(([chapter, record]) => {
           if (target.pending.get(chapter)?.bijgewerkt === record.bijgewerkt) target.pending.delete(chapter);
         });
@@ -224,9 +240,9 @@
       const client = BES.auth?.client;
       if (!target.owner || !client) { target.loaded = true; return; }
       try {
-        const { data: rows, error } = await client.from('voortgang').select('hoofdstuk,beantwoord,goed,laatst_goed,laatst_totaal,bijgewerkt').eq('user_id', target.owner).eq('vak', data.id);
+        const { data: rows, error } = await client.from('voortgang').select('hoofdstuk,beantwoord,goed,laatst_goed,laatst_totaal,bijgewerkt').eq('user_id', target.owner).eq('vak', courseKey(target.level));
         if (error) throw error;
-        if (generation !== authGeneration || target !== context) return;
+        if (generation !== authGeneration || target.owner !== context.owner) return;
         const remote = cleanProgress(Object.fromEntries((rows || []).map(row => [row.hoofdstuk, {
           beantwoord: row.beantwoord, goed: row.goed, laatstGoed: row.laatst_goed, laatstTotaal: row.laatst_totaal, bijgewerkt: row.bijgewerkt
         }])));
@@ -239,11 +255,11 @@
             target.pending.set(id, local);
           }
         });
-        save();
-        renderChapters();
+        save(target);
+        if (target === context) renderChapters();
       } catch { syncError(); }
       finally {
-        if (generation === authGeneration && target === context) {
+        if (generation === authGeneration && target.owner === context.owner) {
           target.loaded = true;
           scheduleSync(target);
         }
@@ -254,32 +270,73 @@
       const owner = user?.id || null;
       if (owner === context.owner && context.authReady) return;
       const previous = context;
-      window.clearTimeout(previous.timer);
-      previous.timer = 0;
       authGeneration += 1;
-      if (!contexts.has(owner)) contexts.set(owner, newContext(owner));
-      context = contexts.get(owner);
-      if (owner && !previous.owner) {
-        Object.entries(previous.chapters).forEach(([chapter, record]) => {
-          if (!context.chapters[chapter] || timestamp(record.bijgewerkt) > timestamp(context.chapters[chapter].bijgewerkt)) context.chapters[chapter] = { ...record };
-        });
-        if (previous.simulation && (!context.simulation || timestamp(previous.simulation.bijgewerkt) > timestamp(context.simulation.bijgewerkt))) context.simulation = { ...previous.simulation };
-        previous.chapters = {};
-        previous.simulation = null;
-        previous.pending.clear();
-      }
-      context.authReady = true;
-      context.loaded = !owner;
-      if (session && previous !== context) {
+      banks.forEach((bank, value) => {
+        bank.forEach(profile => { window.clearTimeout(profile.timer); profile.timer = 0; });
+        if (!bank.has(owner)) bank.set(owner, newContext(owner, value));
+        const target = bank.get(owner);
+        const guest = bank.get(null);
+        if (owner && !previous.owner && guest) {
+          Object.entries(guest.chapters).forEach(([chapter, record]) => {
+            if (!target.chapters[chapter] || timestamp(record.bijgewerkt) > timestamp(target.chapters[chapter].bijgewerkt)) target.chapters[chapter] = { ...record };
+          });
+          if (guest.simulation && (!target.simulation || timestamp(guest.simulation.bijgewerkt) > timestamp(target.simulation.bijgewerkt))) target.simulation = { ...guest.simulation };
+          guest.chapters = {};
+          guest.simulation = null;
+          guest.pending.clear();
+        }
+        target.authReady = true;
+        target.loaded = !owner;
+        save(target);
+      });
+      context = banks.get(level).get(owner);
+      if (previous !== context) {
         session = null;
         lastRun = null;
-        showScreen('keuzes');
+        if (screen !== 'keuzes') showScreen('keuzes');
       }
-      save();
       renderChapters();
       renderSimulation();
       updateStart();
-      loadRemote(context, authGeneration);
+      banks.forEach(bank => loadRemote(bank.get(owner), authGeneration));
+    }
+
+    function setLevel(value) {
+      if (!hasLevels || !levels.includes(value) || (value === 'hard' && !data.hardVragen.length) || screen !== 'keuzes') return;
+      if (level !== value) {
+        const previous = context;
+        level = value;
+        counts = countsFor(level);
+        selected = selections.get(level);
+        const bank = banks.get(level);
+        if (!bank.has(previous.owner)) bank.set(previous.owner, newContext(previous.owner, level));
+        context = bank.get(previous.owner);
+        context.authReady = previous.authReady;
+        if (context.authReady) {
+          save();
+          if (context.loaded) scheduleSync(context);
+        }
+      }
+      byId('niveau-keuzes')?.querySelectorAll('[data-niveau]').forEach(button => {
+        const active = button.dataset.niveau === level;
+        button.disabled = button.dataset.niveau === 'hard' && !data.hardVragen.length;
+        button.setAttribute('aria-checked', String(active));
+        button.tabIndex = active ? 0 : -1;
+        button.classList.toggle('is-gekozen', active);
+      });
+      if (byId('niveau-uitleg')) {
+        byId('niveau-uitleg').textContent = !data.hardVragen.length
+          ? 'Voor dit vak staan nog geen vragen voor Hard mode klaar. Je kunt oefenen op Normaal.'
+          : level === 'hard'
+            ? `Eerste set: ${countText(data.hardVragen.length)} waarin je kennis toepast en begrippen combineert. Alleen hoofdstukken met Hard mode-vragen zijn beschikbaar.`
+            : 'Oefen met de bestaande vragen. Hard mode heeft een eigen vragenreeks en aparte voortgang.';
+      }
+      if (byId('voortgang-niveau')) byId('voortgang-niveau').textContent = `Voortgang: ${levelLabel(level)}`;
+      const simulationDescription = byId('modus-keuzes').querySelector('[data-modus="simulatie"] .kaart-sub');
+      if (simulationDescription) simulationDescription.textContent = `${countText(Math.min(20, questionsFor(level).length))}, uitslag en uitleg aan het einde.`;
+      renderChapters();
+      renderSimulation();
+      updateStart();
     }
 
     function renderChapters() {
@@ -288,22 +345,23 @@
       list.replaceChildren();
       data.hoofdstukken.forEach(chapter => {
         const total = counts[chapter.id];
+        const chosen = hasLevels && mode === 'simulatie' ? Boolean(total) : selected.has(chapter.id);
         const record = context.authReady || !context.owner ? context.chapters[chapter.id] : null;
         const complete = Boolean(record?.laatstTotaal && record.laatstGoed === record.laatstTotaal);
         const row = create('button', 'hoofdstuk kaart');
         row.type = 'button';
         row.dataset.hoofdstuk = chapter.id;
         row.setAttribute('role', 'checkbox');
-        row.setAttribute('aria-checked', String(selected.has(chapter.id)));
+        row.setAttribute('aria-checked', String(chosen));
         row.disabled = !total || mode === 'simulatie';
-        row.classList.toggle('is-gekozen', selected.has(chapter.id));
+        row.classList.toggle('is-gekozen', chosen);
         row.classList.toggle('is-afgerond', complete);
         row.classList.toggle('is-leeg', !total);
-        const checkbox = create('span', 'vinkvak', selected.has(chapter.id) ? '✓' : '');
+        const checkbox = create('span', 'vinkvak', chosen ? '✓' : '');
         checkbox.setAttribute('aria-hidden', 'true');
         const body = create('span', 'hoofdstuk-inhoud');
         const top = create('span', 'hoofdstuk-boven');
-        top.append(create('span', 'hoofdstuk-kop', chapter.naam), create('span', 'hoofdstuk-aantal', total ? countText(total) : 'Nog geen vragen'));
+        top.append(create('span', 'hoofdstuk-kop', chapter.naam), create('span', 'hoofdstuk-aantal', total ? countText(total) : level === 'hard' ? 'Nog geen Hard mode-vragen' : 'Nog geen vragen'));
         const bottom = create('span', 'hoofdstuk-voortgang');
         const progressText = !record ? 'Nog niet geoefend' : `${record.laatstGoed} van ${record.laatstTotaal} goed${complete ? ' · Afgerond ✓' : ''}`;
         bottom.append(progressBar(record?.laatstGoed || 0, record?.laatstTotaal || 0), create('span', 'voortgang-tekst', progressText));
@@ -323,14 +381,24 @@
     function renderSimulation() {
       const result = context.authReady || !context.owner ? context.simulation : null;
       byId('laatste-simulatie').hidden = !result;
-      byId('laatste-simulatie').textContent = result ? `Laatste simulatie: ${result.goed} van ${result.totaal}` : '';
+      byId('laatste-simulatie').textContent = result ? `Laatste simulatie${hasLevels ? ` (${levelLabel(level)})` : ''}: ${result.goed} van ${result.totaal}` : '';
     }
 
     function updateStart() {
       const emptySelection = mode === 'training' && !selected.size;
-      byId('start-oefening').disabled = emptySelection || !data.vragen.length || !context.authReady;
+      const pool = questionsFor(level);
+      const amount = mode === 'simulatie' ? Math.min(20, pool.length) : pool.filter(question => selected.has(question.h)).length;
+      byId('start-oefening').disabled = emptySelection || !amount || !context.authReady;
       byId('start-hint').hidden = !emptySelection;
       byId('start-hint').textContent = emptySelection ? 'Kies minstens één hoofdstuk.' : '';
+      if (hasLevels) {
+        const chapters = mode === 'simulatie' ? 'Alle beschikbare hoofdstukken' : selected.size
+          ? data.hoofdstukken.filter(chapter => selected.has(chapter.id)).map(chapter => chapter.naam).join(', ')
+          : 'Nog geen hoofdstukken gekozen';
+        if (byId('keuze-samenvatting')) byId('keuze-samenvatting').textContent = `${modeLabel(mode)} · ${levelLabel(level)} · ${chapters}`;
+        if (byId('keuze-aantal')) byId('keuze-aantal').textContent = `${countText(amount)}${mode === 'simulatie' ? ' · Uitslag en uitleg aan het einde.' : ' · Uitleg na ieder antwoord.'}`;
+        byId('simulatie-uitleg').textContent = `De simulatie kiest ${countText(amount)} uit alle beschikbare hoofdstukken op ${levelLabel(level)}. Je krijgt je uitslag en uitleg aan het einde.`;
+      }
     }
 
     function setMode(value) {
@@ -358,16 +426,17 @@
       });
     }
 
-    function start(questions, runMode = mode) {
-      if (!questions.length || !context.authReady) return;
+    function start(questions, runMode = mode, runLevel = level) {
+      if (!questions.length || !context.authReady || runLevel !== level) return;
       session = {
-        mode: runMode, owner: context, index: 0,
+        mode: runMode, level: runLevel, owner: context, index: 0,
         questions: shuffle(questions).map(question => {
           const answers = Array.isArray(question.a) ? question.a : [question.a];
           return { question, options: shuffle(question.o.map((text, index) => ({ text, correct: answers.includes(index) }))), pending: new Set(), selected: null };
         }),
         chapters: Object.fromEntries(data.hoofdstukken.map(({ id }) => [id, { answered: 0, good: 0, total: questions.filter(question => question.h === id).length }]))
       };
+      if (hasLevels && byId('niveau-status')) byId('niveau-status').textContent = `${modeLabel(runMode)} · ${levelLabel(runLevel)}`;
       showScreen('oefenen');
       renderQuestion();
     }
@@ -497,12 +566,14 @@
     }
 
     function finish() {
+      if (!session || session.owner !== context) return;
       const answers = session.questions;
       const correct = correctAnswer;
       const good = answers.filter(correct).length;
       const name = typeof BES.naamOphalen === 'function' ? BES.naamOphalen() : '';
       byId('score-kop').textContent = `${good} van ${answers.length} goed.`;
       byId('score-tekst').textContent = name ? `Goed gewerkt, ${name}. Je bent weer een stap verder.` : 'Goed gewerkt. Je bent weer een stap verder.';
+      if (hasLevels && byId('score-niveau')) byId('score-niveau').textContent = `${modeLabel(session.mode)} · ${levelLabel(session.level)}`;
       byId('score-hoofdstukken').replaceChildren();
       data.hoofdstukken.forEach(chapter => {
         const group = answers.filter(entry => entry.question.h === chapter.id);
@@ -514,7 +585,7 @@
         row.append(top, progressBar(amount, group.length));
         byId('score-hoofdstukken').append(row);
       });
-      lastRun = { mode: session.mode, questions: answers.map(entry => entry.question), wrong: answers.filter(entry => !correct(entry)).map(entry => entry.question) };
+      lastRun = { mode: session.mode, level: session.level, questions: answers.map(entry => entry.question), wrong: answers.filter(entry => !correct(entry)).map(entry => entry.question) };
       byId('fouten-opnieuw').hidden = !lastRun.wrong.length;
       const simulation = session.mode === 'simulatie';
       byId('simulatie-overzicht').hidden = !simulation;
@@ -641,10 +712,26 @@
       setMode(modeButtons[index].dataset.modus);
       modeButtons[index].focus();
     });
+    if (hasLevels && byId('niveau-keuzes')) {
+      const levelButtons = [...byId('niveau-keuzes').querySelectorAll('[data-niveau]')];
+      levelButtons.forEach(button => button.addEventListener('click', () => setLevel(button.dataset.niveau)));
+      byId('niveau-keuzes').addEventListener('keydown', event => {
+        const enabled = levelButtons.filter(button => !button.disabled);
+        const current = enabled.indexOf(document.activeElement);
+        if (current < 0 || !['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
+        const step = ['ArrowLeft', 'ArrowUp'].includes(event.key) ? -1 : 1;
+        const index = event.key === 'Home' ? 0 : event.key === 'End' ? enabled.length - 1 : (current + step + enabled.length) % enabled.length;
+        setLevel(enabled[index].dataset.niveau);
+        enabled[index].focus();
+      });
+      setLevel('normaal');
+    }
     byId('kies-alles').addEventListener('click', () => { data.hoofdstukken.forEach(({ id }) => { if (counts[id]) selected.add(id); }); renderChapters(); updateStart(); });
     byId('kies-niets').addEventListener('click', () => { selected.clear(); renderChapters(); updateStart(); });
     byId('start-oefening').addEventListener('click', () => {
-      const questions = mode === 'simulatie' ? shuffle(data.vragen).slice(0, 20) : data.vragen.filter(question => selected.has(question.h));
+      const pool = questionsFor(level);
+      const questions = mode === 'simulatie' ? shuffle(pool).slice(0, 20) : pool.filter(question => selected.has(question.h));
       start(questions);
     });
     byId('volgende-vraag').addEventListener('click', next);
@@ -652,11 +739,11 @@
     byId('stop-oefening').addEventListener('click', () => { fade(byId('stop-bevestiging')); byId('stop-nee').focus(); });
     byId('stop-nee').addEventListener('click', () => { byId('stop-bevestiging').hidden = true; byId('stop-oefening').focus(); });
     byId('stop-ja').addEventListener('click', () => { session = null; showScreen('keuzes'); byId('start-oefening').focus(); scheduleSync(); });
-    byId('fouten-opnieuw').addEventListener('click', () => { if (lastRun) start(lastRun.wrong, 'training'); });
+    byId('fouten-opnieuw').addEventListener('click', () => { if (lastRun) start(lastRun.wrong, 'training', lastRun.level); });
     byId('opnieuw').addEventListener('click', () => {
       if (!lastRun) return;
-      const questions = lastRun.mode === 'simulatie' ? shuffle(data.vragen).slice(0, 20) : lastRun.questions;
-      start(questions, lastRun.mode);
+      const questions = lastRun.mode === 'simulatie' ? shuffle(questionsFor(lastRun.level)).slice(0, 20) : lastRun.questions;
+      start(questions, lastRun.mode, lastRun.level);
     });
     byId('terug-vak').addEventListener('click', () => { session = null; showScreen('keuzes'); byId('start-oefening').focus(); });
     document.addEventListener('keydown', event => {
@@ -675,9 +762,14 @@
     renderSimulation();
     renderContent();
     setMode('training');
-    window.addEventListener('bes:auth', event => setAccount(event.detail?.user));
-    Promise.resolve(BES.auth?.gereed).then(() => BES.auth?.gebruiker?.()).then(setAccount).catch(() => setAccount(null));
+    let authEvents = 0;
+    window.addEventListener('bes:auth', event => { authEvents += 1; setAccount(event.detail?.user); });
+    const initialEvents = authEvents;
+    Promise.resolve(BES.auth?.gereed).then(() => BES.auth?.gebruiker?.()).then(user => {
+      if (initialEvents === authEvents) setAccount(user);
+    }).catch(() => { if (initialEvents === authEvents) setAccount(null); });
     BES.vak = {
+      get niveau() { return level; },
       get voortgang() { return structuredClone(context.chapters); },
       get laatsteSimulatie() { return context.simulation ? { ...context.simulation } : null; },
       schud: shuffle

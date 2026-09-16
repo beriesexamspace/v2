@@ -116,3 +116,39 @@
   .vak-pagina :is(.kaart, .knop, .knop-secundair):is(:hover, :active) { transform: none; }
   .vak-pagina .vinkje circle, .vak-pagina .vinkje path { stroke-dashoffset: 0; }
 }
+
+.vak-pagina[data-niveaus] .keuze-stap { margin: 0 0 10px; color: var(--muted); font-size: .8125rem; font-weight: 500; line-height: 1.4; }
+.vak-pagina[data-niveaus] .modus { padding: 28px; gap: 14px; border-width: 1px; }
+.vak-pagina[data-niveaus] .modus .kaart-titel { font-size: 1.375rem; }
+.vak-pagina[data-niveaus] .modus .kaart-sub { flex: 1; font-weight: 400; line-height: 1.65; }
+.vak-pagina[data-niveaus] .modus-boven { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 10px; }
+.vak-pagina[data-niveaus] .modus-icoon { display: inline-grid; place-items: center; width: 48px; height: 48px; border-radius: 14px; background: var(--surface); color: var(--ink); }
+.vak-pagina[data-niveaus] .modus-icoon svg { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.vak-pagina[data-niveaus] .modus[aria-checked="true"] .modus-icoon { background: var(--accent); color: var(--white); }
+.vak-pagina[data-niveaus] .modus-vink { display: inline-grid; place-items: center; width: 22px; height: 22px; border: 1px solid var(--line); border-radius: 50%; font-size: .8125rem; }
+.vak-pagina[data-niveaus] .modus[aria-checked="true"] .modus-vink { background: var(--accent); border-color: var(--accent); color: var(--white); }
+.vak-pagina[data-niveaus] .modus[aria-checked="true"] .modus-vink::after { content: '✓'; }
+.vak-pagina[data-niveaus] .modus-detail { color: var(--ink-soft); font-size: .8125rem; font-weight: 500; }
+.vak-pagina[data-niveaus] .niveau-keuzes { display: inline-flex; max-width: 100%; gap: 4px; padding: 4px; border: 1px solid var(--line); border-radius: var(--radius-pill); background: var(--surface); }
+.vak-pagina[data-niveaus] .niveau-keuze { min-height: 44px; padding: 10px 24px; border: 1px solid var(--transparent); border-radius: var(--radius-pill); background: var(--transparent); color: var(--ink-soft); font-size: .9375rem; font-weight: 500; cursor: pointer; transition: background-color 150ms var(--ease), color 150ms var(--ease), box-shadow 150ms var(--ease), transform 150ms var(--ease); }
+.vak-pagina[data-niveaus] .niveau-keuze[aria-checked="true"] { background: var(--card); color: var(--ink); border-color: var(--line); box-shadow: var(--shadow-soft); }
+.vak-pagina[data-niveaus] .niveau-keuze:disabled { opacity: .5; cursor: default; }
+:where(html.has-hover) .vak-pagina[data-niveaus] .niveau-keuze:not(:disabled):hover { color: var(--ink); background: var(--card); }
+:where(html.has-hover) .vak-pagina[data-niveaus] .niveau-keuze:not(:disabled):hover:not(:active) { transform: scale(1.025); }
+.vak-pagina[data-niveaus] .niveau-keuze:not(:disabled):active { transform: scale(.98); }
+.vak-pagina[data-niveaus] #niveau-uitleg { max-width: 68ch; line-height: 1.65; }
+.vak-pagina[data-niveaus] .keuze-start { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px 24px; align-items: center; background: var(--surface); box-shadow: none; }
+.vak-pagina[data-niveaus] .keuze-start .keuze-stap { color: var(--ink); font-weight: 600; }
+.vak-pagina[data-niveaus] #keuze-samenvatting { margin: 0; font-size: .9375rem; line-height: 1.65; overflow-wrap: anywhere; }
+.vak-pagina[data-niveaus] #keuze-aantal { margin-top: 8px; }
+.vak-pagina[data-niveaus] .keuze-start #start-hint { grid-column: 1 / -1; margin: 0; }
+.vak-pagina[data-niveaus] .keuze-start .knop { min-width: 132px; }
+.vak-pagina[data-niveaus] .oefening-niveau { margin: 0 0 12px; background: var(--surface); color: var(--ink-soft); }
+@media (max-width: 767px) {
+  .vak-pagina[data-niveaus] .modus { padding: 24px; }
+  .vak-pagina[data-niveaus] .keuze-start { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .vak-pagina[data-niveaus] .keuze-start .knop { width: 100%; max-width: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vak-pagina[data-niveaus] .niveau-keuze:is(:hover, :active) { transform: none !important; }
+}

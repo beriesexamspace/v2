@@ -44,7 +44,7 @@ assets/updates.js     updates voor de sectie Wat is nieuw op de hub
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 16), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 17), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.
@@ -131,6 +131,14 @@ window.BES_VAK = {
 - Lege hoofdstukken tonen "Nog geen vragen". Lege lijsten voor vragen, hacks en theorie hebben ieder een eigen lege melding.
 
 ### Oefenen en voortgang
+
+`vak/inlped/index.html` is de eerste proef met de nieuwe oefenkeuze. Alleen deze pagina heeft `data-niveaus` op `.vak-pagina`: eerst Examen Training of Examensimulatie, dan Normaal of Hard mode, daarna de hoofdstukken en een samenvatting met het daadwerkelijke aantal vragen boven Start. De overige vakpagina's houden hun bestaande bediening.
+
+Normaal gebruikt de bestaande `vragen` zonder wijziging. De optionele lijst `hardVragen` gebruikt hetzelfde vraagformaat en bevat bij Inleiding pedagogiek een eerste set van 14 toepassingsvragen, twee per hoofdstuk h1 tot en met h7. Ze zijn uit de bestaande leerstof uitgewerkt en gecontroleerd op consistentie met die inhoud; verdere beoordeling door de vakinhoudelijke gebruiker blijft nodig vóór een brede uitrol. h8 (Echte examenvragen) krijgt geen verzonnen examenvragen. Een hoofdstuk zonder Hard mode-vragen is niet selecteerbaar op dat niveau; zonder geldige Hard mode-set is het niveau uitgeschakeld.
+
+Hard mode gebruikt dezelfde trainings- en simulatieregels. De simulatie neemt maximaal 20 vragen uit de gekozen moeilijkheid, dus bij deze eerste Hard mode-set 14. Een foutenronde en Opnieuw behouden het niveau. Zowel de oefening als de uitslag vermelden het niveau. De hoofdstukkeuze blijft per niveau bewaard zolang de pagina open is.
+
+Normale voortgang behoudt de sleutel `bes_voortgang_inlped` en de bestaande Supabase-vakwaarde `inlped`. Hard mode bewaart dezelfde account-/gaststructuur apart onder `bes_voortgang_inlped__hard`, met Supabase-vakwaarde `inlped__hard`. De bestaande tabel laat tekstwaarden toe; er is geen schemawijziging nodig. Resultaten van de twee niveaus worden niet samengevoegd. Test aanpassingen met nagebootste accounts voordat je echte voortgang gebruikt.
 
 Examen Training gebruikt alle vragen van de gekozen hoofdstukken en geeft uitleg na ieder antwoord. Examensimulatie gebruikt maximaal 20 willekeurige vragen uit alle hoofdstukken, zonder tijdklok of feedback tussendoor. Alleen de uitslag bevat dan de antwoorden en uitleg. "Fouten opnieuw" begint altijd een nieuwe trainingssessie met alleen de fouten uit de afgeronde sessie, ook na een simulatie. In die foutenronde krijg je na ieder antwoord uitleg en wordt de hoofdstukvoortgang bijgewerkt.
 

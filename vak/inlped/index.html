@@ -19,14 +19,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../assets/style.css?v=16">
-  <link rel="stylesheet" href="../../assets/vak.css?v=16">
-  <script src="../../assets/app.js?v=16"></script>
-  <script src="../../assets/config.js?v=16" defer></script>
+  <link rel="stylesheet" href="../../assets/style.css?v=17">
+  <link rel="stylesheet" href="../../assets/vak.css?v=17">
+  <script src="../../assets/app.js?v=17"></script>
+  <script src="../../assets/config.js?v=17" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="../../assets/auth.js?v=16" defer></script>
-  <script src="data.js?v=12" defer></script>
-  <script src="../../assets/vak.js?v=16" defer></script>
+  <script src="../../assets/auth.js?v=17" defer></script>
+  <script src="data.js?v=13" defer></script>
+  <script src="../../assets/vak.js?v=17" defer></script>
 </head>
 <body>
   <header class="site-header">
@@ -50,7 +50,7 @@
     </nav>
   </header>
 
-  <main class="pagina vak-pagina" aria-labelledby="vak-naam">
+  <main class="pagina vak-pagina" aria-labelledby="vak-naam" data-niveaus>
     <div class="wrap">
       <a class="terug" id="vak-terug" href="../../jaar-1ba.html" data-terug="../../jaar-1ba.html" data-terug-tekst="Terug">← Terug</a>
       <header class="pagina-kop">
@@ -74,9 +74,43 @@
             <a class="terug" href="../../jaar-1ba.html" data-vak-jaar-link>← Terug naar het jaar</a>
           </div>
           <div id="vak-instellingen">
+            <section class="sectie" aria-labelledby="modus-kop">
+              <p class="keuze-stap">Stap 1</p>
+              <h2 class="sectie-kop" id="modus-kop">Hoe wil je oefenen?</h2>
+              <p class="vak-hint" id="laatste-simulatie" hidden></p>
+              <div class="rooster-2" id="modus-keuzes" role="radiogroup" aria-labelledby="modus-kop">
+                <button class="kaart modus is-gekozen" type="button" role="radio" aria-checked="true" data-modus="training">
+                  <span class="modus-boven" aria-hidden="true"><span class="modus-icoon"><svg viewBox="0 0 24 24" width="24" height="24"><path d="M12 6c-3-2-6-2-9-1v15c3-1 6-1 9 1m0-15c3-2 6-2 9-1v15c-3-1-6-1-9 1V6"/></svg></span><span class="modus-vink"></span></span>
+                  <span class="kaart-titel">Examen Training</span>
+                  <span class="kaart-sub">Oefen de hoofdstukken die jij kiest. Na ieder antwoord krijg je feedback en uitleg.</span>
+                  <span class="modus-detail">Op jouw tempo</span>
+                </button>
+                <button class="kaart modus" type="button" role="radio" aria-checked="false" data-modus="simulatie" tabindex="-1">
+                  <span class="modus-boven" aria-hidden="true"><span class="modus-icoon"><svg viewBox="0 0 24 24" width="24" height="24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M9 10h6M9 14h6M9 18h3"/></svg></span><span class="modus-vink"></span></span>
+                  <span class="kaart-titel">Examensimulatie</span>
+                  <span class="kaart-sub">Vragen uit alle beschikbare hoofdstukken. Je score en de uitleg zie je aan het einde.</span>
+                  <span class="modus-detail">Maximaal 20 vragen</span>
+                </button>
+              </div>
+            </section>
+
+            <section class="sectie" aria-labelledby="niveau-kop">
+              <p class="keuze-stap">Stap 2</p>
+              <h2 class="sectie-kop" id="niveau-kop">Kies je niveau</h2>
+              <div class="niveau-keuzes" id="niveau-keuzes" role="radiogroup" aria-labelledby="niveau-kop" aria-describedby="niveau-uitleg">
+                <button class="niveau-keuze" type="button" role="radio" data-niveau="normaal" aria-checked="true">Normaal</button>
+                <button class="niveau-keuze" type="button" role="radio" data-niveau="hard" aria-checked="false" tabindex="-1">Hard mode</button>
+              </div>
+              <p class="vak-hint" id="niveau-uitleg">Oefen met de bestaande vragen en bouw je kennis op.</p>
+            </section>
+
             <section class="sectie" aria-labelledby="hoofdstukken-kop">
+              <p class="keuze-stap">Stap 3</p>
               <div class="vak-sectie-kop">
-                <h2 class="sectie-kop" id="hoofdstukken-kop">Kies je hoofdstukken</h2>
+                <div>
+                  <h2 class="sectie-kop" id="hoofdstukken-kop">Kies je hoofdstukken</h2>
+                  <p class="vak-hint" id="voortgang-niveau">Voortgang voor Normaal</p>
+                </div>
                 <div class="hoofdstuk-acties" id="hoofdstuk-acties">
                   <button class="vak-tekstknop" type="button" id="kies-alles">Alles</button>
                   <button class="vak-tekstknop" type="button" id="kies-niets">Niets</button>
@@ -85,26 +119,16 @@
               <div id="hoofdstuk-selectie">
                 <div class="kaart-rij" id="hoofdstukken" role="group" aria-labelledby="hoofdstukken-kop"></div>
               </div>
-              <p class="vak-hint" id="simulatie-uitleg" hidden>Simulatie gebruikt alle hoofdstukken.</p>
+              <p class="vak-hint" id="simulatie-uitleg" hidden>Simulatie gebruikt alle beschikbare hoofdstukken.</p>
             </section>
 
-            <section class="sectie" aria-labelledby="modus-kop">
-              <h2 class="sectie-kop" id="modus-kop">Hoe wil je oefenen?</h2>
-              <p class="vak-hint" id="laatste-simulatie" hidden></p>
-              <div class="rooster-2" id="modus-keuzes" role="radiogroup" aria-labelledby="modus-kop">
-                <button class="kaart modus is-gekozen" type="button" role="radio" aria-checked="true" data-modus="training">
-                  <span class="kaart-titel">Examen Training</span>
-                  <span class="kaart-sub">Per hoofdstuk, met uitleg na elke vraag.</span>
-                </button>
-                <button class="kaart modus" type="button" role="radio" aria-checked="false" data-modus="simulatie" tabindex="-1">
-                  <span class="kaart-titel">Examensimulatie</span>
-                  <span class="kaart-sub">20 willekeurige vragen, uitslag aan het einde.</span>
-                </button>
+            <div class="kaart vak-start keuze-start">
+              <div class="keuze-overzicht">
+                <p class="keuze-stap">Jouw oefening</p>
+                <p id="keuze-samenvatting" aria-live="polite" aria-atomic="true"></p>
+                <p class="vak-hint" id="keuze-aantal"></p>
               </div>
-            </section>
-
-            <div class="vak-start">
-              <button class="knop" type="button" id="start-oefening" aria-describedby="start-hint">Start →</button>
+              <button class="knop" type="button" id="start-oefening" aria-describedby="keuze-samenvatting keuze-aantal start-hint">Start →</button>
               <p class="vak-hint" id="start-hint" hidden>Kies minstens één hoofdstuk.</p>
             </div>
             <p class="vak-reco"><a id="reco-link" href="https://beriesexamspace.com/reco/">Net examen gehad? Maak een reco →</a></p>
@@ -122,6 +146,7 @@
           </div>
           <div class="voortgang-balk" id="vraag-balk" role="progressbar" aria-label="Voortgang van deze oefening" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
           <p class="eyebrow" id="vraag-teller"></p>
+          <p class="label oefening-niveau" id="niveau-status"></p>
           <p class="vak-hint" id="simulatie-melding" hidden>Examensimulatie: uitslag aan het einde.</p>
           <h2 id="vraag-tekst" tabindex="-1"></h2>
           <div class="opties" id="opties" role="group" aria-labelledby="vraag-tekst"></div>
@@ -135,6 +160,7 @@
         <section class="eindscherm" id="eindscherm" aria-labelledby="score-kop" hidden>
           <svg class="vinkje" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30"></circle><path d="M20 33 l9 9 l17 -18"></path></svg>
           <h2 id="score-kop" tabindex="-1"></h2>
+          <p class="label oefening-niveau" id="score-niveau"></p>
           <p class="vak-score-tekst" id="score-tekst"></p>
           <div class="score-hoofdstukken" id="score-hoofdstukken"></div>
           <div class="vak-knoppen">
