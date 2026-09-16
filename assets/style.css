@@ -36,13 +36,14 @@
   --shadow-primary-hover: 0 10px 28px var(--shadow-primary-hover-color);
   --shadow-card-hover: 0 2px 4px var(--shadow-near-color), 0 12px 28px var(--shadow-far-color);
   --shadow-nav: 0 1px 2px var(--shadow-near-color), 0 6px 18px var(--shadow-far-color);
-  --cursor-bg: rgb(190 190 195 / 72%);
-  --cursor-border: rgb(120 120 128 / 20%);
-  --cursor-hover-bg: rgb(184 184 190 / 76%);
-  --cursor-hover-border: rgb(120 120 128 / 22%);
-  --cursor-pressed-bg: rgb(155 155 162 / 82%);
-  --cursor-pressed-border: rgb(105 105 112 / 26%);
-  --cursor-ring: rgb(120 120 128 / 35%);
+  --cursor-tone: 0 0 0;
+  --cursor-bg: rgb(var(--cursor-tone));
+  --cursor-border: rgb(var(--cursor-tone));
+  --cursor-hover-bg: rgb(var(--cursor-tone));
+  --cursor-hover-border: rgb(var(--cursor-tone));
+  --cursor-pressed-bg: rgb(var(--cursor-tone));
+  --cursor-pressed-border: rgb(var(--cursor-tone));
+  --cursor-ring: rgb(var(--cursor-tone) / 35%);
   --cursor-shadow-color: rgb(0 0 0 / 8%);
   --cursor-shadow-hover-color: rgb(0 0 0 / 9%);
   --ease: cubic-bezier(.2,.8,.2,1);
@@ -71,13 +72,7 @@ html[data-theme="dark"] {
   --shadow-primary-hover-color: rgba(0,0,0,.5);
   --fout: #FF6B60;
   --fout-zacht: rgba(255,107,96,.12);
-  --cursor-bg: rgb(120 120 128 / 55%);
-  --cursor-hover-bg: rgb(120 120 128 / 55%);
-  --cursor-pressed-bg: rgb(120 120 128 / 70%);
-  --cursor-border: rgb(190 190 195 / 28%);
-  --cursor-hover-border: rgb(190 190 195 / 38%);
-  --cursor-pressed-border: rgb(190 190 195 / 45%);
-  --cursor-ring: rgb(190 190 195 / 35%);
+  --cursor-tone: 255 255 255;
   --cursor-shadow-color: rgba(0,0,0,.5);
   --cursor-shadow-hover-color: rgba(0,0,0,.5);
   color-scheme: dark;
@@ -132,8 +127,8 @@ a:focus-visible, button:focus-visible {
   top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 100%;
-  max-width: 100%;
+  width: calc(100% - 32px);
+  max-width: 1160px;
   height: 56px;
   display: flex;
   align-items: center;
@@ -669,7 +664,7 @@ html.page-fade.page-ready body { animation: page-in 250ms ease-out both; }
 }
 
 @media (max-width: 767px) {
-  .navigation, .nav-vol { gap: 10px; padding: 0 8px 0 12px; }
+  .navigation, .nav-vol { width: calc(100% - 20px); gap: 10px; padding: 0 8px 0 12px; }
   .brand { gap: 8px; font-size: .875rem; }
   .navigation-links { display: none; }
   .menu-toggle {

@@ -18,11 +18,18 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=17">
-  <script src="assets/app.js?v=17" defer></script>
-  <script src="assets/config.js?v=17" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=18">
+  <script src="assets/app.js?v=18" defer></script>
+  <script src="assets/config.js?v=18" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=17" defer></script>
+  <script src="assets/auth.js?v=18" defer></script>
+  <script src="assets/activiteit.js?v=18" defer></script>
+  <style>
+    #name-step { display: grid; gap: 18px; }
+    #name-step[hidden] { display: none; }
+    #name-step .auth-input { width: 100%; }
+    #name-step .auth-help { margin: 8px 0 0; }
+  </style>
 </head>
 <body>
   <header class="site-header">
@@ -56,11 +63,22 @@
             <circle cx="32" cy="32" r="30" fill="none" stroke="var(--teal)" stroke-width="2"></circle>
             <path d="M20 33 l9 9 l17 -18" fill="none" stroke="var(--teal)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
           </svg>
-          <h1 id="signup-title" tabindex="-1">Hoe mogen we je noemen?</h1>
+          <h1 id="signup-title" tabindex="-1">Wat is je naam?</h1>
           <form class="auth-form" id="signup-form" novalidate>
             <div id="name-step">
-              <input class="auth-input" id="signup-name" type="text" placeholder="Je voornaam of bijnaam" aria-label="Je voornaam of bijnaam" aria-describedby="signup-error" maxlength="24" autocomplete="given-name" autocapitalize="words" spellcheck="false" enterkeyhint="next">
-              <p class="auth-error" id="signup-error" role="alert" hidden></p>
+              <div>
+                <label for="signup-name">Voornaam</label>
+                <input class="auth-input" id="signup-name" type="text" placeholder="Je voornaam" aria-describedby="signup-error" maxlength="60" autocomplete="given-name" autocapitalize="words" spellcheck="false" enterkeyhint="next" required>
+              </div>
+              <div>
+                <label for="signup-lastname">Achternaam</label>
+                <input class="auth-input" id="signup-lastname" type="text" placeholder="Je achternaam" aria-describedby="signup-error" maxlength="60" autocomplete="family-name" autocapitalize="words" spellcheck="false" enterkeyhint="next" required>
+              </div>
+              <div>
+                <label for="signup-nickname">Bijnaam (optioneel)</label>
+                <input class="auth-input" id="signup-nickname" type="text" placeholder="Bijvoorbeeld Berie" aria-describedby="nickname-help signup-error" maxlength="24" autocomplete="nickname" autocapitalize="words" spellcheck="false" enterkeyhint="go">
+                <p class="auth-help" id="nickname-help">Zo spreken we je aan. Zonder bijnaam gebruiken we je voornaam.</p>
+              </div>
             </div>
             <div id="email-step" hidden>
               <input class="auth-input" id="signup-email" type="email" placeholder="naam@voorbeeld.be" aria-label="E-mailadres" aria-describedby="email-help signup-error" autocomplete="email" autocapitalize="none" spellcheck="false" enterkeyhint="next" disabled>
@@ -73,6 +91,7 @@
               </div>
               <p class="auth-help" id="password-help">Minimaal 8 tekens. Meer eisen stellen we niet.</p>
             </div>
+            <p class="auth-error" id="signup-error" role="alert" hidden></p>
             <button class="knop" id="signup-submit" type="submit">Verder →</button>
           </form>
           <div class="auth-success" id="signup-success" hidden>
@@ -101,10 +120,14 @@
       const submit = document.getElementById('signup-submit');
       const error = document.getElementById('signup-error');
       const fields = ['signup-name', 'signup-email', 'signup-password'].map(id => document.getElementById(id));
+      const lastName = document.getElementById('signup-lastname');
+      const nickname = document.getElementById('signup-nickname');
+      const nameFields = [fields[0], lastName, nickname];
+      const allFields = [...fields, lastName, nickname];
       const panels = ['name-step', 'email-step', 'password-step'].map(id => document.getElementById(id));
-      const titles = ['Hoe mogen we je noemen?', 'Wat is je e-mailadres?', 'Kies een wachtwoord.'];
+      const titles = ['Wat is je naam?', 'Wat is je e-mailadres?', 'Kies een wachtwoord.'];
       const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-      const cleanName = value => Array.from(value.normalize('NFC').replace(/[^\p{L}\p{M}\p{Nd} '\u2019-]/gu, '')).slice(0, 24).join('');
+      const cleanName = (value, limit = 60) => Array.from(value.normalize('NFC').replace(/[^\p{L}\p{M}\p{Nd} '\u2019-]/gu, '')).slice(0, limit).join('');
       let step = 0;
       let changing = false;
       let submitting = false;
@@ -142,19 +165,18 @@
       };
 
       const clearError = () => {
-        fields.forEach(field => field.removeAttribute('aria-invalid'));
+        allFields.forEach(field => field.removeAttribute('aria-invalid'));
         if (!auth?.beschikbaar && error.dataset.code === 'unavailable' && !error.hidden) return;
         error.hidden = true;
         error.replaceChildren();
         availability();
       };
 
-      const cleanInput = () => {
-        const field = fields[0];
+      const cleanInput = field => {
         const value = field.value;
         const start = field.selectionStart ?? value.length;
         const end = field.selectionEnd ?? start;
-        const clean = cleanName(value);
+        const clean = cleanName(value, field.maxLength);
         if (clean !== value) {
           field.value = clean;
           field.setSelectionRange(
@@ -179,10 +201,9 @@
         clearError();
         panels.forEach((panel, index) => {
           panel.hidden = index !== step;
-          fields[index].disabled = index !== step;
+          panel.querySelectorAll('input, button').forEach(field => { field.disabled = index !== step; });
         });
         if (step < 3) {
-          (fields[step].closest('.auth-password') || fields[step]).insertAdjacentElement('afterend', error);
           heading.textContent = titles[step];
           stepLabel.textContent = 'Stap ' + (step + 1) + ' van 3';
           submit.textContent = step === 2 ? 'Account maken →' : 'Verder →';
@@ -208,12 +229,11 @@
         changing = false;
       };
 
-      fields[0].value = cleanName(window.BES.naamOphalen() || '');
-      fields[0].addEventListener('input', event => {
-        if (!event.isComposing) cleanInput();
+      nameFields.forEach(field => {
+        field.addEventListener('input', event => { if (!event.isComposing) cleanInput(field); });
+        field.addEventListener('compositionend', () => cleanInput(field));
       });
-      fields[0].addEventListener('compositionend', cleanInput);
-      fields.forEach(field => field.addEventListener('input', clearError));
+      allFields.forEach(field => field.addEventListener('input', clearError));
 
       back.addEventListener('click', event => {
         if (step > 0 || changing || submitting) {
@@ -232,11 +252,15 @@
       form.addEventListener('submit', async event => {
         event.preventDefault();
         if (changing || submitting || step > 2) return;
-        cleanInput();
+        nameFields.forEach(cleanInput);
         clearError();
         if (step === 0) {
           if (!fields[0].value.trim()) {
-            showError('Vul je naam in om verder te gaan.', fields[0]);
+            showError('Vul je voornaam in om verder te gaan.', fields[0]);
+            return;
+          }
+          if (!lastName.value.trim()) {
+            showError('Vul je achternaam in om verder te gaan.', lastName);
             return;
           }
           await changeStep(1);
@@ -261,9 +285,8 @@
         submit.textContent = 'Even geduld…';
         form.setAttribute('aria-busy', 'true');
         try {
-          const name = fields[0].value.trim();
-          await auth.aanmelden(name, fields[1].value.trim(), fields[2].value);
-          window.BES.naamOpslaan(name);
+          const names = { voornaam: fields[0].value.trim(), achternaam: lastName.value.trim(), bijnaam: nickname.value.trim() };
+          await auth.aanmelden(names, fields[1].value.trim(), fields[2].value);
           fields[2].value = '';
           fields[2].type = 'password';
           try { window.sessionStorage.removeItem('bes_nieuw_gezien'); } catch {}

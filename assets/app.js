@@ -332,8 +332,49 @@
     document.body.append(dot);
     let currentDialog = null;
     let releaseTimer;
+    let pointerPosition = null;
+    let refreshFrame = 0;
+    let colorTarget = null;
+    let colorTheme = '';
+    let colorTime = 0;
+    const rgba = value => {
+      const values = value.match(/[\d.]+/g)?.map(Number);
+      if (!values || values.length < 3) return [0, 0, 0, 0];
+      const scale = value.startsWith('color(srgb ') ? 255 : 1;
+      return [values[0] * scale, values[1] * scale, values[2] * scale, values[3] ?? 1];
+    };
+    const contrast = target => {
+      const now = performance.now();
+      if (colorTarget === target && colorTheme === root.dataset.theme && now - colorTime < 120) return;
+      colorTarget = target;
+      colorTheme = root.dataset.theme;
+      colorTime = now;
+      const color = [0, 0, 0];
+      let remaining = 1;
+      for (let element = target; element && remaining > .01; element = element.parentElement) {
+        const [r, g, b, alpha] = rgba(getComputedStyle(element).backgroundColor);
+        color[0] += r * alpha * remaining;
+        color[1] += g * alpha * remaining;
+        color[2] += b * alpha * remaining;
+        remaining *= 1 - alpha;
+      }
+      const fallback = root.dataset.theme === 'dark' ? 11 : 255;
+      const linear = color.map(channel => {
+        const value = (channel + fallback * remaining) / 255;
+        return value <= .04045 ? value / 12.92 : Math.pow((value + .055) / 1.055, 2.4);
+      });
+      const luminance = .2126 * linear[0] + .7152 * linear[1] + .0722 * linear[2];
+      const tone = luminance > .179 ? '0 0 0' : '255 255 255';
+      dot.style.setProperty('--cursor-tone', tone);
+      dot.style.backgroundColor = `rgb(${tone})`;
+      dot.style.borderColor = `rgb(${tone})`;
+      dot.style.setProperty('--cursor-ring', `rgb(${tone} / 35%)`);
+    };
     const clear = () => {
       clearTimeout(releaseTimer);
+      cancelAnimationFrame(refreshFrame);
+      refreshFrame = 0;
+      pointerPosition = null;
       dot.classList.remove('is-pressed', 'is-releasing', 'over-control');
       document.documentElement.classList.remove('ball-cursor');
       if (dot.matches(':popover-open')) dot.hidePopover();
@@ -344,6 +385,8 @@
       const target = event.target;
       if (!(target instanceof Element)) return;
       if (target.closest('input, textarea, [contenteditable="true"], select')) { clear(); return; }
+      pointerPosition = { clientX: event.clientX, clientY: event.clientY };
+      contrast(target);
       const dialog = document.querySelector('dialog[open]');
       // Reinsert above a newly opened modal in the browser's top layer.
       if (dialog !== currentDialog && dot.matches(':popover-open')) dot.hidePopover();
@@ -357,6 +400,22 @@
         document.documentElement.classList.add('ball-cursor');
       } catch { clear(); }
     };
+    const refreshPointer = () => {
+      if (!pointerPosition || refreshFrame) return;
+      refreshFrame = requestAnimationFrame(() => {
+        refreshFrame = 0;
+        if (!pointerPosition || !dot.matches(':popover-open')) return;
+        const target = document.elementFromPoint(pointerPosition.clientX, pointerPosition.clientY);
+        colorTime = 0;
+        updatePointer({ ...pointerPosition, pointerType: 'mouse', target });
+      });
+    };
+    document.addEventListener('scroll', refreshPointer, { capture: true, passive: true });
+    window.addEventListener('resize', refreshPointer, { passive: true });
+    document.addEventListener('transitionend', event => {
+      if (event.target !== dot && event.propertyName === 'background-color') refreshPointer();
+    });
+    new MutationObserver(refreshPointer).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
     document.addEventListener('pointermove', updatePointer, { passive: true });
     document.addEventListener('pointerout', event => { if (!event.relatedTarget) clear(); });
     document.addEventListener('pointerdown', event => {
@@ -371,6 +430,7 @@
       dot.classList.remove('is-pressed');
       dot.classList.add('is-releasing');
       releaseTimer = setTimeout(() => dot.classList.remove('is-releasing'), 300);
+      refreshPointer();
     }, { passive: true });
     document.addEventListener('pointercancel', clear);
     document.addEventListener('keydown', clear);

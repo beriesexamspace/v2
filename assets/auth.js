@@ -21,12 +21,14 @@
     rate_limit: 'Even wachten, probeer het over een minuut opnieuw.',
     network: 'Even geen verbinding. Probeer het opnieuw.',
     invalid_email: 'Dit e-mailadres klopt niet. Controleer het en probeer het opnieuw.',
-    invalid_name: 'Vul je naam in om verder te gaan.',
+    invalid_name: 'Vul je voornaam en achternaam in om verder te gaan.',
     signed_out: 'Je bent niet meer ingelogd. Log opnieuw in.',
     weak_password: 'Je wachtwoord is te kort. Kies minimaal 8 tekens.',
     same_password: 'Dit is je huidige wachtwoord. Kies een ander wachtwoord.',
     recovery_invalid: 'Deze link is verlopen. Vraag een nieuwe aan.',
     confirmation_required: 'Je account kan nog niet direct inloggen. Probeer later opnieuw.',
+    email_confirmation: 'Deze bevestigingslink is ongeldig of verlopen. Vraag de e-mailwijziging opnieuw aan via je profiel.',
+    reauthentication_needed: 'Log opnieuw in en probeer de wijziging nog eens.',
     unknown: 'Dit is niet gelukt. Probeer het opnieuw.'
   };
 
@@ -46,15 +48,31 @@
     if (/email_address_invalid|validation_failed/.test(code) && /email/.test(message)) return failure('invalid_email');
     if (code === 'weak_password' || /password should be at least|password is too short/.test(message)) return failure('weak_password');
     if (code === 'same_password') return failure('same_password');
+    if (/reauthentication_needed|reauthentication_not_valid/.test(code)) return failure('reauthentication_needed');
     if (/session_not_found|session_expired|otp_expired|refresh_token_not_found/.test(code)) return failure('recovery_invalid');
     if (code === 'email_not_confirmed') return failure('confirmation_required');
     if (window.navigator.onLine === false || error?.name === 'AuthRetryableFetchError' || error instanceof TypeError || /failed to fetch|network|load failed|fetch failed/.test(message)) return failure('network');
     return failure('unknown');
   }
 
-  const cleanName = value => typeof value === 'string'
-    ? Array.from(value.normalize('NFC').replace(/[^\p{L}\p{M}\p{Nd} '\u2019-]/gu, '')).slice(0, 24).join('').trim()
+  const cleanName = (value, limit = 60) => typeof value === 'string'
+    ? Array.from(value.normalize('NFC').replace(/[^\p{L}\p{M}\p{Nd} '\u2019-]/gu, '')).slice(0, limit).join('').trim()
     : '';
+
+  function nameDetails(user) {
+    const metadata = user?.user_metadata || {};
+    const voornaam = cleanName(metadata.voornaam);
+    const achternaam = cleanName(metadata.achternaam);
+    const bijnaam = cleanName(metadata.bijnaam, 24);
+    const gesplitst = Boolean(voornaam && achternaam);
+    const volledig = gesplitst ? voornaam + ' ' + achternaam : cleanName(metadata.naam, 121);
+    return { voornaam, achternaam, bijnaam, volledig, gesplitst, aanspreeknaam: bijnaam || voornaam || volledig };
+  }
+
+  const callbackUrl = new URL(window.location.href);
+  const callbackHash = new URLSearchParams(callbackUrl.hash.slice(1));
+  const emailCallback = callbackUrl.searchParams.get('email') === 'bevestigen';
+  const emailCallbackError = emailCallback && (callbackHash.has('error') || callbackHash.has('error_code') || callbackUrl.searchParams.has('error'));
 
   function clearName() {
     try { window.localStorage.removeItem('bes_naam'); } catch {}
@@ -74,7 +92,7 @@
   }
 
   function fillAvatar(element, user) {
-    const words = cleanName(user?.user_metadata?.naam).split(/\s+/).filter(Boolean);
+    const words = nameDetails(user).volledig.split(/\s+/).filter(Boolean);
     const initials = Array.from(words.map(word => word.match(/\p{L}/u)?.[0] || '').filter(Boolean).slice(0, 2).join('').toLocaleUpperCase('nl')).slice(0, 2).join('');
     element.replaceChildren();
     element.textContent = initials;
@@ -90,15 +108,6 @@
     element.replaceChildren(image);
   }
 
-  function logoutLink(className) {
-    const link = document.createElement('a');
-    link.className = className;
-    link.href = pagePrefix + 'index.html';
-    link.textContent = 'Uitloggen';
-    link.setAttribute('data-account-uitloggen', '');
-    return link;
-  }
-
   function renderAccount() {
     document.querySelectorAll('nav.navigation, nav.nav-vol').forEach(navigation => {
       let controls = navigation.querySelector('.account-controls');
@@ -110,14 +119,13 @@
         original.replaceWith(controls);
       }
       controls.replaceChildren();
-      let mobileLogout = navigation.querySelector('.account-uitloggen-mobiel');
+      navigation.querySelectorAll('.account-uitloggen-mobiel, [data-account-uitloggen]').forEach(link => link.remove());
       if (!currentUser) {
         const login = document.createElement('a');
         login.className = 'pill login-button';
         login.textContent = 'Inloggen →';
         login.href = pagePrefix + 'inloggen.html';
         controls.append(login);
-        mobileLogout?.remove();
         return;
       }
       const profile = document.createElement('a');
@@ -127,16 +135,7 @@
       avatar.className = 'profiel-avatar';
       fillAvatar(avatar, currentUser);
       profile.append(avatar, document.createTextNode('Profiel'));
-      controls.append(profile, logoutLink('tekstlink account-uitloggen'));
-      const menu = navigation.querySelector('.navigation-links');
-      if (menu) {
-        if (!mobileLogout) {
-          mobileLogout = document.createElement('li');
-          mobileLogout.className = 'account-uitloggen-mobiel';
-          menu.append(mobileLogout);
-        }
-        mobileLogout.replaceChildren(logoutLink('tekstlink'));
-      }
+      controls.append(profile);
     });
     document.querySelectorAll('[data-account-opties]').forEach(element => { element.hidden = Boolean(currentUser); });
     document.querySelectorAll('[data-account-sessie]').forEach(element => {
@@ -151,7 +150,7 @@
   function setUser(user, clearGuestName = false) {
     currentUser = user || null;
     if (currentUser) {
-      const name = cleanName(currentUser.user_metadata?.naam);
+      const name = nameDetails(currentUser).aanspreeknaam;
       if (name) BES.naamOpslaan?.(name);
       else clearName();
     } else if (clearGuestName) {
@@ -186,20 +185,32 @@
     gereed: Promise.resolve(null),
     get client() { return client; },
     avatarVullen: fillAvatar,
+    naamGegevens: nameDetails,
+    get emailBevestiging() { return { teruggekeerd: emailCallback, fout: emailCallbackError || (emailCallback && initializationError?.code === 'recovery_invalid') }; },
 
     async gebruiker() {
       await auth.gereed;
       return currentUser;
     },
 
+    async gebruikerVerversen() {
+      const owner = currentUser?.id;
+      if (!owner) return null;
+      const data = await request(api => api.getUser());
+      if (!data?.user || currentUser?.id !== owner || data.user.id !== owner || logoutInProgress) throw failure('signed_out');
+      setUser(data.user);
+      return data.user;
+    },
+
     async aanmelden(naam, email, wachtwoord) {
-      const name = cleanName(naam);
-      if (!name) throw failure('unknown');
+      const metadata = { voornaam: cleanName(naam?.voornaam), achternaam: cleanName(naam?.achternaam), bijnaam: cleanName(naam?.bijnaam, 24) };
+      if (!metadata.voornaam || !metadata.achternaam) throw failure('invalid_name');
+      metadata.naam = metadata.voornaam + ' ' + metadata.achternaam;
       if (String(wachtwoord).length < 8) throw failure('weak_password');
       const data = await request(api => api.signUp({
         email: String(email).trim(),
         password: wachtwoord,
-        options: { data: { naam: name } }
+        options: { data: metadata }
       }));
       if (data?.user?.identities?.length === 0) throw failure('duplicate');
       if (!data?.session || !data?.user) throw failure('confirmation_required');
@@ -251,13 +262,20 @@
       return data.user;
     },
 
-    async profielBijwerken(patch = {}, wachtwoord = '') {
+    async profielBijwerken(patch = {}, wachtwoord = '', email = '', options = {}) {
       const owner = currentUser?.id;
       await requireClient();
       if (!owner || currentUser?.id !== owner || logoutInProgress) throw failure('signed_out');
       const metadata = {};
+      if (['voornaam', 'achternaam'].some(key => Object.hasOwn(patch, key))) {
+        metadata.voornaam = cleanName(patch.voornaam);
+        metadata.achternaam = cleanName(patch.achternaam);
+        if (!metadata.voornaam || !metadata.achternaam) throw failure('invalid_name');
+        metadata.naam = metadata.voornaam + ' ' + metadata.achternaam;
+      }
+      if (Object.hasOwn(patch, 'bijnaam')) metadata.bijnaam = cleanName(patch.bijnaam, 24);
       if (Object.hasOwn(patch, 'naam')) {
-        metadata.naam = cleanName(patch.naam);
+        metadata.naam = cleanName(patch.naam, 121);
         if (!metadata.naam) throw failure('invalid_name');
       }
       if (Object.hasOwn(patch, 'thema')) {
@@ -269,14 +287,20 @@
         if (metadata.foto === '') throw failure('unknown');
       }
       if (wachtwoord && (typeof wachtwoord !== 'string' || wachtwoord.length < 8)) throw failure('weak_password');
+      const newEmail = typeof email === 'string' ? email.trim() : '';
+      if (newEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) throw failure('invalid_email');
       const operation = async () => {
         if (!currentUser || currentUser.id !== owner || logoutInProgress) throw failure('signed_out');
-        if (!Object.keys(metadata).length && !wachtwoord) return currentUser;
+        const changeEmail = newEmail && newEmail.toLowerCase() !== String(currentUser.email || '').toLowerCase()
+          && (options.emailOpnieuw || newEmail.toLowerCase() !== String(currentUser.new_email || '').toLowerCase());
+        if (!Object.keys(metadata).length && !wachtwoord && !changeEmail) return currentUser;
         const attributes = { data: metadata };
         if (wachtwoord) attributes.password = wachtwoord;
+        if (changeEmail) attributes.email = newEmail;
+        const requestOptions = changeEmail ? { emailRedirectTo: new URL(pagePrefix + 'profiel.html?email=bevestigen', window.location.href).href } : undefined;
         const data = await request(api => {
           if (!currentUser || currentUser.id !== owner || logoutInProgress) throw failure('signed_out');
-          return api.updateUser(attributes);
+          return api.updateUser(attributes, requestOptions);
         });
         if (!data?.user || data.user.id !== owner || currentUser?.id !== owner || logoutInProgress) throw failure('signed_out');
         setUser(data.user);
@@ -331,7 +355,7 @@
       if (signingOut) return;
       signingOut = true;
       link.setAttribute('aria-disabled', 'true');
-      const errorHost = link.closest('nav') || document.querySelector('nav.navigation, nav.nav-vol') || document.querySelector('[data-account-sessie]') || link.parentElement;
+      const errorHost = link.closest('[data-uitloggen-groep]') || link.closest('nav') || document.querySelector('nav.navigation, nav.nav-vol') || document.querySelector('[data-account-sessie]') || link.parentElement;
       const previousError = document.querySelector('[data-account-fout]');
       if (previousError) previousError.remove();
       try {
