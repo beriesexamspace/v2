@@ -1,0 +1,44 @@
+.rondleiding-intro { max-width: 680px; margin: 0 0 24px; color: var(--ink-soft); line-height: 1.7; }
+.rondleiding { overflow: hidden; border: 1px solid var(--line); border-radius: 24px; background: var(--card); box-shadow: var(--shadow-soft); }
+.rondleiding-kop { padding: 28px 32px 24px; scroll-margin-top: 96px; }
+.rondleiding-teller { margin: 0 0 10px; color: var(--accent); font-size: .8125rem; font-weight: 600; }
+.rondleiding h3 { margin: 0 0 12px; font-size: clamp(1.375rem, 2.5vw, 1.75rem); line-height: 1.25; letter-spacing: -.035em; }
+.rondleiding-uitleg { max-width: 720px; margin: 0; color: var(--ink-soft); font-size: .9375rem; line-height: 1.7; }
+.rondleiding-actie { display: flex; align-items: start; gap: 9px; margin: 16px 0 0; font-size: .9375rem; line-height: 1.5; font-weight: 600; }
+.rondleiding-actie::before { content: '↗'; color: var(--accent); font-size: 1.2rem; line-height: 1.2; }
+.rondleiding-beeld { margin: 0; padding: 0 24px; }
+.rondleiding-venster { position: relative; max-width: min(1040px, var(--beeld-max, 1040px)); margin: 0 auto; overflow: hidden; isolation: isolate; border: 1px solid var(--line); border-radius: 16px; background: var(--bg); aspect-ratio: var(--beeld-verhouding, 16/9); }
+.rondleiding-venster picture, .rondleiding-venster img { display: block; width: 100%; height: 100%; }
+.rondleiding-venster img { object-fit: contain; }
+.rondleiding-aanwijzingen { position: absolute; inset: 0; pointer-events: none; }
+.rondleiding-venster.is-laden .rondleiding-aanwijzingen { visibility: hidden; }
+.rondleiding-doel { position: absolute; width: 42px; height: 42px; margin: -21px 0 0 -21px; border: 2px solid var(--accent); border-radius: 50%; box-shadow: 0 0 0 5px var(--accent-zacht); }
+.rondleiding-pijl { position: absolute; width: 54px; height: 2px; background: var(--accent); transform-origin: left center; transform: translate(-58px, -38px) rotate(34deg); }
+.rondleiding-pijl::after { content: ''; position: absolute; right: 0; top: -4px; width: 9px; height: 9px; border-top: 2px solid var(--accent); border-right: 2px solid var(--accent); transform: rotate(45deg); }
+.rondleiding-muis { position: absolute; width: 28px; height: 33px; color: #fff; filter: drop-shadow(0 2px 2px rgb(0 0 0 / .3)); }
+.rondleiding-muis svg { display: block; width: 100%; height: 100%; fill: currentColor; stroke: #1D1D1F; stroke-width: 1.8; stroke-linejoin: round; }
+.rondleiding-bijschrift { max-width: 1040px; margin: 12px auto 0; color: var(--ink-soft); font-size: .75rem; line-height: 1.6; }
+.rondleiding-bediening { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 24px 32px 28px; }
+.rondleiding-paginering { display: flex; gap: 10px; }
+.rondleiding-bediening button { min-height: 44px; font-size: .875rem; padding: 11px 19px; }
+.rondleiding-opnieuw { border: 0; background: transparent; color: var(--accent); border-radius: var(--pill); font: inherit; font-weight: 500; transition: background 160ms ease, transform 160ms ease; }
+.rondleiding-opnieuw:hover { background: var(--accent-zacht); transform: scale(1.02); }
+.rondleiding button:disabled { opacity: .45; cursor: default; transform: none; box-shadow: none; }
+.rondleiding button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.rondleiding-notitie { margin: 20px 0 0; color: var(--ink-soft); font-size: .8125rem; line-height: 1.65; }
+@media (max-width: 600px) {
+  .rondleiding { border-radius: 20px; }
+  .rondleiding-kop { padding: 22px 20px; }
+  .rondleiding-beeld { padding: 0 12px; }
+  .rondleiding-venster { max-width: 375px; border-radius: 12px; }
+  .rondleiding-bijschrift { padding: 0 7px; }
+  .rondleiding-bediening { flex-direction: column-reverse; align-items: stretch; padding: 20px; }
+  .rondleiding-paginering > button { flex: 1; padding-inline: 12px; }
+  .rondleiding-opnieuw { align-self: center; }
+  .rondleiding-doel { width: 34px; height: 34px; margin: -17px 0 0 -17px; }
+  .rondleiding-muis { width: 25px; height: 30px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rondleiding-opnieuw { transition: none; }
+  .rondleiding-opnieuw:hover { transform: none; }
+}

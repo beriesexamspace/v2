@@ -17,7 +17,7 @@ wachtwoord.html       wachtwoord instellen via een herstel-link
 nieuw.html            updates na iedere nieuwe login, vóór de hub
 hub.html              jaren + tools
 over-mij.html         kennismaking, sociale links en het ontstaan van de site
-profiel.html          accountnaam, profielfoto en wachtwoord aanpassen
+profiel.html          naam, e-mailadres, profielfoto, wachtwoord en studiekalender
 jaar-1ba.html         vakken 1ste bachelor
 jaar-2ba.html         vakken 2de bachelor
 jaar-3ba.html         vakken 3de bachelor
@@ -31,6 +31,12 @@ assets/vak.css        aanvullende stijl van de vakpagina
 assets/vak.js         logica van de vakpagina
 assets/vakken.js      lijst van alle vakken per jaar
 assets/updates.js     updates voor de sectie Wat is nieuw op de hub
+assets/activiteit.js  persoonlijke dagtotalen, bezoeksessies en studiekalender
+assets/kalender.css   aanvullende stijl voor de studiekalender
+assets/rondleiding.js visuele uitleg met echte screenshots en voorbeeldmuis
+assets/rondleiding.css aanvullende stijl voor de rondleiding
+assets/rondleiding/   lokale screenshots met fictieve testgegevens
+supabase/studieactiviteit.sql optionele accountopslag voor de studiekalender
 ```
 
 ## Stand van zaken
@@ -38,13 +44,13 @@ assets/updates.js     updates voor de sectie Wat is nieuw op de hub
 - De jaarpagina's zijn één sjabloon; alleen `data-jaar` op `<body>`, de titel en de `<h1>` verschillen. De vakkaarten linken naar de bestaande tools op de huidige site tot `v2: true` staat in `vakken.js`.
 - Gedeelde kaartstijl in `style.css`: `.pagina` (binnenpagina met terugknop), `.kaart-pijl`, `.kaart-tekst`, `.kaart-titel`, `.kaart-sub`, `.pijl`, `.rooster-2`, `.sectie`, `.sectie-kop`.
 - Reken je punten en Examen-info staan nu in v2 (`reken.html` en `examen-info.html`), bereikbaar via de tool-kaarten op de hub.
-- De startpagina (`index.html`) heeft bewust geen navigatiebalk en past in één schermhoogte. De getekende grijze muisaanwijzer (overgenomen uit Helder) zit in `style.css` en `app.js` en werkt op elke pagina; op touch verschijnt hij niet.
+- De startpagina (`index.html`) heeft bewust geen navigatiebalk en past in één schermhoogte. Een statische, zachte V2 ligt achter de inhoud. De getekende muisaanwijzer (overgenomen uit Helder) zit in `style.css` en `app.js`; hij kiest zwart of wit op basis van de berekende achtergrondkleur onder de muis, inclusief transparante bovenliggende vlakken. Op touch verschijnt hij niet.
 - Gedeelde helpers staan op `window.BES` (`naamOpslaan`, `naamOphalen`, `jaarOpslaan`, `jaarOphalen`); de losse `window.naamOpslaan` enz. blijven als alias bestaan.
-- Navigatiebalk: `<nav class="navigation">` of `<nav class="nav-vol">` krijgt het Helder-gedrag (recht bovenaan, pill bij scrollen). De startpagina heeft geen balk. Elke binnenpagina heeft direct naast het logo een Home-knop naar de hub. Op `profiel.html` houdt `data-nav="vast"` de balk volledig breed en stil, ook tijdens scrollen.
+- Navigatiebalk: `<nav class="navigation">` of `<nav class="nav-vol">` staat bovenaan gecentreerd met zijmarges en wordt bij scrollen een pill. De ruststand is maximaal 1160 px breed, de zwevende stand maximaal 1100 px. De startpagina heeft geen balk. Elke binnenpagina heeft naast het logo een Home-knop naar de hub. Op `profiel.html` houdt `data-nav="vast"` de balk stil. Uitloggen staat onder Opslaan op Profiel; de bestaande uitloglink op de startpagina blijft werken. De logolink blijft naar de startpagina wijzen.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 17), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 18), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.
@@ -64,7 +70,15 @@ Hover volgt de werkelijk gebruikte invoer via `html.has-hover`: muisbewegingen s
 4. Stel onder Authentication → URL Configuration de Site URL in op `https://beriesexamspace.com/v2/` en voeg `https://beriesexamspace.com/v2/wachtwoord.html` toe als Redirect URL.
 5. Test na het invullen aanmelden, inloggen, herstelmail, het nieuwe wachtwoord en uitloggen. Zonder ingevulde instellingen blijven accounts uitgeschakeld en kan iedereen wel oefenen. Voor herstelmail in een lokale preview moet ook de exacte lokale `wachtwoord.html`-URL in Supabase als Redirect URL zijn toegestaan.
 
-De accountnaam staat in Supabase onder user metadata `naam` en wordt lokaal opgeslagen via `BES.naamOpslaan`. De client wordt na `app.js` en `config.js` geladen; `auth.js` regelt de sessie en de inloglink centraal. `BES.auth.client` geeft de bestaande Supabase-client door aan de vakpagina. Voortgang tussen toestellen werkt voor ingelogde gebruikers na het aanmaken van de tabel en toegangsregels onder "Vakpagina".
+Nieuwe accounts bewaren `voornaam`, `achternaam` en de optionele `bijnaam` in Supabase user metadata. `naam` blijft de volledige naam voor bestaande koppelingen. `BES.auth.naamGegevens(user)` geeft de volledige naam en aanspreeknaam terug; `BES.naamOpslaan` bewaart de bijnaam of voornaam. Alleen Profiel toont de volledige naam. Een oude, ongesplitste naam wordt niet automatisch verdeeld en blijft op Profiel behouden; de hub gebruikt daarvoor een algemene begroeting totdat de gebruiker de losse velden invult. Bestaande gebruikers hoeven naamvelden niet opnieuw in te vullen om hun wachtwoord of e-mailadres te wijzigen.
+
+De client wordt na `app.js` en `config.js` geladen; `auth.js` regelt de sessie en de inloglink centraal. `BES.auth.client` geeft de bestaande Supabase-client door aan de vakpagina. Voortgang tussen toestellen werkt voor ingelogde gebruikers na het aanmaken van de tabel en toegangsregels onder "Vakpagina".
+
+### E-mailadres wijzigen
+
+Profiel gebruikt de bestaande `auth.updateUser`-functie. De gebruikers-ID blijft gelijk. De bevestiging volgt de huidige Supabase-instellingen; schakel beveiligde e-mailwijziging niet uit. Zolang de provider een `new_email` teruggeeft, meldt Profiel dat bevestiging nodig is. Alleen `user.email` geldt als het bevestigde adres.
+
+Voeg voor deze flow `https://beriesexamspace.com/v2/profiel.html?email=bevestigen` toe aan de toegestane redirect-URL's in Supabase. Voor een echte lokale test is ook de exacte lokale URL nodig. De wijziging in deze PR voert geen configuratie-aanpassing of e-mailverzending uit. Browsercontroles gebruiken een nagebootste auth-provider; een echte bevestigingsmail, inclusief eventuele bevestiging via het oude adres, moet na inrichting met een testaccount worden gecontroleerd.
 
 Een project op het instapplan kan na een week zonder voldoende gebruik pauzeren. Open dan het project in het Supabase-dashboard en kies "Resume project". Zie de [Supabase-uitleg over projectpauzes](https://supabase.com/docs/guides/platform/free-project-pausing).
 
@@ -87,6 +101,28 @@ create policy "eigen avatar verwijderen" on storage.objects for delete using (bu
 ```
 
 Zolang de bucket ontbreekt, meldt de profielpagina "Foto's zijn nog niet ingeschakeld." bij een fotobewerking. Naam, wachtwoord en thema blijven zelfstandig werken. De publieke foto-URL met tijdparameter staat in `user_metadata.foto`. Een upload en de daaropvolgende metadatawijziging zijn aparte verzoeken; bij een storing toont de pagina een fout en kan de gebruiker opnieuw proberen. Voer na het aanmaken van de bucket een echte upload en verwijdering uit en controleer met een tweede account dat alleen het eigen bestand aangepast kan worden. De browsercontroles bij deze wijziging gebruiken een nagebootste account- en opslagdienst en veranderen geen bestaande accounts of bestanden.
+
+## Persoonlijke studiekalender
+
+`assets/activiteit.js` wordt na `auth.js` geladen. Alleen ingelogde accounts worden gemeten. Lokale dagsamenvattingen staan onder `bes_studieactiviteit_<account-id>`. De willekeurige browser-ID in `bes_studieapparaat` bevat geen persoonsgegevens. Alleen leertijd en bezoeken per dag worden gesynchroniseerd, geen antwoorden of bezochte pagina's.
+
+- Een bezoek is een sessie met maximaal 30 minuten tussen activiteiten. Navigeren en herladen tellen niet opnieuw. Verschillende toestellen hebben afzonderlijke bezoeksessies.
+- Leertijd loopt alleen op een zichtbaar en actief oefenscherm, theorietabblad of tabblad Studie-hacks. Instellingen, uitslag, hub en Profiel tellen niet mee.
+- Na 120 seconden zonder invoer pauzeert de teller. Hervatten telt de pauze niet achteraf mee. Een verborgen of niet-actief tabblad telt niet mee.
+- Web Locks en gedeelde lokale opslag voorkomen dat meerdere tabbladen in dezelfde browser dezelfde tijd dubbel boeken. Als deze functies ontbreken, wordt dat gemeld en stopt de meting.
+- Intervallen over middernacht worden over lokale kalenderdagen verdeeld. Leertijd is een indicatie op basis van activiteit, geen concentratiemeting.
+- Ontbrekende dagen tonen "Geen gegevens geregistreerd" met een stippelrand. Een geregistreerde dag met nul leertijd is herkenbaar als zo'n dag. Historische gegevens worden niet verzonnen.
+- De maandkalender begint bij de huidige maand. Vorige/volgende maand, hover, toetsenbordfocus en tikken tonen de dagsamenvatting. De legenda loopt van minder naar meer leertijd.
+
+### Opslag tussen apparaten inschakelen
+
+Voer [supabase/studieactiviteit.sql](supabase/studieactiviteit.sql) één keer uit via de SQL Editor van het bijbehorende Supabase-project. Deze PR voert dit niet op productie uit. Het script maakt een tabel met per account, browser en dag een rij. Lezen vereist de eigen account-ID via RLS. Schrijven loopt via een beperkte functie die de ingelogde gebruiker controleert; anon heeft geen toegang. Updates zijn monotoon en idempotent, zodat herhaalde of verlate verzoeken geen tijd verdubbelen of terugzetten. De kalender telt de dagtotalen van de eigen browsers op.
+
+Zonder tabel, functie of verbinding blijft de kalender lokaal werken en vermeldt hij expliciet dat synchronisatie niet beschikbaar is. Verwar deze lokale werking niet met een bevestigde koppeling tussen apparaten. Na inrichting moeten een echt testaccount op twee apparaten en de toegangscontrole met een tweede testaccount nog worden gecontroleerd. De geautomatiseerde controles gebruiken nagebootste accounts en een nagebootste database.
+
+## Visuele rondleiding
+
+De uitleg blijft op `hub.html#hoe-werkt-het`. `assets/rondleiding.js` en `assets/rondleiding.css` tonen echte lokale screenshots uit `assets/rondleiding/`, opgenomen met fictieve testgegevens. De voorbeeldmuis en markeringen blijven binnen het screenshot; zij voeren geen echte klikken uit. De bezoeker kiest zelf Volgende, Vorige of Nog eens afspelen. Bij verminderde beweging blijven de aanwijzingen statisch. Bij wijzigingen aan de getoonde bediening moeten ook de bijbehorende screenshots en relatieve klikposities worden bijgewerkt.
 
 ## Vakpagina
 

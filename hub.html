@@ -30,12 +30,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=17">
-  <script src="assets/app.js?v=17"></script>
-  <script src="assets/updates.js?v=17"></script>
-  <script src="assets/config.js?v=17" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=18">
+  <link rel="stylesheet" href="assets/rondleiding.css?v=18">
+  <script src="assets/rondleiding.js?v=18" defer></script>
+  <script src="assets/app.js?v=18"></script>
+  <script src="assets/updates.js?v=18"></script>
+  <script src="assets/config.js?v=18" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=17" defer></script>
+  <script src="assets/auth.js?v=18" defer></script>
+  <script src="assets/activiteit.js?v=18" defer></script>
   <style>
     html { scroll-behavior: smooth; }
 
@@ -119,14 +122,6 @@
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
-    .hub-handleiding { max-width: 760px; }
-    .handleiding-inleiding, .handleiding-stap p { color: var(--muted); font-size: .9375rem; line-height: 1.7; }
-    .handleiding-inleiding { margin: 0; }
-    .handleiding-stap { margin-top: 28px; }
-    .handleiding-stap h3 { margin: 0 0 12px; font-size: 1.125rem; line-height: 1.4; }
-    .handleiding-stap p { margin: 8px 0 0; }
-    .handleiding-inleiding strong, .handleiding-stap strong { color: var(--ink); }
 
     @media (max-width: 767px) {
       .hub-update { grid-template-columns: minmax(0, 1fr); gap: 4px; }
@@ -237,69 +232,38 @@
 
       <section class="sectie hub-sectie" id="hoe-werkt-het" aria-labelledby="hoe-werkt-het-kop">
         <h2 class="sectie-kop" id="hoe-werkt-het-kop">Hoe werkt het</h2>
-        <div class="hub-handleiding">
-          <p class="handleiding-inleiding">Berie's Exam Space helpt je om je leerstof te oefenen en te ontdekken wat je nog wilt herhalen. Je kiest eerst <strong>je jaar en vak</strong>. Daarna oefen je met vragen, bekijk je uitleg en volg je je voortgang. Hieronder staat de route, van je eerste bezoek tot het bekijken van je uitslag.</p>
-          <article class="handleiding-stap">
-            <h3>1. Maak een account of log in</h3>
-            <p><strong>Waar:</strong> Op de startpagina, onder de grote titel. Je hebt je naam, e-mailadres en een wachtwoord nodig om een account te maken.</p>
-            <p><strong>Klik op:</strong> <strong>"Aanmelden →"</strong>. Heb je al een account, kies dan <strong>"Heb je al een account? Log in"</strong> en vervolgens <strong>"Inloggen →"</strong>.</p>
-            <p><strong>Daarna:</strong> Vul de gevraagde gegevens in. Bij aanmelden geef je één antwoord per scherm en kies je een wachtwoord van <strong>minimaal acht tekens</strong>.</p>
-          </article>
-          <article class="handleiding-stap">
-            <h3>2. Lees wat er nieuw is</h3>
-            <p><strong>Waar:</strong> Op het scherm dat na het aanmelden of inloggen verschijnt. Hier staan de laatste veranderingen met hun datum.</p>
-            <p><strong>Klik op:</strong> <strong>"Begrepen →"</strong> zodra je naar beneden hebt gescrold. De knop wordt actief wanneer je <strong>het einde van de uitleg</strong> bereikt.</p>
-            <p><strong>Daarna:</strong> Je komt op de hub, je overzicht met jaren en tools. Tijdens dezelfde browsersessie hoef je dit scherm niet opnieuw door.</p>
-          </article>
-          <article class="handleiding-stap">
-            <h3>3. Kies je jaar</h3>
-            <p><strong>Waar:</strong> Bovenaan de hub, onder je begroeting. Je ziet drie gekleurde jaarkaarten.</p>
-            <p><strong>Klik op:</strong> <strong>"1ste bachelor"</strong>, <strong>"2de bachelor"</strong> of <strong>"3de bachelor"</strong>. Onderaan iedere kaart staat <strong>"Bekijk vakken →"</strong>; de hele kaart is klikbaar.</p>
-            <p><strong>Daarna:</strong> Je opent de vakken van dat jaar. De aanduiding "Laatst gekozen" helpt je bij een volgend bezoek.</p>
-          </article>
-          <article class="handleiding-stap">
-            <h3>4. Open je vak</h3>
-            <p><strong>Waar:</strong> Op de jaarpagina staan de vakken als kaarten, met telkens een naam en korte beschrijving.</p>
-            <p><strong>Klik op:</strong> <strong>De vakkaart</strong> van het vak waarvoor je wilt oefenen.</p>
-            <p><strong>Daarna:</strong> De vakpagina opent. Je ziet de hoofdstukken, je oefenmogelijkheden en de tabbladen. Via <strong>"Terug"</strong> kom je weer bij je jaar.</p>
-          </article>
-          <article class="handleiding-stap">
-            <h3>5. Kies hoofdstukken</h3>
-            <p><strong>Waar:</strong> Op de vakpagina, onder <strong>"Kies je hoofdstukken"</strong>. Elke rij toont een hoofdstuk en je eerdere oefenstand.</p>
-            <p><strong>Klik op:</strong> De hoofdstukken die je wilt oefenen. Met <strong>"Alles"</strong> selecteer je alle beschikbare hoofdstukken; met <strong>"Niets"</strong> maak je de selectie leeg.</p>
-            <p><strong>Daarna:</strong> Voor Examen Training blijft <strong>minstens één hoofdstuk</strong> geselecteerd. Een hoofdstuk zonder vragen kun je nog niet oefenen.</p>
-          </article>
-          <article class="handleiding-stap">
-            <h3>6. Kies hoe je oefent</h3>
-            <p><strong>Waar:</strong> Onder "Hoe wil je oefenen?", op dezelfde vakpagina.</p>
-            <p><strong>Klik op:</strong> <strong>"Examen Training"</strong> voor uitleg na elke vraag, of <strong>"Examensimulatie"</strong> voor een uitslag aan het einde. Kies daarna <strong>"Start →"</strong>.</p>
-            <p><strong>Daarna:</strong> Training gebruikt je gekozen hoofdstukken. Een simulatie gebruikt alle hoofdstukken en <strong>maximaal twintig willekeurige vragen</strong>; bij minder beschikbare vragen krijg je er minder.</p>
-          </article>
-          <article class="handleiding-stap">
-            <h3>7. Beantwoord de vragen</h3>
-            <p><strong>Waar:</strong> Onder de vraag. Bij meerdere keuzes staat bijvoorbeeld <strong>"Kies 2 antwoorden."</strong> of <strong>"Kies de 2 foute antwoorden."</strong> Volg wat de hint vraagt.</p>
-            <p><strong>Klik op:</strong> Eén antwoord, of vink het gevraagde aantal aan en kies <strong>"Controleer →"</strong>. Vervolgens: <strong>"Volgende →"</strong> of bij de laatste vraag <strong>"Bekijk je uitslag →"</strong>.</p>
-            <p><strong>Daarna:</strong> Lees bij training de uitleg. Kies <strong>"Fouten opnieuw →"</strong> om fouten te oefenen, of <strong>"Opnieuw"</strong> voor een nieuwe ronde. Stoppen kan met <strong>"Stop"</strong> en <strong>"Ja, stoppen"</strong>.</p>
-          </article>
-          <article class="handleiding-stap">
-            <h3>8. Bekijk je voortgang</h3>
-            <p><strong>Waar:</strong> Bij de hoofdstukken en op je uitslagscherm zie je hoeveel antwoorden goed waren.</p>
-            <p><strong>Klik op:</strong> <strong>"Terug naar het vak"</strong> om de hoofdstukstanden weer te bekijken.</p>
-            <p><strong>Daarna:</strong> Trainingsantwoorden werken je hoofdstukstand bij. Met een account wordt die voortgang gesynchroniseerd, zodat je <strong>op een ander toestel</strong> kunt verdergaan. Zonder verbinding blijft je stand <strong>lokaal bewaard</strong>.</p>
-          </article>
-          <article class="handleiding-stap">
-            <h3>9. Herhaal uitleg en theorie</h3>
-            <p><strong>Waar:</strong> Bovenaan de vakpagina staan <strong>"Studie-hacks"</strong> en <strong>"Theorie"</strong> naast "Oefenen".</p>
-            <p><strong>Klik op:</strong> Het tabblad dat je wilt lezen. Na een afgeronde examensimulatie kun je ook <strong>"Bekijk alle vragen"</strong> openen.</p>
-            <p><strong>Daarna:</strong> Lees beschikbare studietips of theorie. Het simulatieoverzicht laat je antwoorden, de juiste keuzes en uitleg zien, zodat je gericht kunt herhalen.</p>
-          </article>
-          <article class="handleiding-stap">
-            <h3>10. Gebruik de extra hulpmiddelen</h3>
-            <p><strong>Waar:</strong> Op de hub staan onder "Tools" de kaarten <strong>"Reken je punten"</strong> en <strong>"Examen-info"</strong>.</p>
-            <p><strong>Klik op:</strong> Een tool, of open <strong>"WhatsApp-groep"</strong> via het menu voor uitleg en de link naar de groep.</p>
-            <p><strong>Daarna:</strong> Bereken je punten, lees exameninformatie of ontvang updates. "Feedback" staat ook in het menu; deze mogelijkheid <strong>komt binnenkort</strong>.</p>
-          </article>
+        <p class="rondleiding-intro">Nieuw hier? Bekijk rustig hoe je begint. Met echte beelden van de site en een voorbeeldmuis laten we zien waar je klikt. Jij bepaalt het tempo.</p>
+        <div class="rondleiding" id="rondleiding" role="region" aria-label="Stap voor stap leren oefenen">
+          <div class="rondleiding-kop" aria-live="polite" aria-atomic="true">
+            <p class="rondleiding-teller" id="rondleiding-teller">Stap 1 van 10</p>
+            <h3 id="rondleiding-titel">Begin met je naam</h3>
+            <p class="rondleiding-uitleg" id="rondleiding-uitleg">Kies op de startpagina Aanmelden. Vul je voornaam en achternaam in. Een bijnaam mag, maar hoeft niet. Daarna vragen we je e-mailadres en een wachtwoord.</p>
+            <p class="rondleiding-actie" id="rondleiding-actie">Vul je naam in en kies Verder.</p>
+          </div>
+          <figure class="rondleiding-beeld">
+            <div class="rondleiding-venster" id="rondleiding-venster">
+              <picture>
+                <source id="rondleiding-mobiel" media="(max-width: 600px)" srcset="assets/rondleiding/naam-licht-mobiel.jpg">
+                <img id="rondleiding-foto" src="assets/rondleiding/naam-licht-desktop.jpg" alt="Het aanmeldscherm met de drie naamvelden en Verder." loading="lazy" decoding="async">
+              </picture>
+              <div class="rondleiding-aanwijzingen" aria-hidden="true">
+                <span class="rondleiding-pijl" id="rondleiding-pijl"></span>
+                <span class="rondleiding-doel" id="rondleiding-doel"></span>
+                <span class="rondleiding-muis" id="rondleiding-muis"><svg viewBox="0 0 28 33"><path d="M2 1 3 25l6-6 6 11 5-3-6-10 9-1Z"/></svg></span>
+              </div>
+            </div>
+            <figcaption class="rondleiding-bijschrift">Dit zijn voorbeeldbeelden van de website. De voorbeeldmuis klikt alleen in de uitleg.</figcaption>
+          </figure>
+          <div class="rondleiding-bediening">
+            <button class="rondleiding-opnieuw" type="button" id="rondleiding-opnieuw">Nog eens afspelen</button>
+            <div class="rondleiding-paginering">
+              <button class="knop-secundair" type="button" id="rondleiding-vorige" disabled>← Vorige</button>
+              <button class="knop" type="button" id="rondleiding-volgende">Volgende →</button>
+            </div>
+          </div>
+          <noscript><p class="rondleiding-kop">Schakel JavaScript in voor de rondleiding. De route is: aanmelden, je jaar kiezen, een vak openen, je oefenvorm en hoofdstukken kiezen, starten en je antwoorden en uitslag bekijken.</p></noscript>
         </div>
+        <p class="rondleiding-notitie"><strong>Goed om te weten:</strong> we laten Inleiding tot de pedagogische wetenschappen zien. Alleen dit voorbeeldvak heeft nu een keuze tussen Normaal en Hard mode. Bij andere vakken kies je de hoofdstukken en oefenvorm in hun bestaande scherm.</p>
       </section>
 
     </div>
@@ -319,11 +283,10 @@
       const begroeting = document.getElementById('begroeting');
       const vraag = document.getElementById('hub-vraag');
       const updateBegroeting = user => {
-        const opgeslagen = typeof bes.naamOphalen === 'function' ? bes.naamOphalen() : '';
-        const naam = String(user?.user_metadata?.naam || opgeslagen || '').trim();
-        const voornaam = naam.split(/\s+/u)[0];
-        begroeting.textContent = voornaam ? 'Welkom terug, ' + voornaam + '.' : 'Welkom.';
-        vraag.textContent = voornaam ? 'Wat gaan we vandaag oefenen?' : 'In welk jaar zit je?';
+        const gegevens = user && typeof bes.auth?.naamGegevens === 'function' ? bes.auth.naamGegevens(user) : null;
+        const naam = gegevens && (gegevens.gesplitst || gegevens.bijnaam) ? gegevens.aanspreeknaam : '';
+        begroeting.textContent = naam ? 'Welkom terug, ' + naam + '.' : user ? 'Welkom terug.' : 'Welkom.';
+        vraag.textContent = user ? 'Wat gaan we vandaag oefenen?' : 'In welk jaar zit je?';
       };
       updateBegroeting();
       window.addEventListener('bes:auth', event => updateBegroeting(event.detail?.user));
