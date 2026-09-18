@@ -22,6 +22,7 @@ jaar-1ba.html         vakken 1ste bachelor
 jaar-2ba.html         vakken 2de bachelor
 jaar-3ba.html         vakken 3de bachelor
 whatsapp.html         uitleg en link naar de WhatsApp-groep
+feedback.html         feedback sturen (fout in een vraag, idee, iets anders) naar de tabel feedback
 vak/voorbeeld/        vak-template (index.html + data.js)
 assets/style.css      gedeelde stijl
 assets/app.js         gedeelde logica (nav, fade, terugknop, naam)
@@ -101,6 +102,28 @@ create policy "eigen avatar verwijderen" on storage.objects for delete using (bu
 ```
 
 Zolang de bucket ontbreekt, meldt de profielpagina "Foto's zijn nog niet ingeschakeld." bij een fotobewerking. Naam, wachtwoord en thema blijven zelfstandig werken. De publieke foto-URL met tijdparameter staat in `user_metadata.foto`. Een upload en de daaropvolgende metadatawijziging zijn aparte verzoeken; bij een storing toont de pagina een fout en kan de gebruiker opnieuw proberen. Voer na het aanmaken van de bucket een echte upload en verwijdering uit en controleer met een tweede account dat alleen het eigen bestand aangepast kan worden. De browsercontroles bij deze wijziging gebruiken een nagebootste account- en opslagdienst en veranderen geen bestaande accounts of bestanden.
+
+## Feedback
+
+De menulink "Feedback" op elke pagina opent `feedback.html`. Alleen ingelogde gebruikers kunnen sturen; het bericht gaat met naam, e-mailadres, soort (fout, idee, anders), gekozen vak en tekst naar de tabel `feedback`. Je leest de berichten in Supabase onder Table Editor. Een link naar de pagina mag `?vak=<id>` en `?vraag=<nummer>` meegeven om het vak en het vraagnummer vooraf in te vullen (bedoeld voor een latere knop per vraag).
+
+Eenmalig in de SQL-editor uitvoeren:
+
+```sql
+create table if not exists public.feedback (
+  id bigint generated always as identity primary key,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  naam text, email text,
+  soort text not null check (soort in ('fout', 'idee', 'anders')),
+  vak text, tekst text not null check (char_length(tekst) between 1 and 2000),
+  pagina text,
+  gemaakt timestamptz not null default now());
+alter table public.feedback enable row level security;
+create policy "eigen feedback sturen" on public.feedback for insert with check (auth.uid() = user_id);
+create policy "eigen feedback lezen" on public.feedback for select using (auth.uid() = user_id);
+```
+
+Zolang de tabel ontbreekt, toont de pagina de rode regel "Feedback is nog niet ingeschakeld." en verwijst ze naar de WhatsApp-groep.
 
 ## Persoonlijke studiekalender
 
