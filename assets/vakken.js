@@ -22,7 +22,7 @@
     { id: 'philsci', jaar: '1ba', naam: 'Philosophy of Science', tekst: '82 oefenvragen per hoofdstuk, met uitleg.', v2: true },
     { id: 'logica', jaar: '1ba', naam: 'Logica & Wetenschapsfilosofie', tekst: '50 oefenvragen per hoofdstuk, met uitleg.', v2: true },
     { id: 'mbg', jaar: '1ba', naam: 'Menselijke biologie en genetica', tekst: '1.296 meerkeuzevragen en 251 oude examenvragen met antwoord, plus een samenvatting per hoofdstuk.', v2: true },
-    { id: 'sociologie', jaar: '1ba', naam: 'Sociologie I', tekst: '204 vragen, waarvan 92 uit echte examens, met het examen van de tweede zit apart.', v2: false },
+    { id: 'sociologie', jaar: '1ba', naam: 'Sociologie I', tekst: '204 vragen over 16 hoofdstukken plus 92 echte examenvragen, met uitleg.', v2: true },
     { id: 'omt1', jaar: '1ba', naam: 'Onderzoeksmethoden en -technieken I: psychometrie', tekst: '42 oefenvragen per hoofdstuk, met uitleg.', v2: true },
     { id: 'socpsy', jaar: '1ba', naam: 'Sociale psychologie I: sociale cognitie', tekst: '70 oefenvragen, hoofdstuk 1 tot 7, met uitleg.', v2: true },
     { id: 'algpsy', jaar: '1ba', naam: 'Algemene psychologie', tekst: '82 oefenvragen per hoofdstuk, met uitleg.', v2: true },

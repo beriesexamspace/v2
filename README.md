@@ -39,7 +39,7 @@ supabase/studieactiviteit.sql optionele accountopslag voor de studiekalender
 ```
 
 ## Stand van zaken
-- Klaar: startpagina, gedeelde basis, accounts, hub, drie jaarpagina's, vak-template en oefenlogica. Het voorbeeldvak bevat 14 vragen, waaronder twee vragen met meerdere te kiezen antwoorden. Van de 34 vakken in `assets/vakken.js` hebben 33 een eigen map met overgezette inhoud.
+- Klaar: startpagina, gedeelde basis, accounts, hub, drie jaarpagina's, vak-template en oefenlogica. Het voorbeeldvak bevat 14 vragen, waaronder twee vragen met meerdere te kiezen antwoorden. Alle 34 vakken in `assets/vakken.js` hebben een eigen map met overgezette inhoud; Sociologie I (19-09-2026) gebruikt het formaat met meerdere antwoorden (`a: [..]` en `kies: 'fout'`), en vragen met één antwoord maar meer dan vijf opties staan daar als lijst met één index.
 - De jaarpagina's zijn één sjabloon; alleen `data-jaar` op `<body>`, de titel en de `<h1>` verschillen. De vakkaarten linken naar de bestaande tools op de huidige site tot `v2: true` staat in `vakken.js`.
 - Gedeelde kaartstijl in `style.css`: `.pagina` (binnenpagina met terugknop), `.kaart-pijl`, `.kaart-tekst`, `.kaart-titel`, `.kaart-sub`, `.pijl`, `.rooster-2`, `.sectie`, `.sectie-kop`.
 - Reken je punten en Examen-info staan nu in v2 (`reken.html` en `examen-info.html`), bereikbaar via de tool-kaarten op de hub.
