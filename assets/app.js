@@ -337,6 +337,8 @@
     let colorTarget = null;
     let colorTheme = '';
     let colorTime = 0;
+    let backgroundTone = '0 0 0';
+    let appliedTone = '';
     const rgba = value => {
       const values = value.match(/[\d.]+/g)?.map(Number);
       if (!values || values.length < 3) return [0, 0, 0, 0];
@@ -364,7 +366,53 @@
         return value <= .04045 ? value / 12.92 : Math.pow((value + .055) / 1.055, 2.4);
       });
       const luminance = .2126 * linear[0] + .7152 * linear[1] + .0722 * linear[2];
-      const tone = luminance > .179 ? '0 0 0' : '255 255 255';
+      backgroundTone = luminance > .179 ? '0 0 0' : '255 255 255';
+    };
+    const luminanceOf = ([r, g, b]) => {
+      const linear = [r, g, b].map(channel => {
+        const value = channel / 255;
+        return value <= .04045 ? value / 12.92 : Math.pow((value + .055) / 1.055, 2.4);
+      });
+      return .2126 * linear[0] + .7152 * linear[1] + .0722 * linear[2];
+    };
+    // Raakt de bol (ook maar voor een deel) tekst, dan bepaalt de tekstkleur de toon:
+    // lichte tekst = zwarte bol, donkere tekst = witte bol. Anders geldt de achtergrond.
+    const textTone = (x, y, radius) => {
+      const fromPoint = document.caretPositionFromPoint
+        ? (px, py) => document.caretPositionFromPoint(px, py)?.offsetNode
+        : document.caretRangeFromPoint
+          ? (px, py) => document.caretRangeFromPoint(px, py)?.startContainer
+          : null;
+      if (!fromPoint) return null;
+      const points = [[x, y], [x - radius, y], [x + radius, y], [x, y - radius], [x, y + radius]];
+      const seen = new Set();
+      for (const [px, py] of points) {
+        let node;
+        try { node = fromPoint(px, py); } catch { continue; }
+        if (!node || node.nodeType !== Node.TEXT_NODE || !node.data.trim() || seen.has(node)) continue;
+        seen.add(node);
+        const parent = node.parentElement;
+        if (!parent || parent.closest('.cursor-dot')) continue;
+        const range = document.createRange();
+        range.selectNodeContents(node);
+        for (const rect of range.getClientRects()) {
+          if (!rect.width || !rect.height) continue;
+          const nx = Math.max(rect.left, Math.min(x, rect.right));
+          const ny = Math.max(rect.top, Math.min(y, rect.bottom));
+          if ((nx - x) ** 2 + (ny - y) ** 2 > radius * radius) continue;
+          const [cr, cg, cb, alpha] = rgba(getComputedStyle(parent).color);
+          if (alpha < .5) continue;
+          const luminance = luminanceOf([cr, cg, cb]);
+          if (luminance > .6) return '0 0 0';
+          if (luminance < .4) return '255 255 255';
+          return null;
+        }
+      }
+      return null;
+    };
+    const applyTone = tone => {
+      if (tone === appliedTone) return;
+      appliedTone = tone;
       dot.style.setProperty('--cursor-tone', tone);
       dot.style.backgroundColor = `rgb(${tone})`;
       dot.style.borderColor = `rgb(${tone})`;
@@ -387,6 +435,8 @@
       if (target.closest('input, textarea, [contenteditable="true"], select')) { clear(); return; }
       pointerPosition = { clientX: event.clientX, clientY: event.clientY };
       contrast(target);
+      const overControl = target.closest('button, a[href], summary, [role="button"], [role="tab"], [role="checkbox"], [role="radio"], .optie');
+      applyTone(textTone(event.clientX, event.clientY, overControl ? 8 : 7) || backgroundTone);
       const dialog = document.querySelector('dialog[open]');
       // Reinsert above a newly opened modal in the browser's top layer.
       if (dialog !== currentDialog && dot.matches(':popover-open')) dot.hidePopover();
