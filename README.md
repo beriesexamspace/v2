@@ -36,6 +36,7 @@ assets/updates.js     updates voor de sectie Wat is nieuw op de hub
 assets/activiteit.js  persoonlijke dagtotalen, bezoeksessies en studiekalender
 assets/kalender.css   aanvullende stijl voor de studiekalender
 supabase/studieactiviteit.sql optionele accountopslag voor de studiekalender
+referentie/comit-schetsen.html drie schetsen van de mascotte Comit met vier bewegingen, niet gelinkt, alleen om te kiezen
 ```
 
 ## Stand van zaken
