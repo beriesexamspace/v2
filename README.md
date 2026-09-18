@@ -37,6 +37,7 @@ assets/activiteit.js  persoonlijke dagtotalen, bezoeksessies en studiekalender
 assets/kalender.css   aanvullende stijl voor de studiekalender
 supabase/studieactiviteit.sql optionele accountopslag voor de studiekalender
 referentie/comit-schetsen.html drie schetsen van de mascotte Comit met vier bewegingen, niet gelinkt, alleen om te kiezen
+referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.js (bron voor SVG op de site en voor PNG via node maak-png.js), voorbeeldpagina index.html; trainingspak wit in licht, zwart in donker
 ```
 
 ## Stand van zaken
