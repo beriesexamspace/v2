@@ -34,9 +34,6 @@ assets/vakken.js      lijst van alle vakken per jaar
 assets/updates.js     updates voor de sectie Wat is nieuw op de hub
 assets/activiteit.js  persoonlijke dagtotalen, bezoeksessies en studiekalender
 assets/kalender.css   aanvullende stijl voor de studiekalender
-assets/rondleiding.js visuele uitleg met echte screenshots en voorbeeldmuis
-assets/rondleiding.css aanvullende stijl voor de rondleiding
-assets/rondleiding/   lokale screenshots met fictieve testgegevens
 supabase/studieactiviteit.sql optionele accountopslag voor de studiekalender
 ```
 
@@ -143,9 +140,9 @@ Voer [supabase/studieactiviteit.sql](supabase/studieactiviteit.sql) één keer u
 
 Zonder tabel, functie of verbinding blijft de kalender lokaal werken en vermeldt hij expliciet dat synchronisatie niet beschikbaar is. Verwar deze lokale werking niet met een bevestigde koppeling tussen apparaten. Na inrichting moeten een echt testaccount op twee apparaten en de toegangscontrole met een tweede testaccount nog worden gecontroleerd. De geautomatiseerde controles gebruiken nagebootste accounts en een nagebootste database.
 
-## Visuele rondleiding
+## Hoe werkt het (hub)
 
-De uitleg blijft op `hub.html#hoe-werkt-het`. `assets/rondleiding.js` en `assets/rondleiding.css` tonen echte lokale screenshots uit `assets/rondleiding/`, opgenomen met fictieve testgegevens. De voorbeeldmuis en markeringen blijven binnen het screenshot; zij voeren geen echte klikken uit. De bezoeker kiest zelf Volgende, Vorige of Nog eens afspelen. Bij verminderde beweging blijven de aanwijzingen statisch. Bij wijzigingen aan de getoonde bediening moeten ook de bijbehorende screenshots en relatieve klikposities worden bijgewerkt.
+De sectie `hub.html#hoe-werkt-het` bestaat uit vier korte kaarten (Log in, Kies je jaar en vak, Kies hoofdstukken en oefenvorm, Zie je voortgang groeien) en daaronder een `details` "Volledige uitleg →" met tien tekststappen (Waar / Klik op / Daarna) met de exacte knopnamen van de site. Vaste regel: uitleg op de hub is tekst. Geen screenshots van de site in de site, geen nagemaakte muis, geen animaties in uitleg; maximaal vier kaarten zichtbaar, de rest ingeklapt. Verandert een knopnaam, pas dan ook de tekst hier aan.
 
 ## Vakpagina
 
