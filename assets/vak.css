@@ -133,6 +133,8 @@
 .vak-pagina[data-niveaus] .niveau-keuze { min-height: 44px; padding: 10px 24px; border: 1px solid var(--transparent); border-radius: var(--radius-pill); background: var(--transparent); color: var(--ink-soft); font-size: .9375rem; font-weight: 500; cursor: pointer; transition: background-color 150ms var(--ease), color 150ms var(--ease), box-shadow 150ms var(--ease), transform 150ms var(--ease); }
 .vak-pagina[data-niveaus] .niveau-keuze[aria-checked="true"] { background: var(--card); color: var(--ink); border-color: var(--line); box-shadow: var(--shadow-soft); }
 .vak-pagina[data-niveaus] .niveau-keuze:disabled { opacity: .5; cursor: default; }
+.vak-pagina[data-niveaus] .niveau-keuze.komt-binnenkort { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; padding-top: 6px; padding-bottom: 6px; line-height: 1.2; }
+.vak-pagina[data-niveaus] .niveau-keuze.komt-binnenkort::after { content: 'Komt binnenkort'; font-size: .6875rem; font-weight: 500; color: var(--ink-soft); }
 :where(html.has-hover) .vak-pagina[data-niveaus] .niveau-keuze:not(:disabled):hover { color: var(--ink); background: var(--card); }
 :where(html.has-hover) .vak-pagina[data-niveaus] .niveau-keuze:not(:disabled):hover:not(:active) { transform: scale(1.025); }
 .vak-pagina[data-niveaus] .niveau-keuze:not(:disabled):active { transform: scale(.98); }

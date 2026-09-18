@@ -188,7 +188,7 @@ window.BES_VAK = {
 
 ### Oefenen en voortgang
 
-`vak/inlped/index.html` is de eerste proef met de nieuwe oefenkeuze. Alleen deze pagina heeft `data-niveaus` op `.vak-pagina`: eerst Examen Training of Examensimulatie, dan Normaal of Hard mode, daarna de hoofdstukken en een samenvatting met het daadwerkelijke aantal vragen boven Start. De overige vakpagina's houden hun bestaande bediening.
+Alle 34 vakpagina's (en het sjabloon `vak/voorbeeld/index.html`) hebben sinds 19-09-2026 dezelfde oefenkeuze in drie stappen, met `data-niveaus` op `.vak-pagina`: Stap 1 Examen Training of Examensimulatie, Stap 2 Normaal of Hard mode, Stap 3 de hoofdstukken, en een samenvatting met het daadwerkelijke aantal vragen boven Start. Heeft een vak geen `hardVragen`, dan staat de knop Hard mode grijs met "Komt binnenkort" en blijft Normaal gekozen. De pagina's verschillen alleen in de titel en de versie van `data.js`; pas de opbouw dus aan via een script over alle mappen, niet per vak.
 
 Normaal gebruikt de bestaande `vragen` zonder wijziging. De optionele lijst `hardVragen` gebruikt hetzelfde vraagformaat en bevat bij Inleiding pedagogiek een eerste set van 14 toepassingsvragen, twee per hoofdstuk h1 tot en met h7. Ze zijn uit de bestaande leerstof uitgewerkt en gecontroleerd op consistentie met die inhoud; verdere beoordeling door de vakinhoudelijke gebruiker blijft nodig vóór een brede uitrol. h8 (Echte examenvragen) krijgt geen verzonnen examenvragen. Een hoofdstuk zonder Hard mode-vragen is niet selecteerbaar op dat niveau; zonder geldige Hard mode-set is het niveau uitgeschakeld.
 

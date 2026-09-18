@@ -320,13 +320,14 @@
       byId('niveau-keuzes')?.querySelectorAll('[data-niveau]').forEach(button => {
         const active = button.dataset.niveau === level;
         button.disabled = button.dataset.niveau === 'hard' && !data.hardVragen.length;
+        if (button.dataset.niveau === 'hard') button.classList.toggle('komt-binnenkort', button.disabled);
         button.setAttribute('aria-checked', String(active));
         button.tabIndex = active ? 0 : -1;
         button.classList.toggle('is-gekozen', active);
       });
       if (byId('niveau-uitleg')) {
         byId('niveau-uitleg').textContent = !data.hardVragen.length
-          ? 'Voor dit vak staan nog geen vragen voor Hard mode klaar. Je kunt oefenen op Normaal.'
+          ? 'Hard mode komt binnenkort voor dit vak. Oefen nu met Normaal.'
           : level === 'hard'
             ? `Eerste set: ${countText(data.hardVragen.length)} waarin je kennis toepast en begrippen combineert. Alleen hoofdstukken met Hard mode-vragen zijn beschikbaar.`
             : 'Oefen met de bestaande vragen. Hard mode heeft een eigen vragenreeks en aparte voortgang.';
