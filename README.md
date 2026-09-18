@@ -23,6 +23,7 @@ jaar-2ba.html         vakken 2de bachelor
 jaar-3ba.html         vakken 3de bachelor
 whatsapp.html         uitleg en link naar de WhatsApp-groep
 feedback.html         feedback sturen (fout in een vraag, idee, iets anders) naar de tabel feedback
+leren.html            leren leren: slim studeren, concentratie en hulplijnen; gelinkt vanaf de hub (Tools) en boven elk tabblad Studie-hacks
 vak/voorbeeld/        vak-template (index.html + data.js)
 assets/style.css      gedeelde stijl
 assets/app.js         gedeelde logica (nav, fade, terugknop, naam)

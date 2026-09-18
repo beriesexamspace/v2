@@ -625,6 +625,12 @@
       const theory = byId('theorie-inhoud');
       hacks.replaceChildren();
       theory.replaceChildren();
+      // Algemene leertips staan op leren.html; de link staat boven de tips van dit vak
+      const algemeen = create('p', 'hacks-algemeen');
+      const algemeenLink = create('a', 'tekstlink', 'Algemene leertips: slim leren, focus en hulp →');
+      algemeenLink.href = '../../leren.html';
+      algemeen.append(algemeenLink);
+      hacks.append(algemeen);
       if (!data.hacks.length) hacks.append(create('p', 'gedimde-tekst', 'Voor dit vak zijn er nog geen studie-hacks.'));
       if (!data.theorie.length) theory.append(create('p', 'gedimde-tekst', 'Voor dit vak staat nog geen theorie klaar.'));
       // Hacks en theorie met h: 'algemeen' horen bij het hele vak en komen bovenaan
