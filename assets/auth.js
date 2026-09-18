@@ -29,6 +29,7 @@
     confirmation_required: 'Je account kan nog niet direct inloggen. Probeer later opnieuw.',
     email_confirmation: 'Deze bevestigingslink is ongeldig of verlopen. Vraag de e-mailwijziging opnieuw aan via je profiel.',
     reauthentication_needed: 'Log opnieuw in en probeer de wijziging nog eens.',
+    google_unavailable: 'Inloggen met Google is nog niet ingeschakeld.',
     unknown: 'Dit is niet gelukt. Probeer het opnieuw.'
   };
 
@@ -51,6 +52,7 @@
     if (/reauthentication_needed|reauthentication_not_valid/.test(code)) return failure('reauthentication_needed');
     if (/session_not_found|session_expired|otp_expired|refresh_token_not_found/.test(code)) return failure('recovery_invalid');
     if (code === 'email_not_confirmed') return failure('confirmation_required');
+    if (/provider.*(not enabled|disabled)|unsupported provider|validation_failed.*provider/.test(message) || (code === 'validation_failed' && /provider/.test(message))) return failure('google_unavailable');
     if (window.navigator.onLine === false || error?.name === 'AuthRetryableFetchError' || error instanceof TypeError || /failed to fetch|network|load failed|fetch failed/.test(message)) return failure('network');
     return failure('unknown');
   }
@@ -73,6 +75,13 @@
   const callbackHash = new URLSearchParams(callbackUrl.hash.slice(1));
   const emailCallback = callbackUrl.searchParams.get('email') === 'bevestigen';
   const emailCallbackError = emailCallback && (callbackHash.has('error') || callbackHash.has('error_code') || callbackUrl.searchParams.has('error'));
+  // Terugkeer van Google: bij een fout (bijvoorbeeld provider nog uit) de melding bewaren en de hash opruimen
+  const googleCallback = callbackUrl.searchParams.get('google') === 'terug';
+  const googleErrorText = googleCallback ? (callbackHash.get('error_description') || callbackUrl.searchParams.get('error_description') || (callbackHash.has('error') ? 'error' : '')) : '';
+  const googleError = googleErrorText ? failure(/provider|unsupported|not enabled|disabled/i.test(googleErrorText) ? 'google_unavailable' : 'unknown') : null;
+  if (googleError) {
+    try { window.history.replaceState(null, '', callbackUrl.pathname + callbackUrl.search); } catch {}
+  }
 
   function clearName() {
     try { window.localStorage.removeItem('bes_naam'); } catch {}
@@ -147,8 +156,28 @@
     });
   }
 
+  let completingName = false;
+  // Na inloggen met Google ontbreken voornaam en achternaam; vul ze één keer aan uit de naam die Google meegeeft
+  function completeNameFromProvider(user) {
+    if (!user || completingName || logoutInProgress || !client) return;
+    const metadata = user.user_metadata || {};
+    if (cleanName(metadata.voornaam)) return;
+    const full = cleanName(metadata.full_name || metadata.name, 121);
+    if (!full) return;
+    const [voornaam, ...rest] = full.split(' ');
+    const achternaam = rest.join(' ').trim();
+    if (!voornaam || !achternaam) return;
+    completingName = true;
+    const data = { voornaam, achternaam, naam: voornaam + ' ' + achternaam };
+    client.auth.updateUser({ data })
+      .then(result => { if (result?.data?.user && currentUser?.id === result.data.user.id) setUser(result.data.user); })
+      .catch(() => {})
+      .finally(() => { completingName = false; });
+  }
+
   function setUser(user, clearGuestName = false) {
     currentUser = user || null;
+    if (currentUser) completeNameFromProvider(currentUser);
     if (currentUser) {
       const name = nameDetails(currentUser).aanspreeknaam;
       if (name) BES.naamOpslaan?.(name);
@@ -186,6 +215,7 @@
     get client() { return client; },
     avatarVullen: fillAvatar,
     naamGegevens: nameDetails,
+    get googleFout() { return googleError; },
     get emailBevestiging() { return { teruggekeerd: emailCallback, fout: emailCallbackError || (emailCallback && initializationError?.code === 'recovery_invalid') }; },
 
     async gebruiker() {
@@ -216,6 +246,23 @@
       if (!data?.session || !data?.user) throw failure('confirmation_required');
       setUser(data.user);
       return data.user;
+    },
+
+    // Start het inloggen via Google; Supabase stuurt de gebruiker daarna terug naar de hub
+    async metGoogle() {
+      const redirectTo = new URL(pagePrefix + 'inloggen.html?google=terug', window.location.href).href;
+      const data = await request(api => api.signInWithOAuth({ provider: 'google', options: { redirectTo, skipBrowserRedirect: true } }));
+      if (!data?.url) throw failure('unknown');
+      // Eerst controleren of Google aanstaat; zolang de provider uit staat geeft Supabase een 400 in plaats van een doorverwijzing
+      try {
+        const check = await fetch(data.url, { redirect: 'manual', credentials: 'omit' });
+        if (check.status === 400 || check.status === 404 || check.status === 422) throw failure('google_unavailable');
+      } catch (error) {
+        if (error?.code === 'google_unavailable') throw error;
+        // netwerkfout of opaque redirect: gewoon doorgaan, de browser volgt de echte doorverwijzing
+      }
+      try { window.sessionStorage.removeItem('bes_nieuw_gezien'); } catch {}
+      window.location.assign(data.url);
     },
 
     async inloggen(email, wachtwoord) {

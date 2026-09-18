@@ -73,6 +73,17 @@ Nieuwe accounts bewaren `voornaam`, `achternaam` en de optionele `bijnaam` in Su
 
 De client wordt na `app.js` en `config.js` geladen; `auth.js` regelt de sessie en de inloglink centraal. `BES.auth.client` geeft de bestaande Supabase-client door aan de vakpagina. Voortgang tussen toestellen werkt voor ingelogde gebruikers na het aanmaken van de tabel en toegangsregels onder "Vakpagina".
 
+### Inloggen met Google
+
+`aanmelden.html` en `inloggen.html` hebben de knop "Verder met Google" (`BES.auth.metGoogle()`). De knop controleert eerst of de provider aanstaat; zolang dat niet zo is, toont hij de rode regel "Inloggen met Google is nog niet ingeschakeld." en blijft de gebruiker op de pagina. Na een geslaagde login komt de gebruiker terug op `inloggen.html?google=terug`, waarna de bestaande logica hem naar de hub stuurt (en dus eerst langs `nieuw.html`). Ontbreken voornaam en achternaam, dan neemt `auth.js` ze één keer over uit de naam die Google meegeeft. De profielfoto van Google wordt niet overgenomen.
+
+Eenmalig inrichten door de eigenaar:
+1. Google Cloud Console (console.cloud.google.com): nieuw project, "APIs & Services" → "OAuth consent screen" (extern, app-naam Berie's Exam Space, je e-mailadres), daarna "Credentials" → "Create credentials" → "OAuth client ID", type "Web application".
+2. Bij "Authorized redirect URIs" de callback-URL plakken die Supabase toont onder Authentication → Providers → Google (eindigt op `/auth/v1/callback`).
+3. Client ID en Client Secret in Supabase bij de Google-provider plakken, de provider aanzetten, Save.
+4. Supabase → Authentication → URL Configuration → Redirect URLs: `https://beriesexamspace.com/v2/inloggen.html?google=terug` toevoegen (en voor de zekerheid `https://beriesexamspace.com/v2/**`).
+5. Testen met een Google-account dat nog geen Berie-account heeft: knop, Google-scherm, terug op de site, "Wat is nieuw", hub met voornaam, en op Profiel de naam.
+
 ### E-mailadres wijzigen
 
 Profiel gebruikt de bestaande `auth.updateUser`-functie. De gebruikers-ID blijft gelijk. De bevestiging volgt de huidige Supabase-instellingen; schakel beveiligde e-mailwijziging niet uit. Zolang de provider een `new_email` teruggeeft, meldt Profiel dat bevestiging nodig is. Alleen `user.email` geldt als het bevestigde adres.

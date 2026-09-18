@@ -906,6 +906,12 @@ html.page-fade.page-ready body { animation: page-in 250ms ease-out both; }
   font: 500 .875rem var(--font-family);
   cursor: pointer;
 }
+.auth-google { width: min(320px, 100%); margin: 0 auto; }
+.auth-of { display: flex; align-items: center; gap: 12px; margin: 22px 0 14px; color: var(--muted); font-size: .875rem; }
+.auth-of::before, .auth-of::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+.knop-google { display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; }
+.knop-google svg { flex-shrink: 0; }
+.knop-google:disabled { opacity: .6; cursor: default; }
 .auth-success { text-align: center; }
 .auth-success .knop { margin-top: 28px; }
 .auth-success .vinkje { margin-bottom: 24px; }
