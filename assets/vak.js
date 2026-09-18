@@ -3,6 +3,14 @@
 
   const BES = window.BES = window.BES || {};
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  // Na een echte klik zacht naar de volgende stap scrollen; niet bij verminderde beweging en niet als het doel al in beeld staat
+  const scrollNaar = element => {
+    if (!element || reducedMotion.matches) return;
+    const rect = element.getBoundingClientRect();
+    const boven = 88;
+    if (rect.top >= boven && rect.bottom <= window.innerHeight) return;
+    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
   const years = { '1ba': '1ste bachelor', '2ba': '2de bachelor', '3ba': '3de bachelor' };
   const fades = new Set();
   const create = (tag, className, text) => {
@@ -369,10 +377,12 @@
         body.append(top, bottom);
         row.append(checkbox, body);
         row.addEventListener('click', () => {
-          if (selected.has(chapter.id)) selected.delete(chapter.id);
-          else selected.add(chapter.id);
+          const aangevinkt = !selected.has(chapter.id);
+          if (aangevinkt) selected.add(chapter.id);
+          else selected.delete(chapter.id);
           renderChapters();
           updateStart();
+          if (aangevinkt) scrollNaar(byId('start-oefening')?.closest('.vak-start') || byId('start-oefening'));
         });
         list.append(row);
       });
@@ -710,7 +720,10 @@
       selectTab(tabs[target], true);
     });
     const modeButtons = [...byId('modus-keuzes').querySelectorAll('[data-modus]')];
-    modeButtons.forEach(button => button.addEventListener('click', () => setMode(button.dataset.modus)));
+    modeButtons.forEach(button => button.addEventListener('click', () => {
+      setMode(button.dataset.modus);
+      scrollNaar(byId('niveau-kop')?.closest('section') || byId('hoofdstukken-kop')?.closest('section'));
+    }));
     byId('modus-keuzes').addEventListener('keydown', event => {
       const current = modeButtons.indexOf(document.activeElement);
       if (current < 0 || !['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) return;
@@ -721,7 +734,11 @@
     });
     if (hasLevels && byId('niveau-keuzes')) {
       const levelButtons = [...byId('niveau-keuzes').querySelectorAll('[data-niveau]')];
-      levelButtons.forEach(button => button.addEventListener('click', () => setLevel(button.dataset.niveau)));
+      levelButtons.forEach(button => button.addEventListener('click', () => {
+        if (button.disabled) return;
+        setLevel(button.dataset.niveau);
+        scrollNaar(byId('hoofdstukken-kop')?.closest('section'));
+      }));
       byId('niveau-keuzes').addEventListener('keydown', event => {
         const enabled = levelButtons.filter(button => !button.disabled);
         const current = enabled.indexOf(document.activeElement);

@@ -84,6 +84,7 @@
 .overzicht-vraag .antwoord-fout { color: var(--fout); border-left: 3px solid var(--fout); padding-left: 12px; }
 .vak-disclaimer { margin: 28px auto 0; color: var(--muted); font-size: .8125rem; }
 .hacks-algemeen { margin: 0 0 28px; }
+.vak-pagina .sectie, .vak-pagina .vak-start { scroll-margin-top: 88px; }
 .hack-groep + .hack-groep, .theorie-groep + .theorie-groep { margin-top: 36px; }
 .hack-groep h2, .theorie-groep h2 { margin: 0 0 20px; font-size: 1.375rem; font-weight: 600; }
 .hack-regel { display: flex; align-items: baseline; gap: 16px; margin-top: 12px; }
