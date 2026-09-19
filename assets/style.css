@@ -530,18 +530,20 @@ h1 span { display: block; }
 }
 
 .terug {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  display: inline-block;
+  box-sizing: border-box;
   min-height: 40px;
+  padding: 9px 0;
   color: var(--accent);
   font-size: .9375rem;
   font-weight: 500;
+  line-height: 1.5;
   text-underline-offset: 4px;
   transition: color 150ms var(--ease), transform 150ms var(--ease), opacity 150ms var(--ease);
 }
 
-.terug-pijl { display: inline-block; transition: transform 150ms var(--ease); }
+/* Pijl blijft gewone tekst, zodat de onderstreping één doorlopende lijn is. */
+.terug-pijl { display: inline; }
 .terug:active { transform: scale(.97); opacity: .8; }
 .tekstlink:not(.terug):active { opacity: .7; }
 .navigation-links a:active { transform: scale(.97); }
@@ -631,7 +633,7 @@ html.page-fade.page-ready body { animation: page-in 250ms ease-out both; }
 :where(html.has-hover) .terug:hover,
 :where(html.has-hover) .terug.tekstlink:hover,
 :where(html.has-hover) .vak-pagina .vak-tekstknop.terug:hover { color: var(--ink); text-decoration: underline; }
-:where(html.has-hover) .terug:hover .terug-pijl { transform: translateX(-2px); }
+:where(html.has-hover) .terug:hover:not(:active) { transform: translateX(-2px); }
 :where(html.has-hover) .navigation-links a:hover,
 .navigation-links a:focus-visible {
   background-color: var(--surface);
@@ -984,7 +986,7 @@ summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 @media (prefers-reduced-motion: reduce) {
   .knop:is(:hover, :active), .knop-secundair:is(:hover, :active), .pill:is(:hover, :active),
   .kaart:is(:hover, :active), .kaart:is(:hover, :active) .pijl,
-  .terug:active, .terug:hover .terug-pijl, .navigation-links a:is(:hover, :focus-visible, :active),
+  .terug:active, .terug:hover, .navigation-links a:is(:hover, :focus-visible, :active),
   :is(.menu-toggle, .auth-toggle, .thema-knop, .home-knop, .profiel-knop):is(:hover, :active),
   .vak-pagina :is(.vak-tab, .optie, [role="checkbox"], [role="radio"]):active { transform: none !important; }
   .vinkje circle, .vinkje path { animation: none; stroke-dashoffset: 0; }
