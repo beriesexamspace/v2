@@ -51,7 +51,7 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 20), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 21), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.
@@ -206,7 +206,7 @@ Alle 34 vakpagina's (en het sjabloon `vak/voorbeeld/index.html`) hebben sinds 19
 
 Normaal gebruikt de bestaande `vragen` zonder wijziging. De optionele lijst `hardVragen` gebruikt hetzelfde vraagformaat en bevat bij Inleiding pedagogiek een eerste set van 14 toepassingsvragen, twee per hoofdstuk h1 tot en met h7. Ze zijn uit de bestaande leerstof uitgewerkt en gecontroleerd op consistentie met die inhoud; verdere beoordeling door de vakinhoudelijke gebruiker blijft nodig vóór een brede uitrol. h8 (Echte examenvragen) krijgt geen verzonnen examenvragen. Een hoofdstuk zonder Hard mode-vragen is niet selecteerbaar op dat niveau; zonder geldige Hard mode-set is het niveau uitgeschakeld.
 
-Hard mode gebruikt dezelfde trainings- en simulatieregels. De simulatie neemt maximaal 20 vragen uit de gekozen moeilijkheid, dus bij deze eerste Hard mode-set 14. Een foutenronde en Opnieuw behouden het niveau. Zowel de oefening als de uitslag vermelden het niveau. De hoofdstukkeuze blijft per niveau bewaard zolang de pagina open is.
+Hard mode gebruikt dezelfde trainings- en simulatieregels. Een Hard-training vraagt minstens 8 vragen (bij 2 per hoofdstuk dus 4 hoofdstukken); anders blijft Start uit met een hint. De simulatie neemt maximaal 20 vragen uit de gekozen moeilijkheid, dus bij deze eerste Hard mode-set 14. Een foutenronde en Opnieuw behouden het niveau. Zowel de oefening als de uitslag vermelden het niveau. De hoofdstukkeuze blijft per niveau bewaard zolang de pagina open is.
 
 Normale voortgang behoudt de sleutel `bes_voortgang_inlped` en de bestaande Supabase-vakwaarde `inlped`. Hard mode bewaart dezelfde account-/gaststructuur apart onder `bes_voortgang_inlped__hard`, met Supabase-vakwaarde `inlped__hard`. De bestaande tabel laat tekstwaarden toe; er is geen schemawijziging nodig. Resultaten van de twee niveaus worden niet samengevoegd. Test aanpassingen met nagebootste accounts voordat je echte voortgang gebruikt.
 

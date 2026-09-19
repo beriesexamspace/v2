@@ -399,9 +399,14 @@
       const emptySelection = mode === 'training' && !selected.size;
       const pool = questionsFor(level);
       const amount = mode === 'simulatie' ? Math.min(20, pool.length) : pool.filter(question => selected.has(question.h)).length;
-      byId('start-oefening').disabled = emptySelection || !amount || !context.authReady;
-      byId('start-hint').hidden = !emptySelection;
-      byId('start-hint').textContent = emptySelection ? 'Kies minstens één hoofdstuk.' : '';
+      // Hard mode heeft weinig vragen per hoofdstuk: een training vraagt daar minstens 8 vragen (nu 4 hoofdstukken)
+      const minimumHard = 8;
+      const tooFewHard = level === 'hard' && mode === 'training' && selected.size > 0 && amount > 0 && amount < minimumHard && pool.length >= minimumHard;
+      byId('start-oefening').disabled = emptySelection || !amount || tooFewHard || !context.authReady;
+      byId('start-hint').hidden = !(emptySelection || tooFewHard);
+      byId('start-hint').textContent = emptySelection
+        ? 'Kies minstens één hoofdstuk.'
+        : tooFewHard ? `Kies voor Hard mode minstens ${minimumHard} vragen, dus meer hoofdstukken (nu ${countText(amount)}).` : '';
       if (hasLevels) {
         const chapters = mode === 'simulatie' ? 'Alle beschikbare hoofdstukken' : selected.size
           ? data.hoofdstukken.filter(chapter => selected.has(chapter.id)).map(chapter => chapter.naam).join(', ')
