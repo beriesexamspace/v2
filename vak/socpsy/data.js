@@ -1037,7 +1037,7 @@ window.BES_VAK = {
     "Visuele prikkels verwerken"
    ],
    "a": 0,
-   "u": "Het mentalizing systeem helpt ons af te leiden wat een ander denkt, voelt, gelooft of wil — het begrijpen van mentale toestanden van anderen."
+   "u": "Het mentalizing systeem helpt ons af te leiden wat een ander denkt, voelt, gelooft of wil; het begrijpen van mentale toestanden van anderen."
   },
   {
    "h": "h9",
@@ -1245,7 +1245,7 @@ window.BES_VAK = {
    "h": "h8",
    "kop": "Kernpunten",
    "items": [
-    "Attributietheorie zoekt antwoord op 'wat is de oorzaak van deze gebeurtenis' — Heider: waarneembaar gedrag verklaren via niet-waarneembare oorzaken.",
+    "Attributietheorie zoekt antwoord op 'wat is de oorzaak van deze gebeurtenis'; Heider: waarneembaar gedrag verklaren via niet-waarneembare oorzaken.",
     "Types verklaringen: causale attributies (hoe kwam het tot stand), dispositionele attributies (persoonlijkheidstrekken), redenen (doel van gedrag) en excuses (verantwoordelijkheid ontkennen).",
     "Vier causale dimensies (Weiner): locus (intern/extern), stabiliteit (stabiel/onstabiel), controleerbaarheid/intentionaliteit, en globaliteit (globaal/specifiek).",
     "Spontane attributiezoektocht neemt toe bij onverwachte gebeurtenissen, negatieve gebeurtenissen, verlies van controle, negatieve gemoedstoestand en conversationele regels.",
@@ -1253,7 +1253,7 @@ window.BES_VAK = {
     "Joint model van Van Overwalle & Heylighen: methode van het verschil (interne, onstabiele, specifieke oorzaken) versus methode van overeenkomst (externe, stabiele, globale oorzaken).",
     "Connectionistische benadering (Wagner & Rescorla): causale sterkte wordt spontaan geleerd via associaties tussen stimuli en gevolg; discounting (verzwakken) en augmentation (versterken) van associatieve waarde.",
     "Attributies beïnvloeden motivatie (via verwachtingen), emoties (evaluatie + interpretatie via dimensies) en gedrag (onrechtstreeks, via verwachtingen en emoties).",
-    "Klinische toepassing: aangeleerde hulpeloosheid (Seligman) — interne, stabiele, globale attributies voor negatieve gebeurtenissen — hangt samen met depressie; attributiestijl op jonge leeftijd voorspelt gezondheid op zeer lange termijn (45 jaar).",
+    "Klinische toepassing: aangeleerde hulpeloosheid (Seligman); interne, stabiele, globale attributies voor negatieve gebeurtenissen; hangt samen met depressie; attributiestijl op jonge leeftijd voorspelt gezondheid op zeer lange termijn (45 jaar).",
     "Attributionele retraining vervangt onaangepaste attributies (bv. lage aanleg) door aangepaste (bv. lage inzet/foute methode), en wordt toegepast in onderwijs en bij intieme relaties (tevredenheid hangt samen met gunstige attributiepatronen)."
    ]
   },

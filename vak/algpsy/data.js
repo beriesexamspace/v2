@@ -1065,7 +1065,7 @@ window.BES_VAK = {
     "Het herstel van een aandoening zonder behandeling"
    ],
    "a": 0,
-   "u": "Comorbiditeit betekent dat iemand niet aan slechts 1 diagnose voldoet, maar aan de criteria van meerdere aandoeningen tegelijk — dit komt in de praktijk vaak voor."
+   "u": "Comorbiditeit betekent dat iemand niet aan slechts 1 diagnose voldoet, maar aan de criteria van meerdere aandoeningen tegelijk; dit komt in de praktijk vaak voor."
   },
   {
    "h": "h10",

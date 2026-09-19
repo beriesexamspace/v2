@@ -545,7 +545,7 @@ window.BES_VAK = {
     "Dit klopt niet, homogeniteit verhoogt net de betrouwbaarheid"
    ],
    "a": 0,
-   "u": "Bij een homogene steekproef (weinig variantie in scores) zal de geschatte betrouwbaarheid automatisch zwakker zijn, zoals bij Wissler's mistake — betrouwbaarheid moet dus steeds opnieuw geschat worden per steekproef."
+   "u": "Bij een homogene steekproef (weinig variantie in scores) zal de geschatte betrouwbaarheid automatisch zwakker zijn, zoals bij Wissler's mistake; betrouwbaarheid moet dus steeds opnieuw geschat worden per steekproef."
   },
   {
    "h": "h7",
@@ -629,7 +629,7 @@ window.BES_VAK = {
     "Omdat betrouwbaarheid geen invloed heeft op validiteit"
    ],
    "a": 0,
-   "u": "De correlatie tussen geobserveerde en true scores is r = √Rxx. Een zwakke betrouwbaarheid houdt daardoor een lage bovengrens in voor de haalbare validiteitscorrelatie — goede betrouwbaarheid is dus noodzakelijk maar niet voldoende voor goede constructvaliditeit."
+   "u": "De correlatie tussen geobserveerde en true scores is r = √Rxx. Een zwakke betrouwbaarheid houdt daardoor een lage bovengrens in voor de haalbare validiteitscorrelatie; goede betrouwbaarheid is dus noodzakelijk maar niet voldoende voor goede constructvaliditeit."
   },
   {
    "h": "h8",
@@ -905,7 +905,7 @@ window.BES_VAK = {
     "Het verschil tussen twee testversies van dezelfde lengte"
    ],
    "a": 0,
-   "u": "DIF onderzoekt of item-parameters verschillen tussen groepen (bv. mannen versus vrouwen), wat betekent dat een test niet even goed functioneert voor elke groep — een bedreiging voor fairness/constructvaliditeit."
+   "u": "DIF onderzoekt of item-parameters verschillen tussen groepen (bv. mannen versus vrouwen), wat betekent dat een test niet even goed functioneert voor elke groep; een bedreiging voor fairness/constructvaliditeit."
   },
   {
    "h": "h11",
@@ -1001,7 +1001,7 @@ window.BES_VAK = {
     "Omdat een lagere cut-off de steekproefgrootte verandert"
    ],
    "a": 0,
-   "u": "Een lagere cut-off classificeert meer mensen als positief: dit vangt meer echte positieven (hogere sensitiviteit) maar ook meer valse positieven (lagere specificiteit) — een klassieke trade-off."
+   "u": "Een lagere cut-off classificeert meer mensen als positief: dit vangt meer echte positieven (hogere sensitiviteit) maar ook meer valse positieven (lagere specificiteit); een klassieke trade-off."
   }
  ],
  "hacks": [
@@ -1043,7 +1043,7 @@ window.BES_VAK = {
   {
    "h": "algemeen",
    "kop": "Meer items = meer betrouwbaarheid (Spearman-Brown)",
-   "t": "Een test verlengen met gelijkwaardige items verhoogt bijna altijd de betrouwbaarheid — dit is de kern van de Spearman-Brown-formule voor testverlenging."
+   "t": "Een test verlengen met gelijkwaardige items verhoogt bijna altijd de betrouwbaarheid; dit is de kern van de Spearman-Brown-formule voor testverlenging."
   },
   {
    "h": "algemeen",
@@ -1169,7 +1169,7 @@ window.BES_VAK = {
     "Verwacht patroon: monotrait-monomethode > monotrait-heteromethode > heterotrait-monomethode > heterotrait-heteromethode correlaties.",
     "Correlaties worden beïnvloed door: true-score correlatie, (toevallige) meetfouten (r_xy ≈ r_TxTy·√(Rxx·Ryy)), range restriction (beperkte variantie verzwakt correlaties), en gedeelde methode-variantie (versterkt correlaties kunstmatig).",
     "Correctie voor onbetrouwbaarheid: r-gecorrigeerd = r-origineel / √(Rxx·Ryy') (beide) of / √Ryy' (enkel criterium).",
-    "Interpretatie van effect sizes is niet universeel vastgelegd (bv. Meyer: klein=0,11, gemiddeld=0,33, sterk=0,55) — rapporteer altijd welke richtlijn je gebruikt."
+    "Interpretatie van effect sizes is niet universeel vastgelegd (bv. Meyer: klein=0,11, gemiddeld=0,33, sterk=0,55); rapporteer altijd welke richtlijn je gebruikt."
    ]
   },
   {

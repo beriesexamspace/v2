@@ -1573,7 +1573,7 @@ window.BES_VAK = {
     "Kennis is aangeboren en hoeft niet geconstrueerd te worden"
    ],
    "a": 0,
-   "u": "Het kernidee van het constructivisme is dat kennis actief geconstrueerd wordt door de lerende, met sterke nadruk op context, ervaring, interactie en betekenisvol handelen — in plaats van passief overgenomen te worden."
+   "u": "Het kernidee van het constructivisme is dat kennis actief geconstrueerd wordt door de lerende, met sterke nadruk op context, ervaring, interactie en betekenisvol handelen; in plaats van passief overgenomen te worden."
   },
   {
    "h": "h7",
@@ -1633,7 +1633,7 @@ window.BES_VAK = {
     "De periode net voor de geboorte waarin taal zich ontwikkelt"
    ],
    "a": 0,
-   "u": "De zone van naaste ontwikkeling is het verschil tussen wat een leerling zelfstandig kan en wat die kan bereiken met hulp van een ander — hier vindt optimaal leren plaats."
+   "u": "De zone van naaste ontwikkeling is het verschil tussen wat een leerling zelfstandig kan en wat die kan bereiken met hulp van een ander; hier vindt optimaal leren plaats."
   },
   {
    "h": "h7",
@@ -2129,7 +2129,7 @@ window.BES_VAK = {
     "Piagets ontwikkelingsfasen: sensomotorisch (0-2j), pre-operationeel (2-7j), concreet-operationeel (7-11j), formeel-operationeel (11j+); ontwikkeling stuurt leren, niet omgekeerd.",
     "Vygotsky (sociaal constructivisme): leren ontstaat via sociale interactie, taal en cultuur; kennis ontstaat eerst sociaal, dan individueel. Kernbegrippen: psychological tools (o.a. taal), zone van naaste ontwikkeling, externaliseren/internaliseren, en mediation (leren via begeleiding, met everyday versus scientific concepts).",
     "Bruner: leren is actief ontdekken en structureren van kennis (guided discovery learning); representaties verlopen van enactief naar iconisch naar symbolisch; het spiral curriculum laat leerstof herhaaldelijk terugkomen op hoger niveau; de leerkracht blijft een centrale, sturende rol spelen (scaffolding).",
-    "Kolb (experiential learning): leren als cyclus van concrete ervaring, reflectie, abstracte conceptualisatie en actief experimenteren; vier leerstijlen (accomodator, diverger, assimilator, converger) op basis van ervaren/denken en doen/reflecteren — leerlingen niet vast indelen in types.",
+    "Kolb (experiential learning): leren als cyclus van concrete ervaring, reflectie, abstracte conceptualisatie en actief experimenteren; vier leerstijlen (accomodator, diverger, assimilator, converger) op basis van ervaren/denken en doen/reflecteren; leerlingen niet vast indelen in types.",
     "Jarvis: leren is een levenslang, ervaringsgericht proces dat cognitieve, sociale en emotionele processen combineert; vooral relevant voor volwassenenonderwijs, waarbij voorkennis en betekenisgeving centraal staan.",
     "Situated learning (Lave & Wenger): leren is een sociaal proces in een echte context; legitimate peripheral participation beschrijft de groei van periferie naar centrale rol binnen een community of practice; kritiek: moeilijke transfer van kennis, weinig aandacht voor theorie.",
     "Vertaling naar instructie: authentieke taken, samenwerking, reflectie, fouten als deel van het leerproces, leerkracht als coach; concrete toepassingen zoals competentiegericht onderwijs (CBE), klinische simulaties, skillslabs en duaal leren (school + werkplek)."
