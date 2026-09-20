@@ -24,7 +24,7 @@ jaar-3ba.html         vakken 3de bachelor
 whatsapp.html         uitleg, link en QR-code (assets/whatsapp-qr.svg, gemaakt met `npx qrcode`) naar de WhatsApp-groep
 feedback.html         feedback sturen (fout in een vraag, idee, iets anders) naar de tabel feedback
 leren.html            leren leren: slim studeren, concentratie en hulplijnen; gelinkt vanaf de hub (Tools) en boven elk tabblad Studie-hacks
-voortgang.html        Jouw voortgang: per vak en per hoofdstuk wat je kent (tabel voortgang, hoofdstuknamen uit vak/<id>/data.js, laagste score bovenaan); kaart bij Tools op de hub
+voortgang.html        Jouw voortgang: per vak en per hoofdstuk wat je kent (tabel voortgang, hoofdstuknamen uit vak/<id>/data.js, laagste score bovenaan); staat sinds 21-09 niet meer op de hub (Berat: later bij Profiel of later), alleen via de URL bereikbaar
 privacy.html          wat we bewaren, waar, cookies, rechten en contact; gelinkt in elke voettekst en onder het aanmeldformulier
 beheer.html           alleen voor de beheerder: hoeveel accounts per dag oefenden (aantallen, geen namen)
 404.html              nette foutpagina van GitHub Pages; gebruikt absolute paden /v2/ (bij de lancering aanpassen)
