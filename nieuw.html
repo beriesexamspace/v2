@@ -14,7 +14,7 @@
     })();
   </script>
   <meta name="robots" content="noindex">
-  <title>Wat is nieuw | Berie's Exam Space</title>
+  <title>Welkom | Berie's Exam Space</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -26,35 +26,141 @@
   <script src="assets/auth.js?v=22" defer></script>
   <script src="assets/activiteit.js?v=22" defer></script>
   <style>
-    .nieuw-pagina { padding: 96px 0 48px; }
-    .nieuw-wrap { max-width: 640px; }
-    .nieuw-pagina .pagina-kop .eyebrow {
-      margin: 0 0 16px;
-      color: var(--accent);
-      font-size: .9375rem;
+    :root { --tel-rand: #1D1D1F; --tel-glans: rgba(255,255,255,.18); --hl-breedte: min(1040px, calc(100vw - 48px)); --hl-ruimte: 16px; --hl-duur: 8s; }
+    html[data-theme="dark"] { --tel-rand: #3A3A3C; --tel-glans: rgba(255,255,255,.1); }
+
+    .nieuw-pagina { padding: 96px 0 48px; overflow-x: clip; }
+    .nieuw-pagina .pagina-kop { margin-bottom: 24px; }
+    .nieuw-pagina .pagina-kop .eyebrow { margin: 0 0 16px; color: var(--accent); font-size: .9375rem; }
+
+    /* Carrousel */
+    .hl { position: relative; }
+    .hl-baan {
+      position: relative;
+      display: flex;
+      gap: var(--hl-ruimte);
+      padding: 8px calc((100% - var(--hl-breedte)) / 2) 28px;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
     }
-    .nieuw-updates { display: grid; gap: 24px; margin: 0; padding: 0; list-style: none; animation: updates-binnen 400ms var(--ease) both; }
-    .nieuw-update { display: grid; grid-template-columns: 144px minmax(0, 1fr); gap: 20px; font-size: .9375rem; line-height: 1.6; }
-    .update-meta { display: flex; flex-wrap: wrap; align-content: start; align-items: center; gap: 6px 8px; }
-    .update-datum { color: var(--ink-soft); }
+    .hl-baan::-webkit-scrollbar { display: none; }
+    .hl-baan:focus-visible { outline: none; }
+    .hl-baan:focus-visible .hl-kaart.is-actief { outline: 2px solid var(--accent); outline-offset: 4px; }
+
+    .hl-kaart {
+      flex: 0 0 var(--hl-breedte);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      min-height: 480px;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: var(--card);
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+      scroll-snap-align: center;
+    }
+    .hl-tekst { display: flex; flex-direction: column; justify-content: center; gap: 12px; padding: 56px 40px 56px 56px; }
+    .hl-label { margin: 0; color: var(--accent); font-size: .875rem; font-weight: 600; letter-spacing: .01em; }
+    .hl-titel { margin: 0; font-size: clamp(1.625rem, 2.8vw, 2.375rem); font-weight: 700; line-height: 1.12; letter-spacing: -.02em; text-wrap: balance; }
+    .hl-uitleg { margin: 4px 0 0; max-width: 34rem; color: var(--ink-soft); font-size: 1.0625rem; line-height: 1.6; }
+    .hl-uitleg strong { color: var(--ink); font-weight: 600; }
+    .hl-beeld { position: relative; display: flex; align-items: flex-end; justify-content: center; padding: 48px 40px 0; background: linear-gradient(180deg, var(--surface) 0%, var(--card) 100%); }
+
+    /* Getekende telefoon (geen screenshots: alles is gewone opmaak) */
+    .tel {
+      display: flex;
+      flex-direction: column;
+      width: 250px;
+      aspect-ratio: 9 / 18;
+      margin-bottom: -84px;
+      border: 8px solid var(--tel-rand);
+      border-radius: 40px;
+      background: var(--bg);
+      box-shadow: inset 0 0 0 1px var(--tel-glans), 0 30px 60px rgba(0,0,0,.28);
+      color: var(--ink);
+      overflow: hidden;
+    }
+    .tel-status { display: flex; justify-content: space-between; padding: 14px 20px 0; font-size: 11px; font-weight: 600; }
+    .tel-status span:last-child { letter-spacing: .06em; }
+    .tel-scherm { display: grid; align-content: start; gap: 8px; padding: 12px 14px; }
+    .tel-kop { margin: 4px 0 0; font-size: 15px; font-weight: 700; letter-spacing: -.01em; }
+    .tel-sub { margin: -4px 0 2px; color: var(--ink-soft); font-size: 11px; }
+    .tel-kaart { display: flex; align-items: center; gap: 9px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); font-size: 11.5px; font-weight: 500; }
+    .tel-kaart.is-los { display: grid; gap: 7px; }
+    .tel-kaart-kop { display: flex; align-items: center; gap: 9px; }
+    .tel-pijl { margin-left: auto; color: var(--ink-soft); }
+    .tel-nummer { display: grid; place-items: center; flex: 0 0 auto; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 11px; font-weight: 700; }
+    .tel-vink { display: grid; place-items: center; flex: 0 0 auto; width: 17px; height: 17px; border: 1.5px solid var(--line); border-radius: 50%; color: #fff; font-size: 10px; }
+    .tel-vink.is-aan { border-color: var(--accent); background: var(--accent); }
+    .tel-vink.is-teal { border-color: var(--teal); background: var(--teal); }
+    .tel-balk { height: 5px; border-radius: 5px; background: var(--surface); overflow: hidden; }
+    .tel-balk i { display: block; height: 100%; border-radius: inherit; background: var(--teal); }
+    .tel-balk.is-doen i { background: var(--accent); }
+    .tel-klein { color: var(--ink-soft); font-size: 10.5px; font-weight: 400; }
+    .tel-klein.is-teal { color: var(--teal); font-weight: 600; }
+    .tel-optie { padding: 9px 11px; border: 1px solid var(--line); border-radius: 11px; font-size: 11.5px; }
+    .tel-optie.is-gekozen { border-color: var(--accent); background: var(--accent-zacht); font-weight: 600; }
+    .tel-knop { margin-top: 4px; padding: 9px 12px; border-radius: var(--radius-pill); background: var(--accent); color: #fff; font-size: 12px; font-weight: 600; text-align: center; }
+    .tel-rij { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--ink-soft); }
+    .tel-vraag { margin: 0; font-size: 12.5px; font-weight: 600; line-height: 1.4; }
+
+    /* Wat is nieuw in de carrousel */
+    .hl-updates { display: grid; align-content: center; gap: 18px; margin: 0; padding: 48px 56px 48px 24px; list-style: none; }
+    .hl-updates .nieuw-update { display: grid; gap: 4px; font-size: .9375rem; line-height: 1.55; }
+    .update-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+    .update-datum { color: var(--ink-soft); font-size: .875rem; }
     .update-label { display: inline-flex; padding: 2px 8px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 600; line-height: 1.5; }
     .update-label-nieuw { background: var(--teal-zacht); color: var(--teal); }
     .update-label-verbeterd { background: var(--surface); color: var(--ink-soft); }
-    .nieuw-sentinel { height: 1px; margin-top: 32px; }
-    .nieuw-begrepen { margin-top: 16px; }
+
+    /* Bediening: balkjes en pauze */
+    .hl-bediening { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 4px; }
+    .hl-stippen { display: flex; align-items: center; gap: 2px; min-height: 44px; padding: 0 10px; border-radius: var(--radius-pill); background: var(--surface); }
+    .hl-stip { display: grid; place-items: center; width: 24px; min-width: 24px; height: 44px; padding: 0; border: 0; background: none; cursor: pointer; transition: width 300ms var(--ease), min-width 300ms var(--ease); }
+    .hl-stip i { display: block; width: 8px; height: 8px; border-radius: 4px; background: var(--ink); opacity: .35; transition: width 300ms var(--ease), opacity 200ms; }
+    .hl-stip[aria-selected="true"] { width: 52px; min-width: 52px; }
+    .hl-stip[aria-selected="true"] i { position: relative; width: 36px; opacity: .25; overflow: hidden; }
+    .hl-stip[aria-selected="true"] i::after { content: ''; position: absolute; inset: 0; width: 0; background: var(--ink); }
+    .hl-stip[aria-selected="true"] i.is-bezig::after { animation: hl-vullen var(--hl-duur) linear forwards; }
+    .hl.is-gepauzeerd .hl-stip i::after { animation-play-state: paused; }
+    .hl-stip:focus-visible { outline: 2px solid var(--accent); outline-offset: -6px; border-radius: 12px; }
+    .hl-pauze { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: var(--surface); color: var(--ink); cursor: pointer; transition: background 150ms var(--ease), transform 150ms var(--ease); }
+    .hl-pauze svg { width: 14px; height: 14px; fill: currentColor; }
+    .hl-pauze .hl-ico-speel { display: none; }
+    .hl.is-gepauzeerd .hl-pauze .hl-ico-pauze { display: none; }
+    .hl.is-gepauzeerd .hl-pauze .hl-ico-speel { display: block; }
+    :where(html.has-hover) .hl-pauze:hover { background: var(--line); }
+    .hl-pauze:active { transform: scale(.94); }
+    @keyframes hl-vullen { from { width: 0; } to { width: 100%; } }
+
+    .nieuw-verder { display: flex; justify-content: center; margin-top: 28px; }
     .nieuw-begrepen:disabled,
     .nieuw-begrepen:disabled:hover,
     .nieuw-begrepen:disabled:active { opacity: .45; transform: none; box-shadow: var(--shadow-primary); cursor: default; }
-    @keyframes updates-binnen {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 900px) {
+      .hl-tekst { padding: 40px 32px; }
+      .hl-updates { padding: 40px 32px 40px 8px; }
     }
     @media (max-width: 767px) {
-      .nieuw-update { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+      :root { --hl-breedte: calc(100vw - 32px); }
+      .nieuw-pagina { padding-top: 84px; }
+      .hl-kaart { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 250px; min-height: 0; border-radius: 22px; }
+      .hl-tekst { gap: 8px; padding: 28px 24px 20px; }
+      .hl-titel { font-size: 1.5rem; }
+      .hl-uitleg { font-size: .9375rem; }
+      .hl-beeld { padding: 20px 24px 0; }
+      .tel { width: 210px; margin-bottom: -170px; }
+      .hl-kaart.is-lijst { grid-template-rows: auto auto; }
+      .hl-updates { gap: 14px; padding: 0 24px 28px; }
     }
     @media (prefers-reduced-motion: reduce) {
-      .nieuw-updates { animation: none; }
-      .nieuw-begrepen { transition: none; }
+      .hl-baan { scroll-behavior: auto; }
+      .hl-stip[aria-selected="true"] i::after { animation: none; width: 100%; }
+      .hl-pauze, .hl-stip, .hl-stip i { transition: none; }
     }
   </style>
 </head>
@@ -80,16 +186,142 @@
     </nav>
   </header>
   <main class="pagina nieuw-pagina" aria-labelledby="nieuw-titel">
-    <div class="wrap nieuw-wrap">
+    <div class="wrap">
       <header class="pagina-kop">
-        <p class="eyebrow">Nieuw</p>
-        <h1 id="nieuw-titel">Dit is er veranderd.</h1>
-        <p>Even doorlezen, dan weet je hoe alles werkt. Scrol naar beneden om verder te gaan.</p>
+        <p class="eyebrow">Welkom</p>
+        <h1 id="nieuw-titel">De highlights op een rij.</h1>
+        <p>Swipe zelf, of laat het even lopen. Daarna weet je hoe alles werkt.</p>
       </header>
+    </div>
 
-      <ul class="nieuw-updates" id="nieuw-updates" aria-label="Laatste updates"></ul>
+    <section class="hl" id="hl" aria-roledescription="carrousel" aria-label="Highlights van Berie's Exam Space">
+      <div class="hl-baan" id="hl-baan" tabindex="0">
 
-      <div class="nieuw-sentinel" id="nieuw-einde" aria-hidden="true"></div>
+        <article class="hl-kaart" id="hl-1" aria-roledescription="dia" aria-label="1 van 5: Vakken">
+          <div class="hl-tekst">
+            <p class="hl-label">Vakken</p>
+            <h2 class="hl-titel">Alle vakken van je jaar, op één plek.</h2>
+            <p class="hl-uitleg">Kies je jaar, dan je vak. Per vak vind je <strong>oefenvragen</strong>, <strong>studie-hacks</strong> en <strong>theorie</strong>, allemaal in dezelfde stijl.</p>
+          </div>
+          <div class="hl-beeld" aria-hidden="true">
+            <div class="tel">
+              <div class="tel-status"><span>9:41</span><span>●●●</span></div>
+              <div class="tel-scherm">
+                <p class="tel-kop">Welkom.</p>
+                <p class="tel-sub">In welk jaar zit je?</p>
+                <div class="tel-kaart"><span class="tel-nummer">1</span>1ste bachelor<span class="tel-pijl">→</span></div>
+                <div class="tel-kaart"><span class="tel-nummer">2</span>2de bachelor<span class="tel-pijl">→</span></div>
+                <div class="tel-kaart"><span class="tel-nummer">3</span>3de bachelor<span class="tel-pijl">→</span></div>
+                <p class="tel-kop">Tools</p>
+                <div class="tel-kaart">Reken je punten<span class="tel-pijl">→</span></div>
+                <div class="tel-kaart">Examen-info<span class="tel-pijl">→</span></div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="hl-kaart" id="hl-2" aria-roledescription="dia" aria-label="2 van 5: Examensimulatie">
+          <div class="hl-tekst">
+            <p class="hl-label">Examensimulatie</p>
+            <h2 class="hl-titel">Oefen zoals op het examen.</h2>
+            <p class="hl-uitleg"><strong>Examen Training</strong> geeft uitleg na elke vraag. <strong>Examensimulatie</strong> houdt je uitslag tot het einde, net als het echte examen.</p>
+          </div>
+          <div class="hl-beeld" aria-hidden="true">
+            <div class="tel">
+              <div class="tel-status"><span>9:41</span><span>●●●</span></div>
+              <div class="tel-scherm">
+                <div class="tel-rij"><span>Vraag 4 van 20</span><span>Simulatie</span></div>
+                <div class="tel-balk is-doen"><i style="width:20%"></i></div>
+                <p class="tel-vraag">Wat hoort bij operante conditionering?</p>
+                <div class="tel-optie is-gekozen">Bekrachtiging</div>
+                <div class="tel-optie">Onvoorwaardelijke stimulus</div>
+                <div class="tel-optie">Habituatie</div>
+                <div class="tel-optie">Spiegelneuronen</div>
+                <div class="tel-knop">Volgende →</div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="hl-kaart" id="hl-3" aria-roledescription="dia" aria-label="3 van 5: Hoe werkt het, hoofdstukken kiezen">
+          <div class="hl-tekst">
+            <p class="hl-label">Hoe werkt het</p>
+            <h2 class="hl-titel">Vink je hoofdstukken aan en start.</h2>
+            <p class="hl-uitleg">Log in, kies je jaar en vak, vink de hoofdstukken aan die je wil oefenen en klik op <strong>Start →</strong>. Je kan ook alles in één keer kiezen.</p>
+          </div>
+          <div class="hl-beeld" aria-hidden="true">
+            <div class="tel">
+              <div class="tel-status"><span>9:41</span><span>●●●</span></div>
+              <div class="tel-scherm">
+                <p class="tel-kop">Kies je hoofdstukken</p>
+                <div class="tel-kaart"><span class="tel-vink is-aan">✓</span>Inleiding<span class="tel-klein tel-pijl">12 vragen</span></div>
+                <div class="tel-kaart"><span class="tel-vink is-aan">✓</span>Leertheorieën<span class="tel-klein tel-pijl">18 vragen</span></div>
+                <div class="tel-kaart"><span class="tel-vink"></span>Ontwikkeling<span class="tel-klein tel-pijl">15 vragen</span></div>
+                <div class="tel-kaart"><span class="tel-vink"></span>Onderzoek<span class="tel-klein tel-pijl">9 vragen</span></div>
+                <div class="tel-knop">Start →</div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="hl-kaart" id="hl-4" aria-roledescription="dia" aria-label="4 van 5: Hoe werkt het, voortgang">
+          <div class="hl-tekst">
+            <p class="hl-label">Hoe werkt het</p>
+            <h2 class="hl-titel">Zie je voortgang groeien.</h2>
+            <p class="hl-uitleg">Per hoofdstuk zie je hoeveel je goed had. <strong>Teal</strong> betekent: gelukt. Met een account staat je voortgang op elk toestel klaar.</p>
+          </div>
+          <div class="hl-beeld" aria-hidden="true">
+            <div class="tel">
+              <div class="tel-status"><span>9:41</span><span>●●●</span></div>
+              <div class="tel-scherm">
+                <p class="tel-kop">Kies je hoofdstukken</p>
+                <div class="tel-kaart is-los">
+                  <div class="tel-kaart-kop"><span class="tel-vink is-teal">✓</span>Inleiding</div>
+                  <div class="tel-balk"><i style="width:100%"></i></div>
+                  <span class="tel-klein is-teal">12 van 12 goed · Afgerond ✓</span>
+                </div>
+                <div class="tel-kaart is-los">
+                  <div class="tel-kaart-kop"><span class="tel-vink is-aan">✓</span>Leertheorieën</div>
+                  <div class="tel-balk"><i style="width:72%"></i></div>
+                  <span class="tel-klein">13 van 18 goed</span>
+                </div>
+                <div class="tel-kaart is-los">
+                  <div class="tel-kaart-kop"><span class="tel-vink"></span>Ontwikkeling</div>
+                  <div class="tel-balk"><i style="width:0"></i></div>
+                  <span class="tel-klein">Nog niet geoefend</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="hl-kaart is-lijst" id="hl-5" aria-roledescription="dia" aria-label="5 van 5: Wat is nieuw">
+          <div class="hl-tekst">
+            <p class="hl-label">Wat is nieuw</p>
+            <h2 class="hl-titel">Dit is er de laatste tijd veranderd.</h2>
+            <p class="hl-uitleg">Elke update staat hier, en later ook op de hub onder <strong>Wat is nieuw</strong>.</p>
+          </div>
+          <ul class="hl-updates" id="hl-updates" aria-label="Laatste updates"></ul>
+        </article>
+
+      </div>
+
+      <div class="hl-bediening">
+        <div class="hl-stippen" role="tablist" aria-label="Kies een highlight">
+          <button class="hl-stip" type="button" role="tab" aria-selected="true" aria-controls="hl-1" aria-label="Vakken"><i></i></button>
+          <button class="hl-stip" type="button" role="tab" aria-selected="false" aria-controls="hl-2" aria-label="Examensimulatie" tabindex="-1"><i></i></button>
+          <button class="hl-stip" type="button" role="tab" aria-selected="false" aria-controls="hl-3" aria-label="Hoofdstukken kiezen" tabindex="-1"><i></i></button>
+          <button class="hl-stip" type="button" role="tab" aria-selected="false" aria-controls="hl-4" aria-label="Voortgang" tabindex="-1"><i></i></button>
+          <button class="hl-stip" type="button" role="tab" aria-selected="false" aria-controls="hl-5" aria-label="Wat is nieuw" tabindex="-1"><i></i></button>
+        </div>
+        <button class="hl-pauze" id="hl-pauze" type="button" aria-pressed="false" aria-label="Pauzeren">
+          <svg class="hl-ico-pauze" viewBox="0 0 14 14" aria-hidden="true"><rect x="2" y="1" width="3.5" height="12" rx="1"/><rect x="8.5" y="1" width="3.5" height="12" rx="1"/></svg>
+          <svg class="hl-ico-speel" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.5v11a.8.8 0 0 0 1.2.7l9-5.5a.8.8 0 0 0 0-1.4l-9-5.5A.8.8 0 0 0 3 1.5z"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <div class="wrap nieuw-verder">
       <button class="knop nieuw-begrepen" id="nieuw-begrepen" type="button" disabled aria-disabled="true">Begrepen →</button>
     </div>
   </main>
@@ -104,41 +336,139 @@
 
   <script>
     (() => {
-      const updates = document.getElementById('nieuw-updates');
-      for (const update of window.BES_UPDATES || []) {
+      const updates = document.getElementById('hl-updates');
+      for (const update of (window.BES_UPDATES || []).slice(0, 4)) {
         updates.append(window.BES.updateRij(update, 'nieuw'));
       }
 
-      const sentinel = document.getElementById('nieuw-einde');
-      const button = document.getElementById('nieuw-begrepen');
-      let observer;
+      const hl = document.getElementById('hl');
+      const baan = document.getElementById('hl-baan');
+      const kaarten = Array.from(baan.querySelectorAll('.hl-kaart'));
+      const stippen = Array.from(hl.querySelectorAll('.hl-stip'));
+      const pauzeKnop = document.getElementById('hl-pauze');
+      const verder = document.getElementById('nieuw-begrepen');
+      const rustig = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const DUUR = 8000;
+      let actief = 0;
+      let gepauzeerd = rustig;
+      let timer = 0;
+      let settleTimer = 0;
+      let laatsteGezien = false;
 
-      const enable = () => {
-        button.disabled = false;
-        button.setAttribute('aria-disabled', 'false');
-        observer?.disconnect();
-        window.removeEventListener('scroll', checkVisible);
-        window.removeEventListener('resize', checkVisible);
+      const maakVerderMogelijk = () => {
+        if (laatsteGezien) return;
+        laatsteGezien = true;
+        verder.disabled = false;
+        verder.setAttribute('aria-disabled', 'false');
       };
 
-      const checkVisible = () => {
-        const bounds = sentinel.getBoundingClientRect();
-        if (bounds.bottom > 0 && bounds.top < window.innerHeight) enable();
+      const herstartVul = () => {
+        const vul = stippen[actief].querySelector('i');
+        vul.classList.remove('is-bezig');
+        void vul.offsetWidth;
+        if (!gepauzeerd) vul.classList.add('is-bezig');
       };
 
-      if ('IntersectionObserver' in window) {
-        observer = new IntersectionObserver(entries => {
-          if (entries.some(entry => entry.isIntersecting)) enable();
-        }, { threshold: .01 });
-        observer.observe(sentinel);
-      } else {
-        window.addEventListener('scroll', checkVisible, { passive: true });
-        window.addEventListener('resize', checkVisible);
-      }
-      checkVisible();
+      const planVolgende = () => {
+        window.clearTimeout(timer);
+        if (gepauzeerd || document.hidden) return;
+        timer = window.setTimeout(() => gaNaar(actief + 1), DUUR);
+      };
 
-      button.addEventListener('click', () => {
-        if (button.disabled) return;
+      const zetActief = index => {
+        actief = index;
+        kaarten.forEach((kaart, n) => kaart.classList.toggle('is-actief', n === index));
+        stippen.forEach((stip, n) => {
+          stip.setAttribute('aria-selected', String(n === index));
+          stip.tabIndex = n === index ? 0 : -1;
+        });
+        if (index === kaarten.length - 1) maakVerderMogelijk();
+      };
+
+      const positieVan = kaart => kaart.offsetLeft - (baan.clientWidth - kaart.offsetWidth) / 2;
+
+      const gaNaar = (index, vloeiend = true) => {
+        const doel = (index + kaarten.length) % kaarten.length;
+        const kaart = kaarten[doel];
+        window.clearTimeout(timer);
+        if (Math.abs(baan.scrollLeft - positieVan(kaart)) < 2) {
+          zetActief(doel);
+          herstartVul();
+          planVolgende();
+          return;
+        }
+        baan.scrollTo({ left: positieVan(kaart), behavior: vloeiend && !rustig ? 'smooth' : 'auto' });
+      };
+
+      const dichtstbij = () => {
+        const midden = baan.scrollLeft + baan.clientWidth / 2;
+        let beste = 0;
+        let afstand = Infinity;
+        kaarten.forEach((kaart, n) => {
+          const verschil = Math.abs(kaart.offsetLeft + kaart.offsetWidth / 2 - midden);
+          if (verschil < afstand) { afstand = verschil; beste = n; }
+        });
+        return beste;
+      };
+
+      baan.addEventListener('scroll', () => {
+        window.clearTimeout(timer);
+        window.clearTimeout(settleTimer);
+        settleTimer = window.setTimeout(() => {
+          zetActief(dichtstbij());
+          herstartVul();
+          planVolgende();
+        }, 120);
+      }, { passive: true });
+
+      baan.addEventListener('pointerdown', () => window.clearTimeout(timer));
+      baan.addEventListener('keydown', event => {
+        if (event.key === 'ArrowRight') { event.preventDefault(); gaNaar(actief + 1); }
+        if (event.key === 'ArrowLeft') { event.preventDefault(); gaNaar(actief - 1); }
+      });
+
+      stippen.forEach((stip, n) => {
+        stip.addEventListener('click', () => gaNaar(n));
+        stip.addEventListener('keydown', event => {
+          if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
+          event.preventDefault();
+          const doel = (n + (event.key === 'ArrowRight' ? 1 : -1) + stippen.length) % stippen.length;
+          stippen[doel].focus();
+          gaNaar(doel);
+        });
+      });
+
+      const zetPauze = waarde => {
+        gepauzeerd = waarde;
+        hl.classList.toggle('is-gepauzeerd', waarde);
+        pauzeKnop.setAttribute('aria-pressed', String(waarde));
+        pauzeKnop.setAttribute('aria-label', waarde ? 'Afspelen' : 'Pauzeren');
+        if (waarde) {
+          window.clearTimeout(timer);
+        } else {
+          herstartVul();
+          planVolgende();
+        }
+      };
+      pauzeKnop.addEventListener('click', () => zetPauze(!gepauzeerd));
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) window.clearTimeout(timer);
+        else if (!gepauzeerd) { herstartVul(); planVolgende(); }
+      });
+
+      window.addEventListener('resize', () => {
+        window.clearTimeout(settleTimer);
+        baan.scrollTo({ left: positieVan(kaarten[actief]), behavior: 'auto' });
+      });
+
+      zetPauze(gepauzeerd);
+      zetActief(0);
+      herstartVul();
+      planVolgende();
+
+      verder.addEventListener('click', () => {
+        if (verder.disabled) return;
         try { window.sessionStorage.setItem('bes_nieuw_gezien', '1'); } catch {}
         window.location.assign('hub.html' + window.location.hash);
       });

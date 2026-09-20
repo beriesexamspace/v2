@@ -1,4 +1,9 @@
 window.BES_UPDATES = [
+  { soort: 'nieuw', datum: '20 september 2026', tekst: '**Inloggen met Google**: één klik, geen wachtwoord nodig.' },
+  { soort: 'nieuw', datum: '19 september 2026', tekst: '**Sociologie I** staat erin, met 204 vragen en oude examenvragen.' },
+  { soort: 'nieuw', datum: '19 september 2026', tekst: '**Leren leren**: slim studeren, focus en hulp als het even niet gaat.' },
+  { soort: 'nieuw', datum: '19 september 2026', tekst: '**Feedbackpagina**: meld een fout of stuur een idee.' },
+  { soort: 'nieuw', datum: '18 september 2026', tekst: '**Hard mode** bij Inleiding tot de pedagogiek, met minstens 8 vragen per ronde.' },
   { soort: 'verbeterd', datum: '16 september 2026', tekst: '**Reken je punten** en **Examen-info** staan in de nieuwe stijl.' },
   { soort: 'verbeterd', datum: '15 september 2026', tekst: 'Alle vakken staan in de **nieuwe vakpagina**, met **voortgang bij je account**.' },
   { soort: 'nieuw', datum: '15 september 2026', tekst: '**Aanmelden en inloggen** met je eigen account.' },

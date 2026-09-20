@@ -14,7 +14,7 @@ index.html            startpagina (de deur)
 aanmelden.html        account maken, één vraag per stap
 inloggen.html         inloggen en herstelmail aanvragen
 wachtwoord.html       wachtwoord instellen via een herstel-link
-nieuw.html            updates na iedere nieuwe login, vóór de hub
+nieuw.html            highlights-carrousel na iedere nieuwe login, vóór de hub
 hub.html              jaren + tools
 over-mij.html         kennismaking, sociale links en het ontstaan van de site
 profiel.html          naam, e-mailadres, profielfoto, wachtwoord en studiekalender
@@ -95,6 +95,8 @@ Voeg voor deze flow `https://beriesexamspace.com/v2/profiel.html?email=bevestige
 Een project op het instapplan kan na een week zonder voldoende gebruik pauzeren. Open dan het project in het Supabase-dashboard en kies "Resume project". Zie de [Supabase-uitleg over projectpauzes](https://supabase.com/docs/guides/platform/free-project-pausing).
 
 Na een geslaagde aanmelding of login wordt `sessionStorage.bes_nieuw_gezien` gewist en opent `nieuw.html`. Uitloggen wist de sleutel ook. De toegangspoort in de head van `hub.html` controleert uitsluitend sessionStorage; oude waarden in localStorage worden niet meer gebruikt. "Begrepen →" bewaart de sleutel voor deze browsersessie en opent de hub, met behoud van een eventuele sectiehash. Tijdens dezelfde sessie verschijnt het scherm niet opnieuw bij paginawissels. Een nieuwe login toont de updates opnieuw. Als sessionStorage geblokkeerd is, blijft de hub bereikbaar om een doorverwijslus te voorkomen.
+
+`nieuw.html` is sinds 20-09-2026 een highlights-carrousel (vijf dia's: Vakken, Examensimulatie, twee keer Hoe werkt het, Wat is nieuw). Hij loopt vanzelf door (8 seconden per dia, balkje vult zich), stopt bij de pauzeknop, bij een verborgen tabblad en bij "prefers-reduced-motion", en laat zich swipen, scrollen, met de pijltoetsen en via de stippen bedienen. De beelden zijn getekende telefoons in gewone opmaak (geen screenshots van de site). "Begrepen →" wordt actief zodra de laatste dia in beeld is geweest. Vaste regel: geen `scroll-snap-stop: always` op de dia's, anders stopt een sprong over meerdere dia's halverwege.
 
 De licht/donkerkeuze staat in `localStorage.bes_thema` (`licht` of `donker`). Zonder keuze volgt de pagina het systeem. Bij ingelogde accounts wordt de keuze ook opgeslagen in `user_metadata.thema`; de accountkeuze wordt toegepast zodra de sessie geladen is. Het kleine script vóór de stylesheet past de lokaal bekende keuze al vóór het eerste beeld toe. Op een nieuw toestel kan de accountkeuze pas worden toegepast zodra de accountgegevens beschikbaar zijn. `BES.themaToepassen()` past een keuze toe en bewaart die lokaal.
 
