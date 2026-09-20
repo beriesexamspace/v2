@@ -334,90 +334,7 @@
     let releaseTimer;
     let pointerPosition = null;
     let refreshFrame = 0;
-    let colorTarget = null;
-    let colorTheme = '';
-    let colorTime = 0;
-    let backgroundTone = '0 0 0';
-    let appliedTone = '';
-    const rgba = value => {
-      const values = value.match(/[\d.]+/g)?.map(Number);
-      if (!values || values.length < 3) return [0, 0, 0, 0];
-      const scale = value.startsWith('color(srgb ') ? 255 : 1;
-      return [values[0] * scale, values[1] * scale, values[2] * scale, values[3] ?? 1];
-    };
-    const contrast = target => {
-      const now = performance.now();
-      if (colorTarget === target && colorTheme === root.dataset.theme && now - colorTime < 120) return;
-      colorTarget = target;
-      colorTheme = root.dataset.theme;
-      colorTime = now;
-      const color = [0, 0, 0];
-      let remaining = 1;
-      for (let element = target; element && remaining > .01; element = element.parentElement) {
-        const [r, g, b, alpha] = rgba(getComputedStyle(element).backgroundColor);
-        color[0] += r * alpha * remaining;
-        color[1] += g * alpha * remaining;
-        color[2] += b * alpha * remaining;
-        remaining *= 1 - alpha;
-      }
-      const fallback = root.dataset.theme === 'dark' ? 11 : 255;
-      const linear = color.map(channel => {
-        const value = (channel + fallback * remaining) / 255;
-        return value <= .04045 ? value / 12.92 : Math.pow((value + .055) / 1.055, 2.4);
-      });
-      const luminance = .2126 * linear[0] + .7152 * linear[1] + .0722 * linear[2];
-      backgroundTone = luminance > .179 ? '0 0 0' : '255 255 255';
-    };
-    const luminanceOf = ([r, g, b]) => {
-      const linear = [r, g, b].map(channel => {
-        const value = channel / 255;
-        return value <= .04045 ? value / 12.92 : Math.pow((value + .055) / 1.055, 2.4);
-      });
-      return .2126 * linear[0] + .7152 * linear[1] + .0722 * linear[2];
-    };
-    // Raakt de bol (ook maar voor een deel) tekst, dan bepaalt de tekstkleur de toon:
-    // lichte tekst = zwarte bol, donkere tekst = witte bol. Anders geldt de achtergrond.
-    const textTone = (x, y, radius) => {
-      const fromPoint = document.caretPositionFromPoint
-        ? (px, py) => document.caretPositionFromPoint(px, py)?.offsetNode
-        : document.caretRangeFromPoint
-          ? (px, py) => document.caretRangeFromPoint(px, py)?.startContainer
-          : null;
-      if (!fromPoint) return null;
-      const points = [[x, y], [x - radius, y], [x + radius, y], [x, y - radius], [x, y + radius]];
-      const seen = new Set();
-      for (const [px, py] of points) {
-        let node;
-        try { node = fromPoint(px, py); } catch { continue; }
-        if (!node || node.nodeType !== Node.TEXT_NODE || !node.data.trim() || seen.has(node)) continue;
-        seen.add(node);
-        const parent = node.parentElement;
-        if (!parent || parent.closest('.cursor-dot')) continue;
-        const range = document.createRange();
-        range.selectNodeContents(node);
-        for (const rect of range.getClientRects()) {
-          if (!rect.width || !rect.height) continue;
-          const nx = Math.max(rect.left, Math.min(x, rect.right));
-          const ny = Math.max(rect.top, Math.min(y, rect.bottom));
-          if ((nx - x) ** 2 + (ny - y) ** 2 > radius * radius) continue;
-          const [cr, cg, cb, alpha] = rgba(getComputedStyle(parent).color);
-          if (alpha < .5) continue;
-          const luminance = luminanceOf([cr, cg, cb]);
-          if (luminance > .6) return '0 0 0';
-          if (luminance < .4) return '255 255 255';
-          return null;
-        }
-      }
-      return null;
-    };
-    const applyTone = tone => {
-      if (tone === appliedTone) return;
-      appliedTone = tone;
-      dot.style.setProperty('--cursor-tone', tone);
-      dot.style.backgroundColor = `rgb(${tone})`;
-      dot.style.borderColor = `rgb(${tone})`;
-      dot.style.setProperty('--cursor-ring', `rgb(${tone} / 35%)`);
-    };
+    // De bol houdt één kleur per thema (--cursor-tone in style.css): zwart in licht, wit in donker.
     const clear = () => {
       clearTimeout(releaseTimer);
       cancelAnimationFrame(refreshFrame);
@@ -434,9 +351,6 @@
       if (!(target instanceof Element)) return;
       if (target.closest('input, textarea, [contenteditable="true"], select')) { clear(); return; }
       pointerPosition = { clientX: event.clientX, clientY: event.clientY };
-      contrast(target);
-      const overControl = target.closest('button, a[href], summary, [role="button"], [role="tab"], [role="checkbox"], [role="radio"], .optie');
-      applyTone(textTone(event.clientX, event.clientY, overControl ? 8 : 7) || backgroundTone);
       const dialog = document.querySelector('dialog[open]');
       // Reinsert above a newly opened modal in the browser's top layer.
       if (dialog !== currentDialog && dot.matches(':popover-open')) dot.hidePopover();
@@ -456,15 +370,11 @@
         refreshFrame = 0;
         if (!pointerPosition || !dot.matches(':popover-open')) return;
         const target = document.elementFromPoint(pointerPosition.clientX, pointerPosition.clientY);
-        colorTime = 0;
         updatePointer({ ...pointerPosition, pointerType: 'mouse', target });
       });
     };
     document.addEventListener('scroll', refreshPointer, { capture: true, passive: true });
     window.addEventListener('resize', refreshPointer, { passive: true });
-    document.addEventListener('transitionend', event => {
-      if (event.target !== dot && event.propertyName === 'background-color') refreshPointer();
-    });
     new MutationObserver(refreshPointer).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
     document.addEventListener('pointermove', updatePointer, { passive: true });
     document.addEventListener('pointerout', event => { if (!event.relatedTarget) clear(); });
