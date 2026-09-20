@@ -3,6 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
+  <link rel="manifest" href="/v2/manifest.webmanifest">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Berie's Exam Space">
+  <meta property="og:title" content="Reken je punten | Berie's Exam Space">
+  <meta property="og:description" content="Bereken je cijfer voor een vak, je gewogen gemiddelde en de deliberatievoorwaarden in Berie's Exam Space.">
+  <meta property="og:image" content="https://beriesexamspace.com/v2/assets/deel.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="https://beriesexamspace.com/v2/reken.html">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="description" content="Bereken je cijfer voor een vak, je gewogen gemiddelde en de deliberatievoorwaarden in Berie's Exam Space.">
   <meta name="theme-color" content="#FFFFFF">
   <script>
@@ -19,13 +30,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=22">
-  <script src="assets/app.js?v=22"></script>
-  <script src="assets/config.js?v=22" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=23">
+  <script src="assets/app.js?v=23"></script>
+  <script src="assets/config.js?v=23" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=22" defer></script>
-  <script src="assets/activiteit.js?v=22" defer></script>
-  <script src="assets/reken.js?v=22" defer></script>
+  <script src="assets/auth.js?v=23" defer></script>
+  <script src="assets/activiteit.js?v=23" defer></script>
+  <script src="assets/reken.js?v=23" defer></script>
   <style>
 
     .reken-pagina .wrap { max-width: 808px; }
@@ -55,7 +66,7 @@
     .metric-status { display: flex; flex-direction: column; justify-content: center; }
     .metric-status .vt { font-weight: 600; font-size: 1rem; line-height: 1.5; margin-bottom: 5px; }
     .metric-graad .mv { font-size: 1.125rem; letter-spacing: 0; line-height: 1.5; overflow-wrap: anywhere; }
-    [data-state="goed"]:is(#ex1Status, #ex2Graad) { color: var(--teal); }
+    [data-state="goed"]:is(#ex1Status, #ex2Graad) { color: var(--teal-tekst); }
     [data-state="fout"]#ex1Status { color: var(--fout); }
     [data-state="leeg"]:is(#ex1Status, #ex2Graad) { color: var(--muted); }
     .wsum { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: .8125rem; line-height: 1.5; }
@@ -65,7 +76,7 @@
     .rule { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 5px 12px; align-items: start; font-size: .875rem; line-height: 1.5; }
     .ric { display: grid; place-items: center; grid-row: span 2; width: 24px; height: 24px; border-radius: 50%; background: var(--surface); color: var(--muted); font-size: 1rem; font-weight: 600; }
     .rdet { grid-column: 2; justify-self: start; padding: 2px 8px; border-radius: 8px; color: var(--muted); background: var(--surface); font-size: .8125rem; overflow-wrap: anywhere; }
-    .rule[data-state="goed"] :is(.ric, .rdet) { color: var(--teal); background: var(--teal-zacht); }
+    .rule[data-state="goed"] :is(.ric, .rdet) { color: var(--teal-tekst); background: var(--teal-zacht); }
     .rule[data-state="fout"] :is(.ric, .rdet) { color: var(--fout); background: var(--fout-zacht); }
     .rule[data-state="leeg"] .rlbl { color: var(--muted); }
     .verdict { display: flex; align-items: flex-start; gap: 14px; margin: 0 0 24px; padding: 20px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
@@ -74,7 +85,7 @@
     .verdict .vt { color: var(--muted); font-size: 1rem; font-weight: 600; line-height: 1.5; }
     .vs { color: var(--muted); margin-top: 6px; font-size: .875rem; line-height: 1.6; }
     .verdict[data-state="goed"] { border-color: var(--teal); background: var(--teal-zacht); }
-    .verdict[data-state="goed"] :is(.vt, .verdict-teken) { color: var(--teal); }
+    .verdict[data-state="goed"] :is(.vt, .verdict-teken) { color: var(--teal-tekst); }
     .verdict[data-state="goed"] .verdict-teken { background: transparent; }
     .verdict[data-state="fout"] { border-color: var(--fout); background: var(--fout-zacht); }
     .verdict[data-state="fout"] :is(.vt, .verdict-teken) { color: var(--fout); }
@@ -103,6 +114,7 @@
   </style>
 </head>
 <body>
+  <a class="skip-link" href="#inhoud">Ga naar inhoud</a>
   <header class="site-header">
     <nav class="navigation" aria-label="Hoofdnavigatie">
       <a class="brand" href="index.html" aria-label="Berie's Exam Space, startpagina">
@@ -124,7 +136,7 @@
     </nav>
   </header>
 
-  <main class="pagina reken-pagina" aria-labelledby="reken-kop">
+  <main id="inhoud" class="pagina reken-pagina" aria-labelledby="reken-kop">
     <div class="wrap">
       <a class="terug" href="hub.html" data-terug="hub.html" data-terug-tekst="Terug">← Terug</a>
       <header class="pagina-kop">
@@ -186,6 +198,7 @@
     <div class="footer-details">
       <p>Duidelijk leren. Rustig groeien.</p>
       <p class="project-label">A project of The Berie Foundation</p>
+      <p class="footer-links"><a href="privacy.html">Privacy</a><span aria-hidden="true"> · </span><a href="mailto:berie007yldrm@gmail.com">berie007yldrm@gmail.com</a></p>
     </div>
   </footer>
 </body>

@@ -24,6 +24,10 @@ jaar-3ba.html         vakken 3de bachelor
 whatsapp.html         uitleg en link naar de WhatsApp-groep
 feedback.html         feedback sturen (fout in een vraag, idee, iets anders) naar de tabel feedback
 leren.html            leren leren: slim studeren, concentratie en hulplijnen; gelinkt vanaf de hub (Tools) en boven elk tabblad Studie-hacks
+privacy.html          wat we bewaren, waar, cookies, rechten en contact; gelinkt in elke voettekst en onder het aanmeldformulier
+beheer.html           alleen voor de beheerder: hoeveel accounts per dag oefenden (aantallen, geen namen)
+404.html              nette foutpagina van GitHub Pages; gebruikt absolute paden /v2/ (bij de lancering aanpassen)
+manifest.webmanifest  naam, kleuren en iconen voor "Zet op beginscherm" (Android); Safari gebruikt de apple-touch-icon
 vak/voorbeeld/        vak-template (index.html + data.js)
 assets/style.css      gedeelde stijl
 assets/app.js         gedeelde logica (nav, fade, terugknop, naam)
@@ -33,9 +37,14 @@ assets/vak.css        aanvullende stijl van de vakpagina
 assets/vak.js         logica van de vakpagina
 assets/vakken.js      lijst van alle vakken per jaar
 assets/updates.js     updates voor de sectie Wat is nieuw op de hub
+assets/highlights.css gedeelde stijl van de highlights-carrousel (welkomstscherm en Hoe werkt het op de hub)
+assets/highlights.js  bouwt de carrousel: BES.highlights(element, { metNieuw, kopniveau, bijLaatste })
+assets/icoon-*.png    beginscherm-iconen (180 Apple, 192 en 512 manifest); assets/deel.png is het deelvoorbeeld (1200x630) voor WhatsApp en co
 assets/activiteit.js  persoonlijke dagtotalen, bezoeksessies en studiekalender
 assets/kalender.css   aanvullende stijl voor de studiekalender
 supabase/studieactiviteit.sql optionele accountopslag voor de studiekalender
+supabase/account-en-beheer.sql account_verwijderen(), tabel beheerders, studie_dagcijfers() en studie_totalen() (uitgevoerd op 20-09-2026)
+lancering/maak-doorsturen.js maakt doorstuurpagina's voor de oude vaklinks; uitvoer lancering/doorsturen/ staat niet in git en gaat pas bij de lancering naar de oude site
 referentie/comit-schetsen.html drie schetsen van de mascotte Comit met vier bewegingen, niet gelinkt, alleen om te kiezen
 referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.js (bron voor SVG op de site en voor PNG via node maak-png.js), voorbeeldpagina index.html; trainingspak wit in licht, zwart in donker
 ```
@@ -51,7 +60,7 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 22), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 23), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.
@@ -116,6 +125,19 @@ create policy "eigen avatar verwijderen" on storage.objects for delete using (bu
 
 Zolang de bucket ontbreekt, meldt de profielpagina "Foto's zijn nog niet ingeschakeld." bij een fotobewerking. Naam, wachtwoord en thema blijven zelfstandig werken. De publieke foto-URL met tijdparameter staat in `user_metadata.foto`. Een upload en de daaropvolgende metadatawijziging zijn aparte verzoeken; bij een storing toont de pagina een fout en kan de gebruiker opnieuw proberen. Voer na het aanmaken van de bucket een echte upload en verwijdering uit en controleer met een tweede account dat alleen het eigen bestand aangepast kan worden. De browsercontroles bij deze wijziging gebruiken een nagebootste account- en opslagdienst en veranderen geen bestaande accounts of bestanden.
 
+## Privacy, account wissen en beheer
+
+- `privacy.html` beschrijft in gewone taal wat er bewaard wordt. Elke voettekst linkt ernaar (`.footer-links`, samen met het contactadres berie007yldrm@gmail.com); het aanmeldformulier heeft er een regel over onder de knop.
+- Account wissen: onderaan `profiel.html` (alleen ingelogd zichtbaar). Eerst WISSEN typen, dan roept de pagina `rpc('account_verwijderen')` aan. Die functie (security definer) wist de avatar in de bucket, de rijen in voortgang, feedback en studieactiviteit en de rij in auth.users. Daarna signOut en terug naar de startpagina.
+- Beheer: `beheer.html` roept `studie_totalen()` en `studie_dagcijfers(30)` aan. Beide geven alleen rijen terug als de ingelogde gebruiker in de tabel `beheerders` staat (gevuld via de SQL-editor, nooit een e-mailadres in de code). Een dag telt zodra iemand minstens 60 seconden leertijd of één bezoek had.
+- De SQL staat in `supabase/account-en-beheer.sql`.
+
+## Deelvoorbeeld, iconen en toegankelijkheid
+
+- Elke pagina heeft og-tags (titel, omschrijving, `assets/deel.png`, url), een `apple-touch-icon` en een link naar `manifest.webmanifest`. De paden zijn absoluut (`/v2/...`) omdat vakpagina's twee mappen diep staan. **Bij de lancering op het hoofddomein:** `/v2/` vervangen door `/` in alle pagina's, in het manifest en in `404.html`.
+- Elke pagina begint met een `.skip-link` ("Ga naar inhoud") naar `<main id="inhoud">`; alleen zichtbaar met de tab-toets.
+- Teal als tekstkleur is te licht voor kleine tekst. Gebruik daarvoor `--teal-tekst` (licht #15756f, donker #5fd0c9); `--teal` blijft voor balken, randen en vinkjes.
+
 ## Feedback
 
 De menulink "Feedback" op elke pagina opent `feedback.html`. Alleen ingelogde gebruikers kunnen sturen; het bericht gaat met naam, e-mailadres, soort (fout, idee, anders), gekozen vak en tekst naar de tabel `feedback`. Je leest de berichten in Supabase onder Table Editor. Een link naar de pagina mag `?vak=<id>` en `?vraag=<nummer>` meegeven om het vak en het vraagnummer vooraf in te vullen (bedoeld voor een latere knop per vraag).
@@ -157,6 +179,8 @@ Voer [supabase/studieactiviteit.sql](supabase/studieactiviteit.sql) één keer u
 Zonder tabel, functie of verbinding blijft de kalender lokaal werken en vermeldt hij expliciet dat synchronisatie niet beschikbaar is. Verwar deze lokale werking niet met een bevestigde koppeling tussen apparaten. Na inrichting moeten een echt testaccount op twee apparaten en de toegangscontrole met een tweede testaccount nog worden gecontroleerd. De geautomatiseerde controles gebruiken nagebootste accounts en een nagebootste database.
 
 ## Hoe werkt het (hub)
+
+Sinds 20-09-2026 staat hier dezelfde highlights-carrousel als op het welkomstscherm (zonder de dia Wat is nieuw), met daaronder de uitklapbare volledige uitleg in tekst. De carrousel loopt alleen door zolang hij in beeld is.
 
 De sectie `hub.html#hoe-werkt-het` bestaat uit vier korte kaarten (Log in, Kies je jaar en vak, Kies hoofdstukken en oefenvorm, Zie je voortgang groeien) en daaronder een `details` "Volledige uitleg →" met tien tekststappen (Waar / Klik op / Daarna) met de exacte knopnamen van de site. Vaste regel: uitleg op de hub is tekst. Geen screenshots van de site in de site, geen nagemaakte muis, geen animaties in uitleg; maximaal vier kaarten zichtbaar, de rest ingeklapt. Verandert een knopnaam, pas dan ook de tekst hier aan.
 

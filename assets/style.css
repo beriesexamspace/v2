@@ -11,6 +11,7 @@
   --accent-zacht: rgba(0,113,227,.06);
   --teal: #3fb9b2;
   --teal-zacht: rgba(63,185,178,.12);
+  --teal-tekst: #15756f;
   --surface: #F5F5F7;
   --line: #E9E7F3;
   --sig: #7FCFC9;
@@ -64,6 +65,7 @@ html[data-theme="dark"] {
   --accent-dark: #409CFF;
   --accent-zacht: rgba(10,132,255,.16);
   --teal-zacht: rgba(63,185,178,.18);
+  --teal-tekst: #5fd0c9;
   --sig: #5FBDB6;
   --nav-bg: rgba(28,28,30,.72);
   --shadow-near-color: rgba(0,0,0,.5);
@@ -585,7 +587,7 @@ h1 span { display: block; }
   padding: 4px 10px;
   border-radius: var(--pill);
   background: var(--teal-zacht);
-  color: var(--teal);
+  color: var(--teal-tekst);
   font-size: .75rem;
   font-weight: 600;
   line-height: 1.2;
@@ -1005,3 +1007,13 @@ html.ball-cursor,html.ball-cursor body,html.ball-cursor body *,html.ball-cursor 
 @keyframes cursor-ring{from{opacity:.55;transform:scale(.65)}to{opacity:0;transform:scale(1.5)}}
 .cursor-dot::backdrop{background:none;pointer-events:none}
 @media(prefers-reduced-motion:reduce){.cursor-dot[popover]{transition:none}}
+
+/* Voettekst: privacy en contact */
+.footer-details .footer-links { margin-top: 6px; color: var(--muted); font-size: .75rem; font-weight: 400; }
+.footer-details .footer-links a { color: var(--muted); text-decoration: none; }
+:where(html.has-hover) .footer-details .footer-links a:hover { color: var(--ink); text-decoration: underline; }
+.footer-details .footer-links a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+/* Toetsenbord: eerste tab-stop springt naar de inhoud */
+.skip-link { position: absolute; top: -100px; left: 16px; z-index: 100; padding: 10px 14px; border-radius: 12px; background: var(--accent); color: #fff; font-size: .9375rem; font-weight: 600; text-decoration: none; }
+.skip-link:focus { top: 12px; outline: 2px solid var(--ink); outline-offset: 2px; }

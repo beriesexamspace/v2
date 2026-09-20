@@ -3,6 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
+  <link rel="manifest" href="/v2/manifest.webmanifest">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Berie's Exam Space">
+  <meta property="og:title" content="Welkom | Berie's Exam Space">
+  <meta property="og:description" content="Kies je jaar, gebruik de tools en help mee met je eigen vak in Berie's Exam Space.">
+  <meta property="og:image" content="https://beriesexamspace.com/v2/assets/deel.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="https://beriesexamspace.com/v2/hub.html">
+  <meta name="twitter:card" content="summary_large_image">
   <script>
     (() => {
       try {
@@ -37,15 +48,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=22">
-  <link rel="stylesheet" href="assets/highlights.css?v=22">
-  <script src="assets/app.js?v=22"></script>
-  <script src="assets/updates.js?v=22"></script>
-  <script src="assets/highlights.js?v=22"></script>
-  <script src="assets/config.js?v=22" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=23">
+  <link rel="stylesheet" href="assets/highlights.css?v=23">
+  <script src="assets/app.js?v=23"></script>
+  <script src="assets/updates.js?v=23"></script>
+  <script src="assets/highlights.js?v=23"></script>
+  <script src="assets/config.js?v=23" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=22" defer></script>
-  <script src="assets/activiteit.js?v=22" defer></script>
+  <script src="assets/auth.js?v=23" defer></script>
+  <script src="assets/activiteit.js?v=23" defer></script>
   <style>
     html { scroll-behavior: smooth; }
 
@@ -116,7 +127,7 @@
     .hub-uitleg-stap { display: grid; gap: 6px; padding-top: 22px; border-top: 1px solid var(--line); }
     .hub-uitleg-stap:first-child { padding-top: 0; border-top: 0; }
     .hub-uitleg-stap h4 { margin: 0 0 4px; font-size: 1.0625rem; font-weight: 600; }
-    .hub-uitleg-stap h4::before { counter-increment: uitlegstap; content: counter(uitlegstap) ". "; color: var(--teal); }
+    .hub-uitleg-stap h4::before { counter-increment: uitlegstap; content: counter(uitlegstap) ". "; color: var(--teal-tekst); }
     .hub-uitleg-stap p { margin: 0; font-size: .9375rem; line-height: 1.6; }
     .hub-uitleg-stap p strong { color: var(--ink); font-weight: 600; }
     @keyframes hub-uitleg-binnen { from { opacity: 0; } to { opacity: 1; } }
@@ -140,7 +151,7 @@
     .update-meta { display: flex; flex-wrap: wrap; align-content: start; align-items: center; gap: 6px 8px; }
     .update-datum { color: var(--ink-soft); }
     .update-label { display: inline-flex; padding: 2px 8px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 600; line-height: 1.5; }
-    .update-label-nieuw { background: var(--teal-zacht); color: var(--teal); }
+    .update-label-nieuw { background: var(--teal-zacht); color: var(--teal-tekst); }
     .update-label-verbeterd { background: var(--surface); color: var(--ink-soft); }
     .hub-updates-knop { margin-top: 24px; }
     .hub-update.is-net-zichtbaar { animation: hub-update-binnen 150ms var(--ease) both; }
@@ -174,6 +185,7 @@
   </style>
 </head>
 <body>
+  <a class="skip-link" href="#inhoud">Ga naar inhoud</a>
   <header class="site-header">
     <nav class="navigation" aria-label="Hoofdnavigatie">
       <a class="brand" href="index.html" aria-label="Berie's Exam Space, startpagina">
@@ -195,7 +207,7 @@
     </nav>
   </header>
 
-  <main class="pagina" aria-labelledby="begroeting">
+  <main id="inhoud" class="pagina" aria-labelledby="begroeting">
     <div class="wrap">
       <header class="pagina-kop">
         <h1 id="begroeting">Welkom.</h1>
@@ -357,6 +369,7 @@
     <div class="footer-details">
       <p>Duidelijk leren. Rustig groeien.</p>
       <p class="project-label">A project of The Berie Foundation</p>
+      <p class="footer-links"><a href="privacy.html">Privacy</a><span aria-hidden="true"> · </span><a href="mailto:berie007yldrm@gmail.com">berie007yldrm@gmail.com</a></p>
     </div>
   </footer>
 

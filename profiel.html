@@ -3,6 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
+  <link rel="manifest" href="/v2/manifest.webmanifest">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Berie's Exam Space">
+  <meta property="og:title" content="Jouw profiel | Berie's Exam Space">
+  <meta property="og:description" content="Beheer je naam, e-mailadres, profielfoto en wachtwoord bij Berie's Exam Space.">
+  <meta property="og:image" content="https://beriesexamspace.com/v2/assets/deel.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="https://beriesexamspace.com/v2/profiel.html">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="description" content="Beheer je naam, e-mailadres, profielfoto en wachtwoord bij Berie's Exam Space.">
   <meta name="theme-color" content="#FFFFFF">
   <script>
@@ -19,13 +30,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=22">
-  <link rel="stylesheet" href="assets/kalender.css?v=22">
-  <script src="assets/app.js?v=22" defer></script>
-  <script src="assets/config.js?v=22" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=23">
+  <link rel="stylesheet" href="assets/kalender.css?v=23">
+  <script src="assets/app.js?v=23" defer></script>
+  <script src="assets/config.js?v=23" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=22" defer></script>
-  <script src="assets/activiteit.js?v=22" defer></script>
+  <script src="assets/auth.js?v=23" defer></script>
+  <script src="assets/activiteit.js?v=23" defer></script>
   <style>
     .profiel-wrap { max-width: 640px; }
     .profiel-kop { display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: start; gap: 20px; }
@@ -39,16 +50,29 @@
     .profiel-veld .auth-help, .profiel-veld .auth-error { margin: 0; }
     .profiel-foto-acties, .profiel-opslaan { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; }
     .profiel-email { min-height: 56px; margin: 0; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); color: var(--ink-soft); overflow-wrap: anywhere; }
-    .profiel-opgeslagen { display: inline-flex; align-items: center; gap: 10px; color: var(--teal); font-size: .9375rem; opacity: 1; transition: opacity 200ms var(--ease); }
+    .profiel-opgeslagen { display: inline-flex; align-items: center; gap: 10px; color: var(--teal-tekst); font-size: .9375rem; opacity: 1; transition: opacity 200ms var(--ease); }
     .profiel-opgeslagen.is-fading { opacity: 0; }
     .profiel-opgeslagen .vinkje { width: 40px; height: 40px; margin: 0; }
     .profiel-uitloggen { padding-top: 12px; }
     .profiel-email-status { overflow-wrap: anywhere; }
     .profiel-email-status:empty { display: none; }
+    .profiel-wissen { margin-top: 40px; }
+    .profiel-wissen h2 { margin: 0 0 16px; font-size: 1.25rem; }
+    .profiel-wissen .kaart p { margin: 0 0 16px; color: var(--ink-soft); font-size: .9375rem; line-height: 1.6; }
+    .profiel-wissen .kaart p strong { color: var(--ink); }
+    .knop-gevaar { color: var(--fout); border-color: var(--fout); }
+    .knop-gevaar-vol { background: var(--fout); border-color: var(--fout); box-shadow: none; }
+    .knop-gevaar-vol:disabled { opacity: .45; cursor: default; }
+    :where(html.has-hover) .knop-gevaar:hover { background: var(--fout-zacht); border-color: var(--fout); }
+    :where(html.has-hover) .knop-gevaar-vol:not(:disabled):hover { background: var(--fout); box-shadow: none; }
+    .wissen-bevestiging { display: grid; gap: 14px; margin-top: 8px; }
+    .wissen-bevestiging .auth-input { max-width: 260px; }
+    .wissen-knoppen { display: flex; flex-wrap: wrap; gap: 12px; }
     @media (prefers-reduced-motion: reduce) { .profiel-opgeslagen { transition: none; } }
   </style>
 </head>
 <body data-nav="vast">
+  <a class="skip-link" href="#inhoud">Ga naar inhoud</a>
   <header class="site-header">
     <nav class="navigation" aria-label="Hoofdnavigatie">
       <a class="brand" href="index.html" aria-label="Berie's Exam Space, startpagina">
@@ -70,7 +94,7 @@
     </nav>
   </header>
 
-  <main class="pagina" aria-labelledby="profiel-titel">
+  <main id="inhoud" class="pagina" aria-labelledby="profiel-titel">
     <div class="wrap profiel-wrap">
       <a class="terug tekstlink" href="hub.html" data-terug="hub.html" data-terug-tekst="Terug">← Terug</a>
       <header class="pagina-kop profiel-kop">
@@ -152,6 +176,24 @@
         </div>
       </form>
 
+      <section class="sectie profiel-wissen" id="account-wissen" aria-labelledby="wissen-kop" hidden>
+        <h2 id="wissen-kop">Account wissen</h2>
+        <div class="kaart">
+          <p>Dit wist je account met je voortgang, studiekalender, feedback en profielfoto. <strong>Dit kan niet ongedaan gemaakt worden.</strong></p>
+          <button class="knop-secundair knop-gevaar" id="wissen-start" type="button">Account wissen</button>
+          <div class="wissen-bevestiging" id="wissen-bevestiging" hidden>
+            <p><strong>Weet je het zeker?</strong> Typ WISSEN om te bevestigen.</p>
+            <input class="auth-input" id="wissen-invoer" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Typ WISSEN om te bevestigen" placeholder="WISSEN">
+            <div class="wissen-knoppen">
+              <button class="knop knop-gevaar-vol" id="wissen-bevestig" type="button" disabled>Ja, wis mijn account</button>
+              <button class="knop-secundair" id="wissen-annuleer" type="button">Annuleren</button>
+            </div>
+            <p class="auth-error" id="wissen-fout" role="alert" hidden></p>
+            <p class="auth-help" id="wissen-status" role="status" aria-live="polite" hidden>Je account is gewist. Tot ziens.</p>
+          </div>
+        </div>
+      </section>
+
       <section id="studiekalender" class="sectie studiekalender" aria-labelledby="kalender-kop">
         <h2 id="kalender-kop">Jouw studiekalender</h2>
         <div data-kalender></div>
@@ -165,6 +207,7 @@
     <div class="footer-details">
       <p>Duidelijk leren. Rustig groeien.</p>
       <p class="project-label">A project of The Berie Foundation</p>
+      <p class="footer-links"><a href="privacy.html">Privacy</a><span aria-hidden="true"> · </span><a href="mailto:berie007yldrm@gmail.com">berie007yldrm@gmail.com</a></p>
     </div>
   </footer>
 
@@ -239,6 +282,7 @@
           emailStatus.textContent = '';
           remove.hidden = true;
           form.hidden = true;
+          document.getElementById('account-wissen').hidden = true;
           if (auth.emailBevestiging.teruggekeerd) {
             confirmation.hidden = false;
             document.getElementById('profiel-bevestiging-tekst').textContent = auth.emailBevestiging.fout
@@ -271,7 +315,54 @@
         if (auth.emailBevestiging.fout && !confirmationHandled) showError(error, 'Deze bevestigingslink is ongeldig of verlopen. Controleer je adres en kies Opslaan om de wijziging opnieuw aan te vragen.', email);
         remove.hidden = !current.user_metadata?.foto;
         form.hidden = false;
+        document.getElementById('account-wissen').hidden = false;
       };
+
+      // Account wissen: eerst WISSEN typen, dan de functie account_verwijderen in Supabase.
+      (() => {
+        const start = document.getElementById('wissen-start');
+        const box = document.getElementById('wissen-bevestiging');
+        const input = document.getElementById('wissen-invoer');
+        const confirmButton = document.getElementById('wissen-bevestig');
+        const cancel = document.getElementById('wissen-annuleer');
+        const fault = document.getElementById('wissen-fout');
+        const status = document.getElementById('wissen-status');
+        let deleting = false;
+        const reset = () => {
+          box.hidden = true;
+          start.hidden = false;
+          input.value = '';
+          confirmButton.disabled = true;
+          fault.hidden = true;
+        };
+        start.addEventListener('click', () => {
+          box.hidden = false;
+          start.hidden = true;
+          input.focus();
+        });
+        cancel.addEventListener('click', reset);
+        input.addEventListener('input', () => { confirmButton.disabled = input.value.trim().toUpperCase() !== 'WISSEN'; });
+        confirmButton.addEventListener('click', async () => {
+          if (deleting || confirmButton.disabled || !auth.client) return;
+          deleting = true;
+          confirmButton.disabled = true;
+          cancel.disabled = true;
+          fault.hidden = true;
+          try {
+            const { error: rpcError } = await auth.client.rpc('account_verwijderen');
+            if (rpcError) throw rpcError;
+            status.hidden = false;
+            try { await auth.client.auth.signOut(); } catch {}
+            window.setTimeout(() => window.location.assign('index.html'), 1200);
+          } catch (caught) {
+            deleting = false;
+            cancel.disabled = false;
+            confirmButton.disabled = false;
+            fault.textContent = 'Wissen is niet gelukt. Probeer het later opnieuw of mail naar berie007yldrm@gmail.com.';
+            fault.hidden = false;
+          }
+        });
+      })();
 
       const setBusy = value => {
         busy = value;

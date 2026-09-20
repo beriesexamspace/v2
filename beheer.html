@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
+  <link rel="manifest" href="/v2/manifest.webmanifest">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#FFFFFF">
+  <script>
+    (() => {
+      let keuze;
+      try { keuze = window.localStorage.getItem('bes_thema'); } catch {}
+      const donker = keuze === 'donker' || (keuze !== 'licht' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.dataset.theme = donker ? 'dark' : 'light';
+      document.querySelector('meta[name="theme-color"]').content = donker ? '#0B0B0C' : '#FFFFFF';
+    })();
+  </script>
+  <title>Beheer | Berie's Exam Space</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css?v=23">
+  <script src="assets/app.js?v=23" defer></script>
+  <script src="assets/config.js?v=23" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
+  <script src="assets/auth.js?v=23" defer></script>
+  <style>
+    .beheer-wrap { max-width: 760px; }
+    .beheer-tegels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .beheer-tegel { padding: 20px 22px; }
+    .beheer-tegel .getal { display: block; font-size: 2rem; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+    .beheer-tegel .uitleg { display: block; margin-top: 6px; color: var(--ink-soft); font-size: .875rem; }
+    .beheer-dagen { margin-top: 32px; }
+    .beheer-dagen .sectie-kop { margin-bottom: 12px; }
+    .beheer-lijst { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; font-size: .875rem; }
+    .beheer-lijst li { display: grid; grid-template-columns: 96px minmax(0, 1fr) 64px; align-items: center; gap: 12px; }
+    .beheer-lijst .dag { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+    .beheer-lijst .balk { height: 10px; border-radius: 5px; background: var(--surface); overflow: hidden; }
+    .beheer-lijst .balk i { display: block; height: 100%; border-radius: inherit; background: var(--accent); min-width: 0; }
+    .beheer-lijst .aantal { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .beheer-lijst .aantal small { color: var(--ink-soft); font-weight: 400; }
+    .beheer-status { margin: 0; color: var(--ink-soft); }
+    @media (max-width: 600px) {
+      .beheer-tegels { grid-template-columns: minmax(0, 1fr); }
+      .beheer-lijst li { grid-template-columns: 72px minmax(0, 1fr) 56px; }
+    }
+  </style>
+</head>
+<body data-nav="vast">
+  <a class="skip-link" href="#inhoud">Ga naar inhoud</a>
+  <header class="site-header">
+    <nav class="navigation" aria-label="Hoofdnavigatie">
+      <a class="brand" href="index.html" aria-label="Berie's Exam Space, startpagina">
+        <span class="brand-symbol" aria-hidden="true">B</span>
+        <span class="brand-name"><span>Berie's</span> <span>Exam Space</span></span>
+      </a>
+      <a class="home-knop" href="hub.html" aria-label="Home" title="Home">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5M5 9v12h5v-7h4v7h5V9"/></svg>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu">Menu</button>
+      <ul class="navigation-links" id="site-menu">
+        <li><a href="hub.html#hoe-werkt-het">Hoe werkt het</a></li>
+        <li><a href="hub.html#nieuw">Wat is nieuw</a></li>
+        <li><a href="over-mij.html">Over mij</a></li>
+        <li><a href="whatsapp.html">WhatsApp-groep</a></li>
+        <li><a href="feedback.html">Feedback</a></li>
+      </ul>
+      <a class="pill login-button" href="inloggen.html">Inloggen →</a>
+    </nav>
+  </header>
+  <main id="inhoud" class="pagina" aria-labelledby="beheer-titel">
+    <div class="wrap beheer-wrap">
+      <a class="terug tekstlink" href="hub.html" data-terug="hub.html" data-terug-tekst="Terug">← Terug</a>
+      <header class="pagina-kop">
+        <h1 id="beheer-titel">Hoeveel mensen oefenen</h1>
+        <p class="pagina-sub">Alleen aantallen, nooit namen. Een dag telt mee zodra iemand minstens één minuut oefende.</p>
+      </header>
+
+      <p class="beheer-status" id="beheer-status" role="status">Even laden.</p>
+
+      <div id="beheer-inhoud" hidden>
+        <div class="beheer-tegels">
+          <div class="kaart beheer-tegel"><span class="getal" id="tegel-accounts">0</span><span class="uitleg">accounts</span></div>
+          <div class="kaart beheer-tegel"><span class="getal" id="tegel-week">0</span><span class="uitleg">oefenden de laatste 7 dagen</span></div>
+          <div class="kaart beheer-tegel"><span class="getal" id="tegel-ooit">0</span><span class="uitleg">oefenden ooit</span></div>
+        </div>
+        <section class="beheer-dagen" aria-labelledby="dagen-kop">
+          <h2 class="sectie-kop" id="dagen-kop">Per dag, laatste 30 dagen</h2>
+          <div class="kaart">
+            <ul class="beheer-lijst" id="beheer-lijst"></ul>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p class="footer-brand">Berie's Exam Space</p>
+    <div class="footer-details">
+      <p>Duidelijk leren. Rustig groeien.</p>
+      <p class="project-label">A project of The Berie Foundation</p>
+      <p class="footer-links"><a href="privacy.html">Privacy</a><span aria-hidden="true"> · </span><a href="mailto:berie007yldrm@gmail.com">berie007yldrm@gmail.com</a></p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const auth = window.BES.auth;
+      const status = document.getElementById('beheer-status');
+      const inhoud = document.getElementById('beheer-inhoud');
+      const lijst = document.getElementById('beheer-lijst');
+      const datum = new Intl.DateTimeFormat('nl-BE', { day: 'numeric', month: 'short' });
+
+      const laad = async () => {
+        await auth.gereed;
+        const user = await auth.gebruiker();
+        if (!user) { status.textContent = 'Log in om dit overzicht te zien.'; inhoud.hidden = true; return; }
+        status.textContent = 'Even laden.';
+        const [totalen, dagen] = await Promise.all([
+          auth.client.rpc('studie_totalen'),
+          auth.client.rpc('studie_dagcijfers', { p_dagen: 30 })
+        ]);
+        if (totalen.error || dagen.error) {
+          status.textContent = 'Laden is niet gelukt. Staat de SQL uit supabase/account-en-beheer.sql al in het project?';
+          inhoud.hidden = true;
+          return;
+        }
+        const totaal = totalen.data?.[0];
+        if (!totaal) { status.textContent = 'Dit overzicht is alleen voor de beheerder.'; inhoud.hidden = true; return; }
+        document.getElementById('tegel-accounts').textContent = totaal.accounts;
+        document.getElementById('tegel-week').textContent = totaal.laatste_7_dagen;
+        document.getElementById('tegel-ooit').textContent = totaal.ooit_geoefend;
+        const rijen = dagen.data || [];
+        const max = Math.max(1, ...rijen.map(rij => rij.oefenaars));
+        lijst.replaceChildren(...rijen.map(rij => {
+          const li = document.createElement('li');
+          const dag = document.createElement('span');
+          dag.className = 'dag';
+          dag.textContent = datum.format(new Date(rij.dag + 'T12:00:00'));
+          const balk = document.createElement('span');
+          balk.className = 'balk';
+          const vul = document.createElement('i');
+          vul.style.width = (rij.oefenaars / max * 100) + '%';
+          balk.append(vul);
+          const aantal = document.createElement('span');
+          aantal.className = 'aantal';
+          aantal.textContent = rij.oefenaars;
+          li.append(dag, balk, aantal);
+          li.setAttribute('aria-label', `${dag.textContent}: ${rij.oefenaars} oefenaars, ${rij.leertijd_min} minuten`);
+          return li;
+        }));
+        status.textContent = '';
+        inhoud.hidden = false;
+      };
+
+      window.addEventListener('bes:auth', laad);
+      laad();
+    });
+  </script>
+</body>
+</html>
