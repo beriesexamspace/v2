@@ -45,6 +45,8 @@ assets/intro.css      stijl van de stap-voor-stap-intro (welkomstscherm en Hoe w
 assets/intro.js       bouwt de stappen: BES.stappen(element, { soorten, kopniveau, overslaan, lus, laatsteTekst, bijKlaar })
 assets/icoon-*.png    beginscherm-iconen (180 Apple, 192 en 512 manifest); assets/deel.png is het deelvoorbeeld (1200x630) voor WhatsApp en co
 assets/activiteit.js  persoonlijke dagtotalen, bezoeksessies en studiekalender
+assets/inzichten.js   Jouw voortgang op Profiel: balk per vak en laatste sessies (tabellen voortgang en sessies)
+supabase/sessies.sql  tabel sessies: één rij per afgeronde ronde
 assets/kalender.css   aanvullende stijl voor de studiekalender
 supabase/studieactiviteit.sql optionele accountopslag voor de studiekalender
 supabase/account-en-beheer.sql account_verwijderen(), tabel beheerders, studie_dagcijfers() en studie_totalen() (uitgevoerd op 20-09-2026)
@@ -64,7 +66,7 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 38), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 39), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.
@@ -178,6 +180,10 @@ Zolang de tabel ontbreekt, toont de pagina de rode regel "Feedback is nog niet i
 ## Examen-info
 
 26 vragen sinds 15-09-2026, plus sinds 21-09-2026 de categorie "Volgend jaar" met vijf vragen over herinschrijving en studievoortgang (OER art. 60 §4, 88 §1 tot §3, 59 §3; bron: het geverifieerde rapport in Backup-D-schijf/Bestanden/Notities/examen-info-vub-geverifieerd.md). Zoekvak en categorieën bestonden al. Onderaan een kaart "Mijn vraag staat er niet bij →" naar feedback.html; de lege zoekstaat verwijst ook naar Feedback in plaats van de WhatsApp-groep. Nooit iets uit het rapportdeel "Nog te bevestigen" publiceren.
+
+## Inzichten (Free)
+
+Sinds 21-09-2026 bewaart `vak.js` na elke afgeronde ronde één rij in de tabel `sessies` (`bewaarSessie`: vak, niveau, modus, goed, totaal; SQL in `supabase/sessies.sql`, uitgevoerd). Op `profiel.html` staat boven de studiekalender de sectie Jouw voortgang (`assets/inzichten.js`, element `[data-inzichten]`): per geoefend vak een balk met het gemiddelde van de laatste score per hoofdstuk (laagste bovenaan, maximaal zes, link naar voortgang.html) en de laatste vijf sessies. Hard mode telt hier niet mee. Plus en Pro bouwen hierop voort (wekelijks overzicht, grafieken, verbeterpunten).
 
 ## Persoonlijke studiekalender
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="assets/deur.js?v=38"></script>
+  <script src="assets/deur.js?v=39"></script>
   <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta property="og:type" content="website">
@@ -31,13 +31,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=38">
-  <link rel="stylesheet" href="assets/kalender.css?v=38">
-  <script src="assets/app.js?v=38" defer></script>
-  <script src="assets/config.js?v=38" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=39">
+  <link rel="stylesheet" href="assets/kalender.css?v=39">
+  <script src="assets/app.js?v=39" defer></script>
+  <script src="assets/config.js?v=39" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=38" defer></script>
-  <script src="assets/activiteit.js?v=38" defer></script>
+  <script src="assets/auth.js?v=39" defer></script>
+  <script src="assets/activiteit.js?v=39" defer></script>
+  <script src="assets/vakken.js?v=39"></script>
+  <script src="assets/inzichten.js?v=39" defer></script>
   <style>
     .profiel-wrap { max-width: 640px; }
     .profiel-kop { display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: start; gap: 20px; }
@@ -57,6 +59,30 @@
     .profiel-uitloggen { padding-top: 12px; }
     .profiel-email-status { overflow-wrap: anywhere; }
     .profiel-email-status:empty { display: none; }
+    #voortgang-kort { margin-top: 40px; }
+    #voortgang-kort h2 { margin: 0 0 16px; font-size: 1.25rem; }
+    .inz-kaart + .inz-kaart { margin-top: 14px; }
+    .inz-leeg { margin: 0; color: var(--ink-soft); font-size: .9375rem; line-height: 1.6; }
+    .inz-vakken { display: grid; gap: 16px; margin: 0; padding: 0; list-style: none; }
+    .inz-vak { display: grid; gap: 6px; }
+    .inz-vak-kop { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+    .inz-naam { color: var(--ink); font-size: .9375rem; font-weight: 600; text-decoration: none; }
+    :where(html.has-hover) .inz-naam:hover { text-decoration: underline; }
+    .inz-procent { font-weight: 700; font-variant-numeric: tabular-nums; }
+    .inz-procent.is-goed, .inz-sessie-score.is-goed { color: var(--teal-tekst); }
+    .inz-balk { height: 8px; border-radius: 4px; background: var(--surface); overflow: hidden; }
+    .inz-balk i { display: block; height: 100%; border-radius: inherit; background: var(--accent); transition: width 600ms var(--ease); }
+    .inz-balk i.is-goed { background: var(--teal); }
+    .inz-sub { color: var(--ink-soft); font-size: .8125rem; }
+    .inz-meer { display: inline-block; margin-top: 16px; }
+    .inz-kop { margin: 0 0 12px; font-size: 1rem; font-weight: 600; }
+    .inz-sessie-lijst { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .inz-sessie { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto auto; align-items: center; gap: 12px; font-size: .875rem; }
+    .inz-sessie-datum, .inz-sessie-modus { color: var(--ink-soft); white-space: nowrap; }
+    .inz-sessie-vak { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .inz-sessie-score { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    @media (max-width: 520px) { .inz-sessie { grid-template-columns: 56px minmax(0, 1fr) auto; } .inz-sessie-modus { display: none; } }
+    @media (prefers-reduced-motion: reduce) { .inz-balk i { transition: none; } }
     .profiel-wissen { margin-top: 40px; }
     .profiel-wissen h2 { margin: 0 0 16px; font-size: 1.25rem; }
     .profiel-wissen .kaart p { margin: 0 0 16px; color: var(--ink-soft); font-size: .9375rem; line-height: 1.6; }
@@ -175,6 +201,11 @@
           <button class="knop-secundair" id="profiel-uitloggen" type="button" data-account-uitloggen>Uitloggen</button>
         </div>
       </form>
+
+      <section id="voortgang-kort" class="sectie" aria-labelledby="voortgang-kop">
+        <h2 id="voortgang-kop">Jouw voortgang</h2>
+        <div data-inzichten hidden></div>
+      </section>
 
       <section class="sectie profiel-wissen" id="account-wissen" aria-labelledby="wissen-kop" hidden>
         <h2 id="wissen-kop">Account wissen</h2>

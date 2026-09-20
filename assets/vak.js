@@ -633,10 +633,19 @@
         });
       }
       renderComit(answers, correct);
+      bewaarSessie(good, answers.length);
       showScreen('einde');
       byId('score-kop').focus({ preventScroll: true });
       byId('eindscherm').scrollIntoView({ block: 'start', behavior: 'instant' });
       scheduleSync();
+    }
+
+    // Eén rij per afgeronde ronde in de tabel sessies (voor de inzichten op Profiel). Alleen de score, geen antwoorden.
+    function bewaarSessie(goed, totaal) {
+      const owner = context.owner;
+      const client = BES.auth?.client;
+      if (!owner || !client || !session || !totaal) return;
+      client.from('sessies').insert({ user_id: owner, vak: data.id, niveau: session.level || 'normaal', modus: session.mode, goed, totaal }).then(() => {}, () => {});
     }
 
     // Comit-basis zonder AI: sterke en zwakke hoofdstukken uit deze ronde, plus één tip met een knop.
