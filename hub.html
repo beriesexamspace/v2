@@ -38,8 +38,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css?v=22">
+  <link rel="stylesheet" href="assets/highlights.css?v=22">
   <script src="assets/app.js?v=22"></script>
   <script src="assets/updates.js?v=22"></script>
+  <script src="assets/highlights.js?v=22"></script>
   <script src="assets/config.js?v=22" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
   <script src="assets/auth.js?v=22" defer></script>
@@ -100,14 +102,6 @@
 
     .hub-sectie { scroll-margin-top: 88px; }
 
-    .hub-stap { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
-    .hub-stap-nummer {
-      display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
-      width: 36px; height: 36px; border-radius: 50%;
-      background: var(--teal-zacht); color: var(--teal); font-weight: 600;
-    }
-    .hub-stap .kaart-titel, .hub-stap .kaart-sub { margin: 0; }
-    .hub-stap .kaart-sub strong { color: var(--ink); font-weight: 600; }
 
     .hub-uitleg { margin-top: 20px; }
     .hub-uitleg summary { list-style: none; display: inline-flex; width: auto; cursor: pointer; }
@@ -158,6 +152,10 @@
     @media (max-width: 767px) {
       .hub-update { grid-template-columns: minmax(0, 1fr); gap: 4px; }
     }
+
+    .hub-hl { --hl-breedte: calc(100cqw - 48px); margin: 0 -24px; }
+    .hub-hl .hl-kaart { min-height: 440px; }
+    .hub-hl + .hub-uitleg { margin-top: 8px; }
 
     /* Na het welkomstscherm komt de navigatiebalk voor het eerst in beeld. */
     html.nav-intro .site-header { animation: nav-binnen 700ms var(--ease) 350ms both; }
@@ -279,36 +277,7 @@
 
       <section class="sectie hub-sectie" id="hoe-werkt-het" aria-labelledby="hoe-werkt-het-kop">
         <h2 class="sectie-kop" id="hoe-werkt-het-kop">Hoe werkt het</h2>
-        <div class="rooster-2">
-          <div class="kaart hub-stap">
-            <span class="hub-stap-nummer" aria-hidden="true">1</span>
-            <div class="kaart-tekst">
-              <h3 class="kaart-titel">Log in</h3>
-              <p class="kaart-sub">Eén account, je voortgang op elk toestel. Op de startpagina: <strong>Aanmelden →</strong> of <strong>Log in</strong>.</p>
-            </div>
-          </div>
-          <div class="kaart hub-stap">
-            <span class="hub-stap-nummer" aria-hidden="true">2</span>
-            <div class="kaart-tekst">
-              <h3 class="kaart-titel">Kies je jaar en vak</h3>
-              <p class="kaart-sub">Op de hub: <strong>1ste</strong>, <strong>2de</strong> of <strong>3de bachelor</strong>, daarna de kaart van je vak.</p>
-            </div>
-          </div>
-          <div class="kaart hub-stap">
-            <span class="hub-stap-nummer" aria-hidden="true">3</span>
-            <div class="kaart-tekst">
-              <h3 class="kaart-titel">Kies hoofdstukken en oefenvorm</h3>
-              <p class="kaart-sub">Vink hoofdstukken aan en kies <strong>Examen Training</strong> (uitleg na elke vraag) of <strong>Examensimulatie</strong> (uitslag op het einde). Dan <strong>Start →</strong>.</p>
-            </div>
-          </div>
-          <div class="kaart hub-stap">
-            <span class="hub-stap-nummer" aria-hidden="true">4</span>
-            <div class="kaart-tekst">
-              <h3 class="kaart-titel">Zie je voortgang groeien</h3>
-              <p class="kaart-sub">Per hoofdstuk zie je hoeveel je goed had. Teal betekent: gelukt.</p>
-            </div>
-          </div>
-        </div>
+        <section class="hl hub-hl" id="hub-hl" aria-roledescription="carrousel" aria-label="Hoe werkt het, in vier dia's"></section>
 
         <details class="hub-uitleg" id="hub-uitleg">
           <summary class="knop-secundair"><span class="uitleg-dicht">Volledige uitleg →</span><span class="uitleg-open">Uitleg sluiten</span></summary>
@@ -413,6 +382,8 @@
           if (typeof bes.jaarOpslaan === 'function') bes.jaarOpslaan(kaart.dataset.jaar);
         });
       });
+
+      window.BES.highlights(document.getElementById('hub-hl'), { metNieuw: false });
 
       const updates = document.getElementById('hub-updates');
       const updatesKnop = document.getElementById('hub-updates-knop');
