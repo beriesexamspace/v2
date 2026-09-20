@@ -703,7 +703,6 @@
     byId('vak-aantallen').textContent = `${countText(data.vragen.length)} over ${data.hoofdstukken.length} ${data.hoofdstukken.length === 1 ? 'hoofdstuk' : 'hoofdstukken'}.`;
     byId('vak-terug').dataset.terug = `../../jaar-${data.jaar}.html`;
     byId('vak-terug').href = `../../jaar-${data.jaar}.html`;
-    byId('reco-link').href = `https://beriesexamspace.com/reco/?vak=${encodeURIComponent(data.id)}`;
     if (!data.vragen.length) {
       byId('vak-instellingen').hidden = true;
       const empty = byId('vak-leeg');

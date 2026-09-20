@@ -38,8 +38,6 @@
 .vak-pagina :is(#oefenscherm, #eindscherm, #vraag-tekst, #score-kop, #start-oefening) { scroll-margin-top: 100px; }
 #laatste-simulatie { margin: -8px 0 20px; }
 .vak-start { margin-top: 32px; }
-.vak-reco { margin: 36px 0 0; color: var(--muted); font-size: .875rem; }
-.vak-reco a { text-underline-offset: 4px; }
 .oefenscherm { margin-top: 36px; }
 .oefenscherm .eyebrow { margin: 24px 0 12px; color: var(--accent); font-size: .875rem; font-weight: 600; line-height: 1.5; }
 .oefenscherm h2, .eindscherm h2 { margin: 20px 0 28px; font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 600; line-height: 1.35; text-wrap: balance; }
@@ -98,7 +96,6 @@
 .theorie-kaart li + li { margin-top: 8px; }
 .vak-pagina :is(.uitleg, .stop-bevestiging, .hack-regel, .theorie-kaart, .overzicht-vraag):is(:hover, :active) { transform: none; box-shadow: var(--shadow-soft); }
 :where(html.has-hover) .vak-tekstknop:hover,
-:where(html.has-hover) .vak-reco a:hover { text-decoration: underline; }
 :where(html.has-hover) .optie:not(:disabled):hover { border-color: var(--accent); background: var(--surface); }
 @media (max-width: 767px) {
   .vak-pagina .pagina-kop h1 { overflow-wrap: anywhere; hyphens: auto; }
