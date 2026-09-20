@@ -1,7 +1,7 @@
 /* Stap-voor-stap-intro (welkomstscherm en Hoe werkt het op de hub): één kaart per stap, Volgende, Vorige, Overslaan.
    Beelden zijn getekende telefoons, geen screenshots. Animaties zijn kort en staan uit bij "minder beweging". */
 .stappen { position: relative; display: flex; flex-direction: column; gap: 14px; container-type: inline-size; --tel-rand: #1D1D1F; --tel-glans: rgba(255,255,255,.18); --stap-richting: 1; }
-html[data-theme="dark"] .stappen { --tel-rand: #3A3A3C; --tel-glans: rgba(255,255,255,.1); }
+html[data-theme="dark"] .stappen { --tel-rand: #1D1D1F; --tel-glans: rgba(255,255,255,.14); }
 
 .stap-boven { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 28px; padding: 0 4px; }
 .stap-teller { color: var(--ink-soft); font-size: .875rem; font-variant-numeric: tabular-nums; }
@@ -33,18 +33,12 @@ html[data-theme="dark"] .stappen { --tel-rand: #3A3A3C; --tel-glans: rgba(255,25
 .stap-uitleg { margin: 4px 0 0; max-width: 34rem; color: var(--ink-soft); font-size: 1.0625rem; line-height: 1.6; }
 .stap-uitleg strong { color: var(--ink); font-weight: 600; }
 .stap-beeld { position: relative; display: flex; align-items: flex-end; justify-content: center; padding: 48px 40px 0; background: linear-gradient(180deg, var(--surface) 0%, var(--card) 100%); }
-/* In de donkere modus is het beeldvak wit, zodat de donkere iPhone en laptop duidelijk blijven. De tekst erin krijgt lichte kleuren. */
-html[data-theme="dark"] .stap-beeld {
-  background: #FFFFFF;
-  color: #1D1D1F;
+/* Donkere modus: het beeldvak iets grijzer zodat de zwarte rand van de iPhone en de laptop zichtbaar blijft. */
+html[data-theme="dark"] .stap-beeld { background: linear-gradient(180deg, #4A4A4E 0%, #343437 100%); }
+/* Het scherm van de iPhone en de laptop is altijd wit (lichte kleuren), ook in de donkere modus. */
+.stap-beeld :is(.tel, .laptop-scherm) {
   --bg: #FFFFFF; --card: #FFFFFF; --surface: #F5F5F7; --line: #E9E7F3; --ink: #1D1D1F; --ink-soft: #6E6E73; --muted: #6E6E73;
   --accent: #0071e3; --accent-zacht: rgba(0,113,227,.06); --teal-zacht: rgba(63,185,178,.12); --teal-tekst: #15756f;
-  --tel-rand: #1D1D1F; --tel-glans: rgba(255,255,255,.18);
-  --shadow-soft: 0 1px 2px rgba(29,29,31,.06), 0 8px 24px rgba(29,29,31,.1); --shadow-primary: 0 8px 24px rgba(0,113,227,.16);
-}
-html[data-theme="dark"] .stap-beeld :is(.tel, .laptop-scherm) {
-  --bg: #0B0B0C; --card: #1C1C1E; --surface: #2C2C2E; --line: rgba(255,255,255,.12); --ink: #F5F5F7; --ink-soft: #A1A1A6; --muted: #A1A1A6;
-  --accent: #0A84FF; --accent-zacht: rgba(10,132,255,.16); --teal-zacht: rgba(63,185,178,.18); --teal-tekst: #5fd0c9;
   color: var(--ink);
 }
 
