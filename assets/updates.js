@@ -1,13 +1,18 @@
+// Versies: het welkomstscherm (Wat is nieuw) verschijnt één keer per persoon per versie.
+// Nieuwe versie uitbrengen: 1) updates toevoegen met versie: N, 2) BES_VERSIE = N zetten, 3) cachenummer verhogen.
+// Iedereen die daarna inlogt (nieuw of bestaand account) ziet het scherm één keer; daarna niet meer tot de volgende versie.
+window.BES_VERSIE = 1;
+
 window.BES_UPDATES = [
-  { soort: 'nieuw', datum: '20 september 2026', tekst: '**Inloggen met Google**: één klik, geen wachtwoord nodig.' },
-  { soort: 'nieuw', datum: '19 september 2026', tekst: '**Sociologie I** staat erin, met 204 vragen en oude examenvragen.' },
-  { soort: 'nieuw', datum: '19 september 2026', tekst: '**Leren leren**: slim studeren, focus en hulp als het even niet gaat.' },
-  { soort: 'nieuw', datum: '19 september 2026', tekst: '**Feedbackpagina**: meld een fout of stuur een idee.' },
-  { soort: 'nieuw', datum: '18 september 2026', tekst: '**Hard mode** bij Inleiding tot de pedagogiek, met minstens 8 vragen per ronde.' },
-  { soort: 'verbeterd', datum: '16 september 2026', tekst: '**Reken je punten** en **Examen-info** staan in de nieuwe stijl.' },
-  { soort: 'verbeterd', datum: '15 september 2026', tekst: 'Alle vakken staan in de **nieuwe vakpagina**, met **voortgang bij je account**.' },
-  { soort: 'nieuw', datum: '15 september 2026', tekst: '**Aanmelden en inloggen** met je eigen account.' },
-  { soort: 'nieuw', datum: '14 september 2026', tekst: "Nieuwe **startpagina**, **hub**, **jaarpagina's** en **WhatsApp-pagina**." }
+  { versie: 1, soort: 'nieuw', datum: '20 september 2026', tekst: '**Inloggen met Google**: één klik, geen wachtwoord nodig.' },
+  { versie: 1, soort: 'nieuw', datum: '19 september 2026', tekst: '**Sociologie I** staat erin, met 204 vragen en oude examenvragen.' },
+  { versie: 1, soort: 'nieuw', datum: '19 september 2026', tekst: '**Leren leren**: slim studeren, focus en hulp als het even niet gaat.' },
+  { versie: 1, soort: 'nieuw', datum: '19 september 2026', tekst: '**Feedbackpagina**: meld een fout of stuur een idee.' },
+  { versie: 1, soort: 'nieuw', datum: '18 september 2026', tekst: '**Hard mode** bij Inleiding tot de pedagogiek, met minstens 8 vragen per ronde.' },
+  { versie: 1, soort: 'verbeterd', datum: '16 september 2026', tekst: '**Reken je punten** en **Examen-info** staan in de nieuwe stijl.' },
+  { versie: 1, soort: 'verbeterd', datum: '15 september 2026', tekst: 'Alle vakken staan in de **nieuwe vakpagina**, met **voortgang bij je account**.' },
+  { versie: 1, soort: 'nieuw', datum: '15 september 2026', tekst: '**Aanmelden en inloggen** met je eigen account.' },
+  { versie: 1, soort: 'nieuw', datum: '14 september 2026', tekst: "Nieuwe **startpagina**, **hub**, **jaarpagina's** en **WhatsApp-pagina**." }
 ];
 
 window.BES = window.BES || {};

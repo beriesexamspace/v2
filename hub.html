@@ -14,14 +14,18 @@
   <meta property="og:image:height" content="630">
   <meta property="og:url" content="https://beriesexamspace.com/v2/hub.html">
   <meta name="twitter:card" content="summary_large_image">
+  <script src="assets/updates.js?v=24"></script>
   <script>
+    // Welkomstscherm (Wat is nieuw) één keer per persoon per versie.
+    // Op dit toestel al gezien: meteen door. Anders even wachten op het account (misschien al gezien op een ander toestel).
     (() => {
       try {
-        const opslag = window.sessionStorage;
-        if (opslag.getItem('bes_nieuw_gezien')) return;
-        opslag.setItem('bes_nieuw_opslagtest', '1');
-        opslag.removeItem('bes_nieuw_opslagtest');
-        window.location.replace('nieuw.html' + window.location.hash);
+        const versie = window.BES_VERSIE || 0;
+        const gezien = Number(window.localStorage.getItem('bes_versie_gezien')) || 0;
+        if (gezien >= versie) return;
+        window.BES_VERSIE_CHECK = true;
+        document.documentElement.classList.add('versie-check');
+        window.setTimeout(() => document.documentElement.classList.remove('versie-check'), 2500);
       } catch {}
     })();
     (() => {
@@ -48,15 +52,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=23">
-  <link rel="stylesheet" href="assets/highlights.css?v=23">
-  <script src="assets/app.js?v=23"></script>
-  <script src="assets/updates.js?v=23"></script>
-  <script src="assets/highlights.js?v=23"></script>
-  <script src="assets/config.js?v=23" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=24">
+  <link rel="stylesheet" href="assets/highlights.css?v=24">
+  <script src="assets/app.js?v=24"></script>
+  <script src="assets/highlights.js?v=24"></script>
+  <script src="assets/config.js?v=24" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=23" defer></script>
-  <script src="assets/activiteit.js?v=23" defer></script>
+  <script src="assets/auth.js?v=24" defer></script>
+  <script src="assets/activiteit.js?v=24" defer></script>
   <style>
     html { scroll-behavior: smooth; }
 
@@ -114,23 +117,6 @@
     .hub-sectie { scroll-margin-top: 88px; }
 
 
-    .hub-uitleg { margin-top: 20px; }
-    .hub-uitleg summary { list-style: none; display: inline-flex; width: auto; cursor: pointer; }
-    .hub-uitleg summary::-webkit-details-marker { display: none; }
-    .hub-uitleg summary .uitleg-dicht { display: inline; }
-    .hub-uitleg summary .uitleg-open { display: none; }
-    .hub-uitleg[open] summary .uitleg-dicht { display: none; }
-    .hub-uitleg[open] summary .uitleg-open { display: inline; }
-    .hub-uitleg-inhoud { margin-top: 20px; padding: clamp(22px, 5vw, 36px); animation: hub-uitleg-binnen 150ms var(--ease) both; }
-    .hub-uitleg-inhoud > p:first-child { margin: 0 0 24px; color: var(--ink-soft); line-height: 1.6; }
-    .hub-uitleg-stappen { display: grid; gap: 22px; margin: 0; padding: 0; list-style: none; counter-reset: uitlegstap; }
-    .hub-uitleg-stap { display: grid; gap: 6px; padding-top: 22px; border-top: 1px solid var(--line); }
-    .hub-uitleg-stap:first-child { padding-top: 0; border-top: 0; }
-    .hub-uitleg-stap h4 { margin: 0 0 4px; font-size: 1.0625rem; font-weight: 600; }
-    .hub-uitleg-stap h4::before { counter-increment: uitlegstap; content: counter(uitlegstap) ". "; color: var(--teal-tekst); }
-    .hub-uitleg-stap p { margin: 0; font-size: .9375rem; line-height: 1.6; }
-    .hub-uitleg-stap p strong { color: var(--ink); font-weight: 600; }
-    @keyframes hub-uitleg-binnen { from { opacity: 0; } to { opacity: 1; } }
 
     .hub-updates {
       display: grid;
@@ -166,7 +152,8 @@
 
     .hub-hl { --hl-breedte: calc(100cqw - 48px); margin: 0 -24px; }
     .hub-hl .hl-kaart { min-height: 440px; }
-    .hub-hl + .hub-uitleg { margin-top: 8px; }
+
+    html.versie-check body { visibility: hidden; }
 
     /* Na het welkomstscherm komt de navigatiebalk voor het eerst in beeld. */
     html.nav-intro .site-header { animation: nav-binnen 700ms var(--ease) 350ms both; }
@@ -198,7 +185,6 @@
       <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu">Menu</button>
       <ul class="navigation-links" id="site-menu">
         <li><a href="hub.html#hoe-werkt-het">Hoe werkt het</a></li>
-        <li><a href="hub.html#nieuw">Wat is nieuw</a></li>
         <li><a href="over-mij.html">Over mij</a></li>
         <li><a href="whatsapp.html">WhatsApp-groep</a></li>
         <li><a href="feedback.html">Feedback</a></li>
@@ -291,74 +277,6 @@
         <h2 class="sectie-kop" id="hoe-werkt-het-kop">Hoe werkt het</h2>
         <section class="hl hub-hl" id="hub-hl" aria-roledescription="carrousel" aria-label="Hoe werkt het, in vier dia's"></section>
 
-        <details class="hub-uitleg" id="hub-uitleg">
-          <summary class="knop-secundair"><span class="uitleg-dicht">Volledige uitleg →</span><span class="uitleg-open">Uitleg sluiten</span></summary>
-          <div class="kaart hub-uitleg-inhoud">
-            <p>Kies je jaar en je vak, oefen met vragen, lees de uitleg en zie je voortgang groeien. Zo gaat het van je eerste bezoek tot je uitslag.</p>
-            <ol class="hub-uitleg-stappen">
-            <li class="hub-uitleg-stap">
-              <h4>Account maken of inloggen</h4>
-              <p><strong>Waar:</strong> startpagina.</p>
-              <p><strong>Klik op:</strong> "Aanmelden →". Al een account? "Heb je al een account? Log in" en dan "Inloggen →".</p>
-              <p><strong>Daarna:</strong> naam, e-mailadres en een wachtwoord van minstens 8 tekens. Klaar.</p>
-            </li>
-            <li class="hub-uitleg-stap">
-              <h4>Wat is nieuw</h4>
-              <p><strong>Waar:</strong> het scherm meteen na het inloggen.</p>
-              <p><strong>Klik op:</strong> "Begrepen →" (werkt zodra je tot onderaan hebt gescrold).</p>
-              <p><strong>Daarna:</strong> je komt op de hub, je startpunt met de jaren en de tools.</p>
-            </li>
-            <li class="hub-uitleg-stap">
-              <h4>Kies je jaar</h4>
-              <p><strong>Waar:</strong> bovenaan de hub, de drie gekleurde kaarten.</p>
-              <p><strong>Klik op:</strong> "1ste bachelor", "2de bachelor" of "3de bachelor".</p>
-              <p><strong>Daarna:</strong> je ziet alle vakken van dat jaar. "Laatst gekozen" onthoudt waar je zat.</p>
-            </li>
-            <li class="hub-uitleg-stap">
-              <h4>Open je vak</h4>
-              <p><strong>Waar:</strong> de jaarpagina.</p>
-              <p><strong>Klik op:</strong> de kaart van je vak.</p>
-              <p><strong>Daarna:</strong> de vakpagina opent met de oefenkeuze, de hoofdstukken en de tabbladen.</p>
-            </li>
-            <li class="hub-uitleg-stap">
-              <h4>Kies hoe je oefent</h4>
-              <p><strong>Waar:</strong> "Hoe wil je oefenen?".</p>
-              <p><strong>Klik op:</strong> "Examen Training" (uitleg na elke vraag) of "Examensimulatie" (20 willekeurige vragen uit het hele vak, uitslag op het einde).</p>
-              <p><strong>Daarna:</strong> kies je niveau: "Normaal" of "Hard mode" (waar beschikbaar).</p>
-            </li>
-            <li class="hub-uitleg-stap">
-              <h4>Kies je hoofdstukken</h4>
-              <p><strong>Waar:</strong> "Kies je hoofdstukken". Bij elk hoofdstuk zie je je stand.</p>
-              <p><strong>Klik op:</strong> de hoofdstukken die je wilt, of "Alles" of "Niets". Dan "Start →".</p>
-              <p><strong>Daarna:</strong> de eerste vraag staat klaar.</p>
-            </li>
-            <li class="hub-uitleg-stap">
-              <h4>Beantwoord de vragen</h4>
-              <p><strong>Waar:</strong> onder de vraag. Staat er "Kies 2 antwoorden." of "Kies de 2 foute antwoorden.", vink er dan precies zoveel aan.</p>
-              <p><strong>Klik op:</strong> je antwoord, "Controleer →", "Volgende →". Bij de laatste vraag: "Bekijk je uitslag →".</p>
-              <p><strong>Daarna:</strong> in Training lees je meteen de uitleg. Na afloop: "Fouten opnieuw →" of "Opnieuw". Stoppen kan altijd met "Stop" en "Ja, stoppen".</p>
-            </li>
-            <li class="hub-uitleg-stap">
-              <h4>Zie je voortgang</h4>
-              <p><strong>Waar:</strong> bij de hoofdstukken en op je uitslagscherm.</p>
-              <p><strong>Klik op:</strong> "Terug naar het vak" om je hoofdstukstanden te zien.</p>
-              <p><strong>Daarna:</strong> elk trainingsantwoord telt mee. Je voortgang hoort bij je account, dus op je telefoon zie je hetzelfde als op je laptop.</p>
-            </li>
-            <li class="hub-uitleg-stap">
-              <h4>Studie-hacks en theorie</h4>
-              <p><strong>Waar:</strong> de tabbladen "Studie-hacks" en "Theorie" naast "Oefenen".</p>
-              <p><strong>Klik op:</strong> het tabblad dat je wilt lezen. Na een simulatie ook "Bekijk alle vragen".</p>
-              <p><strong>Daarna:</strong> je ziet je antwoorden, de juiste keuzes en de uitleg, om gericht te herhalen.</p>
-            </li>
-            <li class="hub-uitleg-stap">
-              <h4>Tools, groep en feedback</h4>
-              <p><strong>Waar:</strong> op de hub onder "Tools", en in het menu.</p>
-              <p><strong>Klik op:</strong> "Reken je punten" of "Examen-info", "WhatsApp-groep" of "Feedback" in het menu.</p>
-              <p><strong>Daarna:</strong> je rekent je punten uit, leest hoe examens en deliberatie werken, gaat naar de groep voor updates, of stuurt een fout of idee door.</p>
-            </li>
-            </ol>
-          </div>
-        </details>
       </section>
 
     </div>
@@ -396,7 +314,22 @@
         });
       });
 
-      window.BES.highlights(document.getElementById('hub-hl'), { metNieuw: false });
+      // auth.js is uitgesteld geladen; pas na DOMContentLoaded is BES.auth er.
+      if (window.BES_VERSIE_CHECK) document.addEventListener('DOMContentLoaded', () => {
+        const versie = window.BES_VERSIE || 0;
+        const auth = window.BES.auth;
+        const klaar = new Promise(resolve => window.setTimeout(resolve, 2000));
+        Promise.race([auth?.gereed || klaar, klaar]).then(() => {
+          if ((auth?.versieGezien || 0) >= versie) {
+            try { window.localStorage.setItem('bes_versie_gezien', String(versie)); } catch {}
+            document.documentElement.classList.remove('versie-check');
+          } else {
+            window.location.replace('nieuw.html' + window.location.hash);
+          }
+        });
+      });
+
+      window.BES.highlights(document.getElementById('hub-hl'), { metNieuw: false, metPauze: false });
 
       const updates = document.getElementById('hub-updates');
       const updatesKnop = document.getElementById('hub-updates-knop');

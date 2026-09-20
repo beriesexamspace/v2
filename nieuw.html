@@ -29,15 +29,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=23">
-  <link rel="stylesheet" href="assets/highlights.css?v=23">
-  <script src="assets/app.js?v=23"></script>
-  <script src="assets/updates.js?v=23"></script>
-  <script src="assets/highlights.js?v=23"></script>
-  <script src="assets/config.js?v=23" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=24">
+  <link rel="stylesheet" href="assets/highlights.css?v=24">
+  <script src="assets/app.js?v=24"></script>
+  <script src="assets/updates.js?v=24"></script>
+  <script src="assets/highlights.js?v=24"></script>
+  <script src="assets/config.js?v=24" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=23" defer></script>
-  <script src="assets/activiteit.js?v=23" defer></script>
+  <script src="assets/auth.js?v=24" defer></script>
+  <script src="assets/activiteit.js?v=24" defer></script>
   <style>
     /* Alles in één scherm: kop, carrousel, balkjes en de knop Begrepen, zonder scrollen. */
     html, body { height: 100%; overflow: hidden; }
@@ -110,11 +110,18 @@
         }
       });
 
-      verder.addEventListener('click', () => {
+      verder.addEventListener('click', async () => {
         if (verder.disabled) return;
+        verder.disabled = true;
+        const versie = window.BES_VERSIE || 0;
         try {
-          window.sessionStorage.setItem('bes_nieuw_gezien', '1');
+          window.localStorage.setItem('bes_versie_gezien', String(versie));
           window.sessionStorage.setItem('bes_nav_intro', '1');
+        } catch {}
+        try {
+          const auth = window.BES.auth;
+          await Promise.race([auth.gereed, new Promise(resolve => window.setTimeout(resolve, 1500))]);
+          if (await auth.gebruiker()) await auth.profielBijwerken({ versieGezien: versie });
         } catch {}
         window.location.assign('hub.html' + window.location.hash);
       });

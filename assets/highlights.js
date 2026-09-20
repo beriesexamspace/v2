@@ -1,5 +1,5 @@
 // Highlights-carrousel: bouwt de dia's, balkjes en pauzeknop in een <section class="hl"> en regelt het doorlopen.
-// Gebruik: BES.highlights(element, { metNieuw: true, bijLaatste: () => {} })
+// Gebruik: BES.highlights(element, { metNieuw: true, metPauze: true, kopniveau: 'h3', bijLaatste: () => {} })
 window.BES = window.BES || {};
 
 (() => {
@@ -95,7 +95,7 @@ window.BES = window.BES || {};
         ${dias.map((dia, n) => `
           <article class="hl-kaart${dia.lijst ? ' is-lijst' : ''}" id="${naam}-dia-${n + 1}" aria-roledescription="dia" aria-label="${n + 1} van ${dias.length}: ${dia.naam}">
             <div class="hl-tekst">
-              <p class="hl-label">${dia.label}</p>
+              <p class="hl-label">${dia.lijst && window.BES_VERSIE ? `${dia.label} · Versie ${window.BES_VERSIE}` : dia.label}</p>
               <${kop} class="hl-titel">${dia.titel}</${kop}>
               <p class="hl-uitleg">${dia.tekst}</p>
             </div>
@@ -106,12 +106,14 @@ window.BES = window.BES || {};
         <div class="hl-stippen" role="tablist" aria-label="Kies een highlight">
           ${dias.map((dia, n) => `<button class="hl-stip" type="button" role="tab" aria-selected="${n === 0}" aria-controls="${naam}-dia-${n + 1}" aria-label="${dia.naam}"${n ? ' tabindex="-1"' : ''}><i></i></button>`).join('')}
         </div>
-        <button class="hl-pauze" type="button" aria-pressed="false" aria-label="Pauzeren">${PAUZE_ICOON}</button>
+        ${opties.metPauze === false ? '' : `<button class="hl-pauze" type="button" aria-pressed="false" aria-label="Pauzeren">${PAUZE_ICOON}</button>`}
       </div>`;
 
     const lijst = root.querySelector('.hl-updates');
     if (lijst && window.BES.updateRij) {
-      for (const update of (window.BES_UPDATES || []).slice(0, 4)) lijst.append(window.BES.updateRij(update, 'nieuw'));
+      const versie = window.BES_VERSIE;
+      const updates = (window.BES_UPDATES || []).filter(update => !versie || !update.versie || update.versie === versie);
+      for (const update of updates.slice(0, 5)) lijst.append(window.BES.updateRij(update, 'nieuw'));
     }
 
     const baan = root.querySelector('.hl-baan');
@@ -209,12 +211,12 @@ window.BES = window.BES || {};
     const zetPauze = waarde => {
       gepauzeerd = waarde;
       root.classList.toggle('is-gepauzeerd', waarde);
-      pauzeKnop.setAttribute('aria-pressed', String(waarde));
-      pauzeKnop.setAttribute('aria-label', waarde ? 'Afspelen' : 'Pauzeren');
+      pauzeKnop?.setAttribute('aria-pressed', String(waarde));
+      pauzeKnop?.setAttribute('aria-label', waarde ? 'Afspelen' : 'Pauzeren');
       if (waarde) window.clearTimeout(timer);
       else { herstartVul(); planVolgende(); }
     };
-    pauzeKnop.addEventListener('click', () => zetPauze(!gepauzeerd));
+    pauzeKnop?.addEventListener('click', () => zetPauze(!gepauzeerd));
 
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) window.clearTimeout(timer);

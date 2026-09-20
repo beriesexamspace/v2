@@ -87,10 +87,6 @@
     try { window.localStorage.removeItem('bes_naam'); } catch {}
   }
 
-  function clearUpdates() {
-    try { window.sessionStorage.removeItem('bes_nieuw_gezien'); } catch {}
-  }
-
   function photoUrl(user, value = user?.user_metadata?.foto) {
     if (!user || typeof value !== 'string' || !value) return '';
     try {
@@ -213,6 +209,7 @@
     beschikbaar: false,
     gereed: Promise.resolve(null),
     get client() { return client; },
+    get versieGezien() { return Number(currentUser?.user_metadata?.versie_gezien) || 0; },
     avatarVullen: fillAvatar,
     naamGegevens: nameDetails,
     get googleFout() { return googleError; },
@@ -261,7 +258,6 @@
         if (error?.code === 'google_unavailable') throw error;
         // netwerkfout of opaque redirect: gewoon doorgaan, de browser volgt de echte doorverwijzing
       }
-      try { window.sessionStorage.removeItem('bes_nieuw_gezien'); } catch {}
       window.location.assign(data.url);
     },
 
@@ -278,7 +274,6 @@
       try {
         await request(api => api.signOut());
         recoveryUserId = null;
-        clearUpdates();
         setUser(null, true);
         window.location.assign(pagePrefix + 'index.html');
       } catch (error) {
@@ -325,6 +320,7 @@
         metadata.naam = cleanName(patch.naam, 121);
         if (!metadata.naam) throw failure('invalid_name');
       }
+      if (Object.hasOwn(patch, 'versieGezien')) metadata.versie_gezien = Math.max(0, Math.floor(Number(patch.versieGezien) || 0));
       if (Object.hasOwn(patch, 'thema')) {
         if (!['licht', 'donker'].includes(patch.thema)) throw failure('unknown');
         metadata.thema = patch.thema;
@@ -369,7 +365,6 @@
       auth.beschikbaar = true;
       client.auth.onAuthStateChange((event, session) => {
         if (event === 'USER_UPDATED' && (logoutInProgress || !currentUser || session?.user?.id !== currentUser.id)) return;
-        if (event === 'SIGNED_OUT') clearUpdates();
         if (event === 'PASSWORD_RECOVERY') recoveryUserId = session?.user?.id || null;
         if (event === 'SIGNED_OUT' || !session || (recoveryUserId && session.user?.id !== recoveryUserId)) recoveryUserId = null;
         setUser(session?.user, event === 'SIGNED_OUT');

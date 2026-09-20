@@ -21,7 +21,7 @@ profiel.html          naam, e-mailadres, profielfoto, wachtwoord en studiekalend
 jaar-1ba.html         vakken 1ste bachelor
 jaar-2ba.html         vakken 2de bachelor
 jaar-3ba.html         vakken 3de bachelor
-whatsapp.html         uitleg en link naar de WhatsApp-groep
+whatsapp.html         uitleg, link en QR-code (assets/whatsapp-qr.svg, gemaakt met `npx qrcode`) naar de WhatsApp-groep
 feedback.html         feedback sturen (fout in een vraag, idee, iets anders) naar de tabel feedback
 leren.html            leren leren: slim studeren, concentratie en hulplijnen; gelinkt vanaf de hub (Tools) en boven elk tabblad Studie-hacks
 privacy.html          wat we bewaren, waar, cookies, rechten en contact; gelinkt in elke voettekst en onder het aanmeldformulier
@@ -60,7 +60,7 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 23), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 24), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.
@@ -103,7 +103,13 @@ Voeg voor deze flow `https://beriesexamspace.com/v2/profiel.html?email=bevestige
 
 Een project op het instapplan kan na een week zonder voldoende gebruik pauzeren. Open dan het project in het Supabase-dashboard en kies "Resume project". Zie de [Supabase-uitleg over projectpauzes](https://supabase.com/docs/guides/platform/free-project-pausing).
 
-Na een geslaagde aanmelding of login wordt `sessionStorage.bes_nieuw_gezien` gewist en opent `nieuw.html`. Uitloggen wist de sleutel ook. De toegangspoort in de head van `hub.html` controleert uitsluitend sessionStorage; oude waarden in localStorage worden niet meer gebruikt. "Begrepen →" bewaart de sleutel voor deze browsersessie en opent de hub, met behoud van een eventuele sectiehash. Tijdens dezelfde sessie verschijnt het scherm niet opnieuw bij paginawissels. Een nieuwe login toont de updates opnieuw. Als sessionStorage geblokkeerd is, blijft de hub bereikbaar om een doorverwijslus te voorkomen.
+## Versies en het welkomstscherm
+
+Het welkomstscherm (`nieuw.html`, de highlights-carrousel met de dia Wat is nieuw) verschijnt **één keer per persoon per versie**. Het versienummer staat in `assets/updates.js` als `window.BES_VERSIE`; elke update in `BES_UPDATES` heeft een `versie`. De dia Wat is nieuw toont alleen de updates van de huidige versie (maximaal vijf) met het label "Versie N"; de hub toont onder Wat is nieuw alles.
+
+Hoe het bijhoudt wie het gezien heeft: "Begrepen →" zet `localStorage.bes_versie_gezien` en, bij een ingelogd account, `user_metadata.versie_gezien` (via `profielBijwerken({ versieGezien })`). De poort in de head van `hub.html` laat iedereen door die het lokaal al zag; anders krijgt `<html>` de klasse `versie-check` (pagina onzichtbaar, maximaal 2,5 seconde) en beslist de pagina na DOMContentLoaded op basis van het account: al gezien op een ander toestel, dan lokaal noteren en doorgaan; anders naar `nieuw.html`. Gasten zonder account zien het dus één keer per toestel. Aanmelden en inloggen sturen gewoon naar de hub; die beslist zelf.
+
+**Nieuwe versie uitbrengen** (alleen als Berat het zegt, alle wijzigingen van de tussenliggende periode samen): 1) de updates toevoegen met `versie: N`, 2) `window.BES_VERSIE = N`, 3) cachenummer verhogen. Daarna ziet iedereen die inlogt het scherm één keer.
 
 `nieuw.html` is sinds 20-09-2026 een highlights-carrousel (vijf dia's: Vakken, Examensimulatie, twee keer Hoe werkt het, Wat is nieuw). Hij loopt vanzelf door (8 seconden per dia, balkje vult zich), stopt bij de pauzeknop, bij een verborgen tabblad en bij "prefers-reduced-motion", en laat zich swipen, scrollen, met de pijltoetsen en via de stippen bedienen. De beelden zijn getekende telefoons in gewone opmaak (geen screenshots van de site). "Begrepen →" wordt actief zodra de laatste dia in beeld is geweest. Het welkomstscherm heeft bewust geen navigatiebalk (alleen de losse themaknop); "Begrepen →" zet ook `sessionStorage.bes_nav_intro`, waarna `hub.html` die sleutel meteen wist en de klasse `nav-intro` op `<html>` zet, zodat de balk daar één keer van boven binnenschuift (`nav-binnen`, niet bij "prefers-reduced-motion"). Vaste regel: geen `scroll-snap-stop: always` op de dia's, anders stopt een sprong over meerdere dia's halverwege.
 
@@ -180,7 +186,7 @@ Zonder tabel, functie of verbinding blijft de kalender lokaal werken en vermeldt
 
 ## Hoe werkt het (hub)
 
-Sinds 20-09-2026 staat hier dezelfde highlights-carrousel als op het welkomstscherm (zonder de dia Wat is nieuw), met daaronder de uitklapbare volledige uitleg in tekst. De carrousel loopt alleen door zolang hij in beeld is.
+Sinds 20-09-2026 staat hier dezelfde highlights-carrousel als op het welkomstscherm (zonder de dia Wat is nieuw en zonder pauzeknop, `metPauze: false`). De uitklapbare volledige uitleg is op verzoek van Berat weggehaald. De carrousel loopt alleen door zolang hij in beeld is. De navigatiebalk heeft geen link Wat is nieuw meer; de sectie op de hub bestaat nog wel (`#nieuw`).
 
 De sectie `hub.html#hoe-werkt-het` bestaat uit vier korte kaarten (Log in, Kies je jaar en vak, Kies hoofdstukken en oefenvorm, Zie je voortgang groeien) en daaronder een `details` "Volledige uitleg →" met tien tekststappen (Waar / Klik op / Daarna) met de exacte knopnamen van de site. Vaste regel: uitleg op de hub is tekst. Geen screenshots van de site in de site, geen nagemaakte muis, geen animaties in uitleg; maximaal vier kaarten zichtbaar, de rest ingeklapt. Verandert een knopnaam, pas dan ook de tekst hier aan.
 
