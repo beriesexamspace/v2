@@ -23,9 +23,10 @@ html[data-theme="dark"] .stappen { --tel-rand: #3A3A3C; --tel-glans: rgba(255,25
   background: var(--card);
   box-shadow: var(--shadow-soft);
   overflow: hidden;
-  animation: stap-kaart-in 380ms var(--ease) both;
 }
-.stap-kaart.is-weg { animation: stap-kaart-uit 160ms var(--ease) both; }
+/* Bij het wisselen gaan de tekst en het beeld weg; een iPhone die blijft staan, wisselt alleen zijn scherm. */
+.stap-kaart.is-weg .stap-tekst, .stap-kaart.is-weg .stap-updates, .stap-kaart.is-weg .stap-beeld > :not(.tel), .stap-kaart.is-weg .tel-scherm { animation: stap-uit 160ms var(--ease) both; }
+.stap-kaart.is-weg .anim, .stap-kaart.is-weg .anim-pop, .stap-kaart.is-weg .anim-links, .stap-kaart.is-weg .anim-rechts, .stap-kaart.is-weg .anim-vink { animation: none; }
 .stap-tekst { display: flex; flex-direction: column; justify-content: center; gap: 12px; padding: 56px 40px 56px 56px; }
 .stap-label { margin: 0; color: var(--accent); font-size: .875rem; font-weight: 600; letter-spacing: .01em; }
 .stap-titel { margin: 0; font-size: clamp(1.625rem, 2.8cqw, 2.375rem); font-weight: 700; line-height: 1.12; letter-spacing: -.02em; text-wrap: balance; }
@@ -34,20 +35,55 @@ html[data-theme="dark"] .stappen { --tel-rand: #3A3A3C; --tel-glans: rgba(255,25
 .stap-beeld { position: relative; display: flex; align-items: flex-end; justify-content: center; padding: 48px 40px 0; background: linear-gradient(180deg, var(--surface) 0%, var(--card) 100%); }
 
 .tel {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 250px;
-  aspect-ratio: 9 / 18;
-  margin-bottom: -84px;
-  border: 8px solid var(--tel-rand);
-  border-radius: 40px;
+  aspect-ratio: 9 / 19.5;
+  margin-bottom: -96px;
+  border: 6px solid var(--tel-rand);
+  border-radius: 46px;
   background: var(--bg);
-  box-shadow: inset 0 0 0 1px var(--tel-glans), 0 30px 60px rgba(0,0,0,.28);
+  box-shadow: inset 0 0 0 2px var(--tel-glans), 0 0 0 1px rgba(0,0,0,.35), 0 30px 60px rgba(0,0,0,.28);
   color: var(--ink);
   overflow: hidden;
 }
-.tel-status { display: flex; justify-content: space-between; padding: 14px 20px 0; font-size: 11px; font-weight: 600; }
-.tel-status span:last-child { letter-spacing: .06em; }
+/* Dynamisch eiland bovenaan en het thuisbalkje onderaan */
+.tel::before { content: ''; position: absolute; top: 9px; left: 50%; width: 84px; height: 24px; border-radius: 14px; background: var(--tel-rand); transform: translateX(-50%); }
+.tel::after { content: ''; position: absolute; bottom: 7px; left: 50%; width: 96px; height: 4px; border-radius: 2px; background: var(--ink); opacity: .3; transform: translateX(-50%); }
+.tel-status { display: flex; justify-content: space-between; align-items: center; padding: 15px 26px 0; font-size: 12px; font-weight: 600; }
+.tel-status-icoontjes { display: inline-flex; gap: 4px; }
+.tel-status-icoontjes i { display: block; width: 6px; height: 9px; border-radius: 1px; background: var(--ink); }
+.tel-status-icoontjes i:nth-child(2) { width: 10px; }
+.tel-status-icoontjes i:nth-child(3) { width: 16px; border-radius: 3px; }
+.tel.is-klein { width: 128px; margin-bottom: -60px; border-width: 4px; border-radius: 26px; font-size: 8px; }
+.tel.is-klein::before { top: 5px; width: 44px; height: 13px; }
+.tel.is-klein .tel-status { padding: 8px 14px 0; font-size: 7px; }
+.tel.is-klein .tel-scherm { gap: 5px; padding: 8px 8px; }
+.tel.is-klein .tel-kop { font-size: 9px; }
+.tel.is-klein .tel-kaart { gap: 5px; padding: 6px 7px; border-radius: 8px; font-size: 7px; }
+.tel.is-klein .tel-vink { width: 11px; height: 11px; font-size: 7px; }
+.tel.is-klein .tel-knop { padding: 6px; font-size: 7.5px; }
+
+/* Laptop naast de telefoon */
+.toestellen { display: flex; align-items: flex-end; justify-content: center; gap: 18px; width: 100%; }
+.laptop { width: 380px; max-width: 100%; margin-bottom: 8px; }
+.laptop-scherm { border: 6px solid var(--tel-rand); border-bottom-width: 10px; border-radius: 12px 12px 4px 4px; background: var(--bg); box-shadow: inset 0 0 0 1px var(--tel-glans); overflow: hidden; }
+.laptop-voet { height: 9px; margin: 0 -14px; border-radius: 0 0 10px 10px; background: var(--tel-rand); box-shadow: inset 0 2px 0 var(--tel-glans); }
+.laptop-balk { display: flex; align-items: center; gap: 6px; padding: 7px 10px; border-bottom: 1px solid var(--line); font-size: 8px; font-weight: 600; }
+.laptop-merk { display: grid; place-items: center; width: 14px; height: 14px; border-radius: 50%; background: var(--teal); color: #fff; font-size: 8px; font-weight: 700; }
+.laptop-pil { margin-left: auto; width: 40px; height: 12px; border-radius: 6px; background: var(--accent); }
+.laptop-inhoud { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; }
+.laptop-kolom { display: grid; align-content: start; gap: 5px; }
+.laptop .tel-kop { margin: 0 0 2px; font-size: 10px; }
+.laptop .tel-kaart { gap: 6px; padding: 6px 8px; border-radius: 8px; font-size: 8px; }
+.laptop .tel-kaart.is-los { gap: 4px; }
+.laptop .tel-kaart-kop { gap: 6px; font-size: 8px; }
+.laptop .tel-vink { width: 12px; height: 12px; font-size: 7px; }
+.laptop .tel-klein { font-size: 7px; }
+.laptop .tel-balk { height: 4px; }
+.laptop .tel-knop { margin-top: 2px; padding: 6px; font-size: 8px; }
+
 .tel-scherm { display: grid; align-content: start; gap: 8px; padding: 12px 14px; }
 .tel-kop { margin: 4px 0 0; font-size: 15px; font-weight: 700; letter-spacing: -.01em; }
 .tel-sub { margin: -4px 0 2px; color: var(--ink-soft); font-size: 11px; }
@@ -126,8 +162,7 @@ html[data-theme="dark"] .stappen { --tel-rand: #3A3A3C; --tel-glans: rgba(255,25
 .stap-kaart .anim-kies { animation: stap-kies 320ms var(--ease) both; animation-delay: 1500ms; }
 .stap-kaart .anim-teal { animation: stap-teal 400ms var(--ease) both; animation-delay: 1500ms; }
 .stap-kaart .anim-puls { animation: stap-puls 700ms var(--ease) both; animation-delay: 1700ms; }
-@keyframes stap-kaart-in { from { opacity: 0; transform: translateX(calc(var(--stap-richting) * 28px)); } to { opacity: 1; transform: none; } }
-@keyframes stap-kaart-uit { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateX(calc(var(--stap-richting) * -20px)); } }
+@keyframes stap-uit { from { opacity: 1; } to { opacity: 0; } }
 @keyframes stap-op { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 @keyframes stap-pop { from { opacity: 0; transform: scale(.5); } to { opacity: 1; transform: scale(1); } }
 @keyframes stap-links { from { opacity: 0; transform: translateX(-28px); } to { opacity: 1; transform: none; } }
@@ -149,6 +184,11 @@ html[data-theme="dark"] .stappen { --tel-rand: #3A3A3C; --tel-glans: rgba(255,25
   .stap-uitleg { font-size: .9375rem; }
   .stap-beeld { padding: 16px 22px 0; }
   .tel { width: 210px; margin-bottom: -170px; }
+  .toestellen { gap: 10px; }
+  .tel.is-klein { width: 96px; margin-bottom: -40px; }
+  .laptop { width: 230px; }
+  .laptop-inhoud { grid-template-columns: 1fr; }
+  .laptop-kolom:last-child { display: none; }
   .stap-kaart.is-lijst { grid-template-rows: auto auto; }
   .stap-qr { display: none; }
   .stap-groep { display: grid; justify-items: center; gap: 4px; align-self: center; margin-bottom: 12px; text-align: center; }

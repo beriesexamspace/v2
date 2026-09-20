@@ -7,8 +7,9 @@ window.BES = window.BES || {};
 
 (() => {
   const BASIS = (document.querySelector('script[src*="intro.js"]')?.getAttribute('src') || '').replace(/assets\/intro\.js.*$/, '');
-  const STATUS = '<div class="tel-status anim" style="--i:0"><span>9:41</span><span>●●●</span></div>';
-  const telefoon = scherm => `<div class="tel anim-pop" style="--i:0">${STATUS}<div class="tel-scherm">${scherm}</div></div>`;
+  const STATUS = '<div class="tel-status"><span>9:41</span><span class="tel-status-icoontjes" aria-hidden="true"><i></i><i></i><i></i></span></div>';
+  // De iPhone: eerste keer veert hij binnen (anim-pop), bij de volgende telefoon-stap blijft hij staan en wisselt alleen het scherm.
+  const telefoon = (scherm, pop = true) => `<div class="tel${pop ? ' anim-pop' : ''}" style="--i:0">${STATUS}<div class="tel-scherm">${scherm}</div></div>`;
 
   const STAPPEN = [
     {
@@ -58,7 +59,8 @@ window.BES = window.BES || {};
       label: 'Vakken',
       titel: 'Alle vakken van je jaar, op één plek.',
       tekst: 'Kies je jaar, dan je vak. Per vak vind je <strong>oefenvragen</strong>, <strong>studie-hacks</strong> en <strong>theorie</strong>, allemaal in dezelfde stijl.',
-      beeld: telefoon(`
+      telefoon: true,
+      scherm: `
         <p class="tel-kop anim" style="--i:1">Welkom.</p>
         <p class="tel-sub anim" style="--i:1">In welk jaar zit je?</p>
         <div class="tel-kaart anim" style="--i:2"><span class="tel-nummer">1</span>1ste bachelor<span class="tel-pijl">→</span></div>
@@ -66,7 +68,7 @@ window.BES = window.BES || {};
         <div class="tel-kaart anim" style="--i:4"><span class="tel-nummer">3</span>3de bachelor<span class="tel-pijl">→</span></div>
         <p class="tel-kop anim" style="--i:5">Tools</p>
         <div class="tel-kaart anim" style="--i:6">Reken je punten<span class="tel-pijl">→</span></div>
-        <div class="tel-kaart anim" style="--i:7">Examen-info<span class="tel-pijl">→</span></div>`)
+        <div class="tel-kaart anim" style="--i:7">Examen-info<span class="tel-pijl">→</span></div>`
     },
     {
       soort: 'uitleg',
@@ -74,7 +76,8 @@ window.BES = window.BES || {};
       label: 'Examensimulatie',
       titel: 'Oefen zoals op het examen.',
       tekst: '<strong>Examen Training</strong> geeft uitleg na elke vraag. <strong>Examensimulatie</strong> houdt je uitslag tot het einde, net als het echte examen.',
-      beeld: telefoon(`
+      telefoon: true,
+      scherm: `
         <div class="tel-rij anim" style="--i:1"><span>Vraag 4 van 20</span><span>Simulatie</span></div>
         <div class="tel-balk is-doen"><i class="anim-vul" style="--doel:20%;--i:0"></i></div>
         <p class="tel-vraag anim" style="--i:2">Wat hoort bij operante conditionering?</p>
@@ -82,7 +85,7 @@ window.BES = window.BES || {};
         <div class="tel-optie anim" style="--i:4">Onvoorwaardelijke stimulus</div>
         <div class="tel-optie anim" style="--i:5">Habituatie</div>
         <div class="tel-optie anim" style="--i:6">Spiegelneuronen</div>
-        <div class="tel-knop anim anim-puls" style="--i:7">Volgende →</div>`)
+        <div class="tel-knop anim anim-puls" style="--i:7">Volgende →</div>`
     },
     {
       soort: 'uitleg',
@@ -90,13 +93,14 @@ window.BES = window.BES || {};
       label: 'Hoe werkt het',
       titel: 'Vink je hoofdstukken aan en start.',
       tekst: 'Log in, kies je jaar en vak, vink de hoofdstukken aan die je wil oefenen en klik op <strong>Start →</strong>. Je kan ook alles in één keer kiezen.',
-      beeld: telefoon(`
+      telefoon: true,
+      scherm: `
         <p class="tel-kop anim" style="--i:1">Kies je hoofdstukken</p>
         <div class="tel-kaart anim" style="--i:2"><span class="tel-vink is-aan anim-vink" style="--i:0">✓</span>Inleiding<span class="tel-klein tel-pijl">12 vragen</span></div>
         <div class="tel-kaart anim" style="--i:3"><span class="tel-vink is-aan anim-vink" style="--i:1">✓</span>Leertheorieën<span class="tel-klein tel-pijl">18 vragen</span></div>
         <div class="tel-kaart anim" style="--i:4"><span class="tel-vink"></span>Ontwikkeling<span class="tel-klein tel-pijl">15 vragen</span></div>
         <div class="tel-kaart anim" style="--i:5"><span class="tel-vink"></span>Onderzoek<span class="tel-klein tel-pijl">9 vragen</span></div>
-        <div class="tel-knop anim anim-puls" style="--i:6">Start →</div>`)
+        <div class="tel-knop anim anim-puls" style="--i:6">Start →</div>`
     },
     {
       soort: 'uitleg',
@@ -104,7 +108,8 @@ window.BES = window.BES || {};
       label: 'Hoe werkt het',
       titel: 'Zie je voortgang groeien.',
       tekst: 'Per hoofdstuk zie je hoeveel je goed had. <strong>Teal</strong> betekent: gelukt. Met een account staat je voortgang op elk toestel klaar.',
-      beeld: telefoon(`
+      telefoon: true,
+      scherm: `
         <p class="tel-kop anim" style="--i:1">Kies je hoofdstukken</p>
         <div class="tel-kaart is-los anim" style="--i:2">
           <div class="tel-kaart-kop"><span class="tel-vink is-teal anim-vink" style="--i:2">✓</span>Inleiding</div>
@@ -120,7 +125,45 @@ window.BES = window.BES || {};
           <div class="tel-kaart-kop"><span class="tel-vink"></span>Ontwikkeling</div>
           <div class="tel-balk"><i style="width:0"></i></div>
           <span class="tel-klein">Nog niet geoefend</span>
-        </div>`)
+        </div>`
+    },
+    {
+      soort: 'uitleg',
+      naam: 'Laptop',
+      label: 'Tip',
+      titel: 'Werkt het best op een laptop.',
+      tekst: 'Op je telefoon kan alles. Op een laptop zie je meer in één keer: je hoofdstukken, je voortgang en de uitleg naast elkaar. Vooral bij een examensimulatie is dat rustiger.',
+      beeld: `
+        <div class="toestellen">
+          <div class="tel is-klein anim-links">${STATUS}<div class="tel-scherm">
+            <p class="tel-kop">Kies je hoofdstukken</p>
+            <div class="tel-kaart"><span class="tel-vink is-aan">✓</span>Inleiding</div>
+            <div class="tel-kaart"><span class="tel-vink is-aan">✓</span>Leertheorieën</div>
+            <div class="tel-kaart"><span class="tel-vink"></span>Ontwikkeling</div>
+            <div class="tel-knop">Start →</div>
+          </div></div>
+          <div class="laptop anim-rechts">
+            <div class="laptop-scherm">
+              <div class="laptop-balk"><span class="laptop-merk">B</span><span class="laptop-merknaam">Berie's Exam Space</span><span class="laptop-pil"></span></div>
+              <div class="laptop-inhoud">
+                <div class="laptop-kolom">
+                  <span class="tel-kop">Kies je hoofdstukken</span>
+                  <div class="tel-kaart"><span class="tel-vink is-aan">✓</span>Inleiding<span class="tel-klein tel-pijl">12 vragen</span></div>
+                  <div class="tel-kaart"><span class="tel-vink is-aan">✓</span>Leertheorieën<span class="tel-klein tel-pijl">18 vragen</span></div>
+                  <div class="tel-kaart"><span class="tel-vink"></span>Ontwikkeling<span class="tel-klein tel-pijl">15 vragen</span></div>
+                  <div class="tel-kaart"><span class="tel-vink"></span>Onderzoek<span class="tel-klein tel-pijl">9 vragen</span></div>
+                </div>
+                <div class="laptop-kolom">
+                  <span class="tel-kop">Jouw voortgang</span>
+                  <div class="tel-kaart is-los"><div class="tel-kaart-kop">Inleiding</div><div class="tel-balk"><i style="width:100%"></i></div><span class="tel-klein is-teal">12 van 12 goed</span></div>
+                  <div class="tel-kaart is-los"><div class="tel-kaart-kop">Leertheorieën</div><div class="tel-balk"><i style="width:72%"></i></div><span class="tel-klein">13 van 18 goed</span></div>
+                  <div class="tel-knop">Start →</div>
+                </div>
+              </div>
+            </div>
+            <div class="laptop-voet"></div>
+          </div>
+        </div>`
     },
     {
       soort: 'groep',
@@ -157,6 +200,7 @@ window.BES = window.BES || {};
     const rustig = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const laatsteTekst = opties.laatsteTekst || 'Begrepen →';
     let actief = 0;
+    let vorigIndex = -1;
     let bezig = false;
 
     root.classList.add("stappen");
@@ -180,13 +224,15 @@ window.BES = window.BES || {};
     const volgende = root.querySelector('.stap-volgende');
     const overslaan = root.querySelector('.stap-overslaan');
 
-    const inhoud = stap => `
+    const tekstVan = stap => `
       <div class="stap-tekst">
         <p class="stap-label anim" style="--i:0">${stap.lijst && window.BES_VERSIE ? `${stap.label} · Versie ${window.BES_VERSIE}` : stap.label}</p>
         <${kop} class="stap-titel anim" style="--i:1">${stap.titel}</${kop}>
         <p class="stap-uitleg anim" style="--i:2">${stap.tekst}</p>
-      </div>
-      ${stap.lijst ? '<ul class="stap-updates" aria-label="Laatste updates"></ul>' : `<div class="stap-beeld" aria-hidden="true">${stap.beeld}</div>`}`;
+      </div>`;
+    const beeldVan = (stap, pop) => stap.lijst
+      ? '<ul class="stap-updates" aria-label="Laatste updates"></ul>'
+      : `<div class="stap-beeld" aria-hidden="true">${stap.telefoon ? telefoon(stap.scherm, pop) : stap.beeld}</div>`;
 
     const vulLijst = () => {
       const lijst = kaart.querySelector('.stap-updates');
@@ -205,9 +251,19 @@ window.BES = window.BES || {};
       actief = index;
       const stap = stappen[index];
       const laatste = index === stappen.length - 1;
+      const vorigeStap = stappen[vorigIndex];
+      const telefoonStaat = Boolean(vorigeStap?.telefoon && stap.telefoon && kaart.querySelector('.tel:not(.is-klein)'));
       kaart.className = `stap-kaart is-${stap.soort}${stap.lijst ? ' is-lijst' : ''}`;
       kaart.setAttribute('aria-label', `Stap ${index + 1} van ${stappen.length}: ${stap.naam}`);
-      kaart.innerHTML = inhoud(stap);
+      if (telefoonStaat) {
+        // Toestel blijft staan, alleen de tekst en het scherm wisselen.
+        kaart.querySelector('.stap-tekst').outerHTML = tekstVan(stap);
+        kaart.querySelector('.tel').classList.remove('anim-pop');
+        kaart.querySelector('.tel-scherm').innerHTML = stap.scherm;
+      } else {
+        kaart.innerHTML = tekstVan(stap) + beeldVan(stap, true);
+      }
+      vorigIndex = index;
       vulLijst();
       teller.textContent = `${index + 1} van ${stappen.length}`;
       stippen.forEach((stip, n) => stip.classList.toggle('is-actief', n === index));
