@@ -29,7 +29,7 @@
     :root { --tel-rand: #1D1D1F; --tel-glans: rgba(255,255,255,.18); --hl-breedte: min(1040px, calc(100vw - 48px)); --hl-ruimte: 16px; --hl-duur: 8s; }
     html[data-theme="dark"] { --tel-rand: #3A3A3C; --tel-glans: rgba(255,255,255,.1); }
 
-    .nieuw-pagina { padding: 96px 0 48px; overflow-x: clip; }
+    .nieuw-pagina { padding: 72px 0 48px; overflow-x: clip; }
     .nieuw-pagina .pagina-kop { margin-bottom: 24px; }
     .nieuw-pagina .pagina-kop .eyebrow { margin: 0 0 16px; color: var(--accent); font-size: .9375rem; }
 
@@ -147,7 +147,7 @@
     }
     @media (max-width: 767px) {
       :root { --hl-breedte: calc(100vw - 32px); }
-      .nieuw-pagina { padding-top: 84px; }
+      .nieuw-pagina { padding-top: 64px; }
       .hl-kaart { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 250px; min-height: 0; border-radius: 22px; }
       .hl-tekst { gap: 8px; padding: 28px 24px 20px; }
       .hl-titel { font-size: 1.5rem; }
@@ -165,26 +165,6 @@
   </style>
 </head>
 <body>
-  <header class="site-header">
-    <nav class="navigation" aria-label="Hoofdnavigatie">
-      <a class="brand" href="index.html" aria-label="Berie's Exam Space, startpagina">
-        <span class="brand-symbol" aria-hidden="true">B</span>
-        <span class="brand-name"><span>Berie's</span> <span>Exam Space</span></span>
-      </a>
-      <a class="home-knop" href="hub.html" aria-label="Home" title="Home">
-        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5M5 9v12h5v-7h4v7h5V9"/></svg>
-      </a>
-      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu">Menu</button>
-      <ul class="navigation-links" id="site-menu">
-        <li><a href="hub.html#hoe-werkt-het">Hoe werkt het</a></li>
-        <li><a href="hub.html#nieuw">Wat is nieuw</a></li>
-        <li><a href="over-mij.html">Over mij</a></li>
-        <li><a href="whatsapp.html">WhatsApp-groep</a></li>
-        <li><a href="feedback.html">Feedback</a></li>
-      </ul>
-      <a class="pill login-button" href="inloggen.html">Inloggen&nbsp; →</a>
-    </nav>
-  </header>
   <main class="pagina nieuw-pagina" aria-labelledby="nieuw-titel">
     <div class="wrap">
       <header class="pagina-kop">
@@ -469,7 +449,10 @@
 
       verder.addEventListener('click', () => {
         if (verder.disabled) return;
-        try { window.sessionStorage.setItem('bes_nieuw_gezien', '1'); } catch {}
+        try {
+          window.sessionStorage.setItem('bes_nieuw_gezien', '1');
+          window.sessionStorage.setItem('bes_nav_intro', '1');
+        } catch {}
         window.location.assign('hub.html' + window.location.hash);
       });
     })();

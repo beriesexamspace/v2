@@ -13,6 +13,13 @@
         window.location.replace('nieuw.html' + window.location.hash);
       } catch {}
     })();
+    (() => {
+      try {
+        if (!window.sessionStorage.getItem('bes_nav_intro')) return;
+        window.sessionStorage.removeItem('bes_nav_intro');
+        document.documentElement.classList.add('nav-intro');
+      } catch {}
+    })();
   </script>
   <meta name="description" content="Kies je jaar, gebruik de tools en help mee met je eigen vak in Berie's Exam Space.">
   <meta name="theme-color" content="#FFFFFF">
@@ -152,8 +159,16 @@
       .hub-update { grid-template-columns: minmax(0, 1fr); gap: 4px; }
     }
 
+    /* Na het welkomstscherm komt de navigatiebalk voor het eerst in beeld. */
+    html.nav-intro .site-header { animation: nav-binnen 700ms var(--ease) 350ms both; }
+    @keyframes nav-binnen {
+      from { opacity: 0; transform: translateY(-18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
+      html.nav-intro .site-header { animation: none; }
       .kaart.jaar, .jaar-pijl { transition: none; }
       .hub-update.is-net-zichtbaar { animation: none; }
       a.kaart.jaar:hover, a.kaart.jaar:active, a.kaart.jaar:hover .jaar-pijl { transform: none !important; }
