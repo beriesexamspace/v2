@@ -57,8 +57,13 @@ html[data-theme="dark"] .stappen { --tel-rand: #3A3A3C; --tel-glans: rgba(255,25
 .tel-status-icoontjes i:nth-child(2) { width: 10px; }
 .tel-status-icoontjes i:nth-child(3) { width: 16px; border-radius: 3px; }
 .tel.is-klein { width: 128px; margin-bottom: -60px; border-width: 4px; border-radius: 26px; font-size: 8px; }
-.tel.is-klein::before { top: 5px; width: 44px; height: 13px; }
-.tel.is-klein .tel-status { padding: 8px 14px 0; font-size: 7px; }
+.tel.is-klein::before { top: 4px; width: 30%; height: 10px; border-radius: 6px; }
+.tel.is-klein::after { bottom: 4px; width: 36px; height: 3px; }
+.tel.is-klein .tel-status { padding: 6px 9px 0; font-size: 6.5px; }
+.tel.is-klein .tel-status-icoontjes { gap: 2px; }
+.tel.is-klein .tel-status-icoontjes i { width: 3px; height: 5px; }
+.tel.is-klein .tel-status-icoontjes i:nth-child(2) { width: 5px; }
+.tel.is-klein .tel-status-icoontjes i:nth-child(3) { width: 9px; border-radius: 2px; }
 .tel.is-klein .tel-scherm { gap: 5px; padding: 8px 8px; }
 .tel.is-klein .tel-kop { font-size: 9px; }
 .tel.is-klein .tel-kaart { gap: 5px; padding: 6px 7px; border-radius: 8px; font-size: 7px; }
@@ -68,9 +73,11 @@ html[data-theme="dark"] .stappen { --tel-rand: #3A3A3C; --tel-glans: rgba(255,25
 /* Laptop naast de telefoon */
 .toestellen { display: flex; align-items: flex-end; justify-content: center; gap: 18px; width: 100%; }
 .laptop { width: 380px; max-width: 100%; margin-bottom: 8px; }
-.laptop-scherm { border: 6px solid var(--tel-rand); border-bottom-width: 10px; border-radius: 12px 12px 4px 4px; background: var(--bg); box-shadow: inset 0 0 0 1px var(--tel-glans); overflow: hidden; }
+.laptop-scherm { position: relative; border: 6px solid var(--tel-rand); border-bottom-width: 10px; border-radius: 12px 12px 4px 4px; background: var(--bg); box-shadow: inset 0 0 0 1px var(--tel-glans); overflow: hidden; }
+/* De inkeping (camera) bovenaan het MacBook-scherm */
+.laptop-scherm::before { content: ''; position: absolute; top: 0; left: 50%; width: 72px; height: 9px; border-radius: 0 0 7px 7px; background: var(--tel-rand); transform: translateX(-50%); }
 .laptop-voet { height: 9px; margin: 0 -14px; border-radius: 0 0 10px 10px; background: var(--tel-rand); box-shadow: inset 0 2px 0 var(--tel-glans); }
-.laptop-balk { display: flex; align-items: center; gap: 6px; padding: 7px 10px; border-bottom: 1px solid var(--line); font-size: 8px; font-weight: 600; }
+.laptop-balk { display: flex; align-items: center; gap: 6px; padding: 12px 10px 7px; border-bottom: 1px solid var(--line); font-size: 8px; font-weight: 600; }
 .laptop-merk { display: grid; place-items: center; width: 14px; height: 14px; border-radius: 50%; background: var(--teal); color: #fff; font-size: 8px; font-weight: 700; }
 .laptop-pil { margin-left: auto; width: 40px; height: 12px; border-radius: 6px; background: var(--accent); }
 .laptop-inhoud { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; }
