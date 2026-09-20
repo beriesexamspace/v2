@@ -209,6 +209,14 @@
     beschikbaar: false,
     gereed: Promise.resolve(null),
     get client() { return client; },
+    get terugNa() {
+      let waarde = '';
+      try { waarde = new URLSearchParams(window.location.search).get('terug') || window.sessionStorage.getItem('bes_terug') || ''; } catch {}
+      try { window.sessionStorage.removeItem('bes_terug'); } catch {}
+      // alleen eigen relatieve paden, nooit een andere site
+      if (!waarde || /^[a-z]+:|^\/\/|^\//i.test(waarde) || waarde.includes('..')) return pagePrefix + 'hub.html';
+      return pagePrefix + waarde;
+    },
     get versieGezien() { return Number(currentUser?.user_metadata?.versie_gezien) || 0; },
     avatarVullen: fillAvatar,
     naamGegevens: nameDetails,
@@ -387,6 +395,14 @@
   }
 
   if (!auth.beschikbaar) console.info('Accounts zijn nog niet ingeschakeld; de client is niet aangemaakt.');
+
+  // De deur (assets/deur.js): zodra de sessie bekend is, pagina tonen of naar inloggen sturen.
+  const openDeur = () => {
+    if (!window.BES_DEUR) return;
+    if (currentUser) document.documentElement.classList.remove('deur-check');
+    else window.BES_DEUR.naarInloggen();
+  };
+  auth.gereed.then(openDeur, openDeur);
 
   const initializeView = () => {
     renderAccount();

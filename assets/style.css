@@ -1011,3 +1011,6 @@ html.ball-cursor,html.ball-cursor body,html.ball-cursor body *,html.ball-cursor 
 /* Toetsenbord: eerste tab-stop springt naar de inhoud */
 .skip-link { position: absolute; top: -100px; left: 16px; z-index: 100; padding: 10px 14px; border-radius: 12px; background: var(--accent); color: #fff; font-size: .9375rem; font-weight: 600; text-decoration: none; }
 .skip-link:focus { top: 12px; outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* De deur: pagina verborgen tot het account bevestigd is (assets/deur.js) */
+html.deur-check body { visibility: hidden; }

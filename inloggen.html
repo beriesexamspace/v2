@@ -29,12 +29,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=32">
-  <script src="assets/app.js?v=32" defer></script>
-  <script src="assets/config.js?v=32" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=33">
+  <script src="assets/app.js?v=33" defer></script>
+  <script src="assets/config.js?v=33" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=32" defer></script>
-  <script src="assets/activiteit.js?v=32" defer></script>
+  <script src="assets/auth.js?v=33" defer></script>
+  <script src="assets/activiteit.js?v=33" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#inhoud">Ga naar inhoud</a>
@@ -204,7 +204,7 @@
           } else {
             await auth.inloggen(email.value, password.value);
             password.value = '';
-            window.location.assign('hub.html' + window.location.hash);
+            window.location.assign(auth.terugNa);
           }
         } catch (failure) {
           const field = failure.code === 'invalid_email' ? email : failure.code === 'invalid_credentials' ? password : null;
@@ -220,7 +220,7 @@
 
       availability();
       if (auth) Promise.resolve(auth.gereed).then(user => {
-        if (user) window.location.replace('hub.html' + window.location.hash);
+        if (user) window.location.replace(auth.terugNa);
       }).catch(() => {});
     });
   

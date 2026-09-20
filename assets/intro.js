@@ -27,9 +27,68 @@ window.BES = window.BES || {};
     },
     {
       soort: 'intro',
-      naam: 'Oud naast nieuw',
-      label: 'Oud naast nieuw',
-      titel: 'Zelfde vragen, nieuwe jas.',
+      naam: 'Oud naast nieuw: startpagina',
+      label: 'Oud naast nieuw · 1 van 3',
+      titel: 'De startpagina.',
+      tekst: 'Vroeger één lange lijst met links naar alle vakken. Nu een rustige start: je meldt je aan of logt in, en daarna is het jouw eigen space.',
+      beeld: `
+        <div class="oudnieuw">
+          <div class="mini is-oud anim-links">
+            <span class="mini-label">Oud</span>
+            <span class="mini-oud-kop">Berie's Exam Space</span>
+            <span class="mini-oud-tekst">Oefenvragen voor psychologie</span>
+            <span class="mini-oud-link">Menselijke biologie en genetica</span>
+            <span class="mini-oud-link">Statistiek I</span>
+            <span class="mini-oud-link">Statistiek II</span>
+            <span class="mini-oud-link">Inleiding pedagogiek</span>
+            <span class="mini-oud-link">Ontwikkelingspsychologie</span>
+            <span class="mini-oud-tekst">Al 1.500 keer geopend</span>
+          </div>
+          <div class="mini is-nieuw is-hero anim-rechts">
+            <span class="mini-label">Nieuw</span>
+            <span class="mini-hero-kop">Jouw leerstof.<em>Jouw eigen space.</em></span>
+            <span class="mini-hero-sub">Alles wat je nodig hebt om overzicht te krijgen en slimmer te leren.</span>
+            <div class="tel-knop">Aanmelden →</div>
+            <span class="mini-hero-link">Heb je al een account? Log in</span>
+          </div>
+        </div>`
+    },
+    {
+      soort: 'intro',
+      naam: 'Oud naast nieuw: oefenen',
+      label: 'Oud naast nieuw · 2 van 3',
+      titel: 'Oefenen.',
+      tekst: 'Vroeger stond een vraag met a, b, c en d onder elkaar, met het antwoord eronder. Nu krijg je één vraag per scherm, je kiest, en je ziet meteen of het goed was, met uitleg.',
+      beeld: `
+        <div class="oudnieuw">
+          <div class="mini is-oud anim-links">
+            <span class="mini-label">Oud</span>
+            <span class="mini-oud-kop">Statistiek I</span>
+            <span class="mini-oud-vraag">Vraag 12. Welke maat hoort bij een ordinale schaal?</span>
+            <span class="mini-oud-optie">a) gemiddelde</span>
+            <span class="mini-oud-optie">b) mediaan</span>
+            <span class="mini-oud-optie">c) standaardafwijking</span>
+            <span class="mini-oud-optie">d) variantie</span>
+            <span class="mini-oud-link">Toon antwoord</span>
+            <span class="mini-oud-tekst">Antwoord: b</span>
+          </div>
+          <div class="mini is-nieuw anim-rechts">
+            <span class="mini-label">Nieuw</span>
+            <span class="tel-rij"><span>Vraag 12 van 20</span><span>Training</span></span>
+            <span class="tel-vraag">Welke maat hoort bij een ordinale schaal?</span>
+            <div class="tel-optie">Gemiddelde</div>
+            <div class="tel-optie is-goed">Mediaan ✓</div>
+            <div class="tel-optie">Standaardafwijking</div>
+            <div class="mini-uitleg">Goed. Bij een ordinale schaal kan je wel ordenen, maar niet rekenen met afstanden.</div>
+            <div class="tel-knop">Volgende →</div>
+          </div>
+        </div>`
+    },
+    {
+      soort: 'intro',
+      naam: 'Oud naast nieuw: hoofdstukken',
+      label: 'Oud naast nieuw · 3 van 3',
+      titel: 'Je hoofdstukken.',
       tekst: 'De oude site was één lange pagina per vak. Nu kies je eerst je jaar en je vak, vink je hoofdstukken aan en oefen je in <strong>Training</strong> of <strong>Simulatie</strong>. Je voortgang blijft bewaard.',
       beeld: `
         <div class="oudnieuw">
