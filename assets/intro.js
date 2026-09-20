@@ -397,4 +397,148 @@ window.BES = window.BES || {};
     toon(0);
     return { gaNaar: index => gaNaar(index, index >= actief ? 1 : -1), get stap() { return actief; } };
   };
+
+  // Carrousel zoals bij Apple: schuift vanzelf door, balkjes die zich vullen, pauzeknop, swipen. Voor Hoe werkt het op de hub.
+  // Gebruik: BES.carrousel(element, { soorten, kopniveau })
+  const PAUZE_ICOON = '<svg class="carrousel-ico-pauze" viewBox="0 0 14 14" aria-hidden="true"><rect x="2" y="1" width="3.5" height="12" rx="1"/><rect x="8.5" y="1" width="3.5" height="12" rx="1"/></svg>'
+    + '<svg class="carrousel-ico-speel" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.5v11a.8.8 0 0 0 1.2.7l9-5.5a.8.8 0 0 0 0-1.4l-9-5.5A.8.8 0 0 0 3 1.5z"/></svg>';
+
+  window.BES.carrousel = (root, opties = {}) => {
+    const soorten = opties.soorten || ['uitleg'];
+    const stappen = STAPPEN.filter(stap => soorten.includes(stap.soort));
+    const kop = opties.kopniveau || 'h3';
+    const naam = root.id || 'carrousel';
+    const rustig = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const DUUR = 8000;
+    root.classList.add('stappen', 'carrousel');
+    root.innerHTML = `
+      <div class="carrousel-baan" tabindex="0">
+        ${stappen.map((stap, n) => `
+          <article class="stap-kaart is-dia is-${stap.soort}" id="${naam}-dia-${n + 1}" aria-roledescription="dia" aria-label="${n + 1} van ${stappen.length}: ${stap.naam}">
+            <div class="stap-tekst">
+              <p class="stap-label">${stap.label}</p>
+              <${kop} class="stap-titel">${stap.titel}</${kop}>
+              <p class="stap-uitleg">${stap.tekst}</p>
+            </div>
+            <div class="stap-beeld" aria-hidden="true">${stap.telefoon ? telefoon(stap.scherm, false) : stap.beeld}</div>
+          </article>`).join('')}
+      </div>
+      <div class="carrousel-bediening">
+        <div class="carrousel-stippen" role="tablist" aria-label="Kies een stap">
+          ${stappen.map((stap, n) => `<button class="carrousel-stip" type="button" role="tab" aria-selected="${n === 0}" aria-controls="${naam}-dia-${n + 1}" aria-label="${stap.naam}"${n ? ' tabindex="-1"' : ''}><i></i></button>`).join('')}
+        </div>
+        <button class="carrousel-pauze" type="button" aria-pressed="false" aria-label="Pauzeren">${PAUZE_ICOON}</button>
+      </div>`;
+
+    const baan = root.querySelector('.carrousel-baan');
+    const kaarten = Array.from(baan.querySelectorAll('.stap-kaart'));
+    const stippen = Array.from(root.querySelectorAll('.carrousel-stip'));
+    const pauzeKnop = root.querySelector('.carrousel-pauze');
+    let actief = 0;
+    let gepauzeerd = rustig;
+    let inBeeld = true;
+    let timer = 0;
+    let settleTimer = 0;
+
+    // Animaties in een dia opnieuw laten lopen zodra hij in beeld komt.
+    const speelAnimaties = kaart => {
+      if (rustig) return;
+      kaart.querySelectorAll('.anim, .anim-pop, .anim-links, .anim-rechts, .anim-vink, .anim-vul, .anim-kies, .anim-teal, .anim-puls').forEach(el => {
+        el.getAnimations?.().forEach(animatie => { animatie.cancel(); animatie.play(); });
+      });
+    };
+
+    const herstartVul = () => {
+      const vul = stippen[actief].querySelector('i');
+      vul.classList.remove('is-bezig');
+      void vul.offsetWidth;
+      if (!gepauzeerd && inBeeld) vul.classList.add('is-bezig');
+    };
+    const planVolgende = () => {
+      window.clearTimeout(timer);
+      if (gepauzeerd || !inBeeld || document.hidden) return;
+      timer = window.setTimeout(() => gaNaar(actief + 1), DUUR);
+    };
+    const zetActief = index => {
+      const veranderd = index !== actief;
+      actief = index;
+      kaarten.forEach((kaart, n) => kaart.classList.toggle('is-actief', n === index));
+      stippen.forEach((stip, n) => {
+        stip.setAttribute('aria-selected', String(n === index));
+        stip.tabIndex = n === index ? 0 : -1;
+      });
+      if (veranderd) speelAnimaties(kaarten[index]);
+    };
+    const positieVan = kaart => kaart.offsetLeft - (baan.clientWidth - kaart.offsetWidth) / 2;
+    const gaNaar = index => {
+      const doel = (index + kaarten.length) % kaarten.length;
+      const kaart = kaarten[doel];
+      window.clearTimeout(timer);
+      if (Math.abs(baan.scrollLeft - positieVan(kaart)) < 2) { zetActief(doel); herstartVul(); planVolgende(); return; }
+      baan.scrollTo({ left: positieVan(kaart), behavior: rustig ? 'auto' : 'smooth' });
+    };
+    const dichtstbij = () => {
+      const midden = baan.scrollLeft + baan.clientWidth / 2;
+      let beste = 0;
+      let afstand = Infinity;
+      kaarten.forEach((kaart, n) => {
+        const verschil = Math.abs(kaart.offsetLeft + kaart.offsetWidth / 2 - midden);
+        if (verschil < afstand) { afstand = verschil; beste = n; }
+      });
+      return beste;
+    };
+
+    baan.addEventListener('scroll', () => {
+      window.clearTimeout(timer);
+      window.clearTimeout(settleTimer);
+      settleTimer = window.setTimeout(() => { zetActief(dichtstbij()); herstartVul(); planVolgende(); }, 120);
+    }, { passive: true });
+    baan.addEventListener('pointerdown', () => window.clearTimeout(timer));
+    baan.addEventListener('keydown', event => {
+      if (event.key === 'ArrowRight') { event.preventDefault(); gaNaar(actief + 1); }
+      if (event.key === 'ArrowLeft') { event.preventDefault(); gaNaar(actief - 1); }
+    });
+    stippen.forEach((stip, n) => {
+      stip.addEventListener('click', () => gaNaar(n));
+      stip.addEventListener('keydown', event => {
+        if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
+        event.preventDefault();
+        const doel = (n + (event.key === 'ArrowRight' ? 1 : -1) + stippen.length) % stippen.length;
+        stippen[doel].focus();
+        gaNaar(doel);
+      });
+    });
+    const zetPauze = waarde => {
+      gepauzeerd = waarde;
+      root.classList.toggle('is-gepauzeerd', waarde);
+      pauzeKnop.setAttribute('aria-pressed', String(waarde));
+      pauzeKnop.setAttribute('aria-label', waarde ? 'Afspelen' : 'Pauzeren');
+      if (waarde) window.clearTimeout(timer);
+      else { herstartVul(); planVolgende(); }
+    };
+    pauzeKnop.addEventListener('click', () => zetPauze(!gepauzeerd));
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) window.clearTimeout(timer);
+      else if (!gepauzeerd) { herstartVul(); planVolgende(); }
+    });
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(entries => {
+        const zichtbaar = entries.some(entry => entry.isIntersecting);
+        if (zichtbaar === inBeeld) return;
+        inBeeld = zichtbaar;
+        if (!zichtbaar) window.clearTimeout(timer);
+        else if (!gepauzeerd) { herstartVul(); planVolgende(); }
+      }, { threshold: .4 }).observe(root);
+    }
+    window.addEventListener('resize', () => {
+      window.clearTimeout(settleTimer);
+      baan.scrollTo({ left: positieVan(kaarten[actief]), behavior: 'auto' });
+    });
+
+    zetPauze(gepauzeerd);
+    zetActief(0);
+    herstartVul();
+    planVolgende();
+    return { gaNaar, pauzeer: () => zetPauze(true) };
+  };
 })();

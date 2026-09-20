@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="assets/deur.js?v=34"></script>
+  <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
+  <link rel="manifest" href="/v2/manifest.webmanifest">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#FFFFFF">
+  <script>
+    (() => {
+      let keuze;
+      try { keuze = window.localStorage.getItem('bes_thema'); } catch {}
+      const donker = keuze === 'donker' || (keuze !== 'licht' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.dataset.theme = donker ? 'dark' : 'light';
+      document.querySelector('meta[name="theme-color"]').content = donker ? '#0B0B0C' : '#FFFFFF';
+    })();
+  </script>
+  <title>Jouw voortgang | Berie's Exam Space</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css?v=34">
+  <script src="assets/app.js?v=34" defer></script>
+  <script src="assets/vakken.js?v=34"></script>
+  <script src="assets/config.js?v=34" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
+  <script src="assets/auth.js?v=34" defer></script>
+  <script src="assets/activiteit.js?v=34" defer></script>
+  <style>
+    .vg-wrap { max-width: 860px; }
+    .vg-status { margin: 0 0 16px; color: var(--ink-soft); }
+    .vg-status:empty { display: none; }
+    .vg-samenvatting { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 28px; }
+    .vg-tegel { padding: 18px 20px; }
+    .vg-tegel .getal { display: block; font-size: 1.75rem; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+    .vg-tegel .uitleg { display: block; margin-top: 4px; color: var(--ink-soft); font-size: .875rem; }
+    .vg-lijst { display: grid; gap: 14px; }
+    .vg-vak { padding: 20px 22px; }
+    .vg-kop { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+    .vg-naam { margin: 0; font-size: 1.0625rem; font-weight: 600; line-height: 1.35; }
+    .vg-jaar { display: block; margin-top: 2px; color: var(--ink-soft); font-size: .8125rem; }
+    .vg-procent { flex: 0 0 auto; font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .vg-procent.is-goed { color: var(--teal-tekst); }
+    .vg-balk { height: 10px; margin-top: 14px; border-radius: 5px; background: var(--surface); overflow: hidden; }
+    .vg-balk i { display: block; height: 100%; border-radius: inherit; background: var(--accent); transition: width 600ms var(--ease); }
+    .vg-balk i.is-goed { background: var(--teal); }
+    .vg-regel { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin-top: 10px; color: var(--ink-soft); font-size: .875rem; }
+    .vg-regel a { color: var(--accent); font-weight: 500; text-decoration: none; }
+    :where(html.has-hover) .vg-regel a:hover { text-decoration: underline; }
+    .vg-hoofdstukken { margin-top: 14px; }
+    .vg-hoofdstukken summary { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 4px; color: var(--accent); font-size: .875rem; font-weight: 500; cursor: pointer; list-style: none; }
+    .vg-hoofdstukken summary::-webkit-details-marker { display: none; }
+    .vg-hoofdstukken summary::after { content: '▾'; font-size: .8em; transition: transform 200ms var(--ease); }
+    .vg-hoofdstukken[open] summary::after { transform: rotate(180deg); }
+    .vg-hoofdstuk-lijst { display: grid; gap: 8px; margin: 6px 0 0; padding: 0; list-style: none; }
+    .vg-hoofdstuk { display: grid; grid-template-columns: minmax(0, 1fr) 120px 90px; align-items: center; gap: 12px; font-size: .875rem; }
+    .vg-hoofdstuk .vg-balk { height: 6px; margin: 0; }
+    .vg-hoofdstuk .stand { text-align: right; color: var(--ink-soft); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .vg-hoofdstuk .stand.is-goed { color: var(--teal-tekst); font-weight: 600; }
+    .vg-hoofdstuk.is-leeg { color: var(--ink-soft); }
+    .vg-rest { margin-top: 28px; }
+    .vg-rest h2 { margin: 0 0 10px; font-size: 1rem; font-weight: 600; }
+    .vg-rest ul { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .vg-rest a { display: inline-flex; align-items: center; min-height: 36px; padding: 0 12px; border: 1px solid var(--line); border-radius: var(--radius-pill); background: var(--card); color: var(--ink); font-size: .8125rem; text-decoration: none; }
+    :where(html.has-hover) .vg-rest a:hover { border-color: var(--accent); }
+    .vg-leeg { padding: 28px; text-align: center; }
+    .vg-leeg p { margin: 0 0 16px; color: var(--ink-soft); }
+    @media (max-width: 640px) {
+      .vg-samenvatting { grid-template-columns: minmax(0, 1fr); }
+      .vg-hoofdstuk { grid-template-columns: minmax(0, 1fr) 80px; }
+      .vg-hoofdstuk .vg-balk { grid-column: 1 / -1; }
+    }
+    @media (prefers-reduced-motion: reduce) { .vg-balk i, .vg-hoofdstukken summary::after { transition: none; } }
+  </style>
+</head>
+<body data-nav="vast">
+  <a class="skip-link" href="#inhoud">Ga naar inhoud</a>
+  <header class="site-header">
+    <nav class="navigation" aria-label="Hoofdnavigatie">
+      <a class="brand" href="index.html" aria-label="Berie's Exam Space, startpagina">
+        <span class="brand-symbol" aria-hidden="true">B</span>
+        <span class="brand-name"><span>Berie's</span> <span>Exam Space</span></span>
+      </a>
+      <a class="home-knop" href="hub.html" aria-label="Home" title="Home">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5M5 9v12h5v-7h4v7h5V9"/></svg>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu">Menu</button>
+      <ul class="navigation-links" id="site-menu">
+        <li><a href="hub.html#hoe-werkt-het">Hoe werkt het</a></li>
+        <li><a href="over-mij.html">Over mij</a></li>
+        <li><a href="whatsapp.html">WhatsApp-groep</a></li>
+        <li><a href="feedback.html">Feedback</a></li>
+      </ul>
+      <a class="pill login-button" href="inloggen.html">Inloggen →</a>
+    </nav>
+  </header>
+  <main id="inhoud" class="pagina" aria-labelledby="vg-titel">
+    <div class="wrap vg-wrap">
+      <a class="terug tekstlink" href="hub.html" data-terug="hub.html" data-terug-tekst="Terug">← Terug</a>
+      <header class="pagina-kop">
+        <h1 id="vg-titel">Jouw voortgang</h1>
+        <p class="pagina-sub">Per vak en per hoofdstuk: wat je al kent, en wat nog aandacht vraagt. Teal betekent gelukt, blauw is bezig.</p>
+      </header>
+
+      <p class="vg-status" id="vg-status" role="status">Even laden.</p>
+      <div class="vg-samenvatting" id="vg-samenvatting" hidden>
+        <div class="kaart vg-tegel"><span class="getal" id="vg-vakken">0</span><span class="uitleg">vakken geoefend</span></div>
+        <div class="kaart vg-tegel"><span class="getal" id="vg-hoofdstukken">0</span><span class="uitleg">hoofdstukken geoefend</span></div>
+        <div class="kaart vg-tegel"><span class="getal" id="vg-afgerond">0</span><span class="uitleg">hoofdstukken afgerond</span></div>
+      </div>
+      <div class="vg-lijst" id="vg-lijst"></div>
+      <section class="vg-rest" id="vg-rest" hidden aria-labelledby="vg-rest-kop">
+        <h2 id="vg-rest-kop">Nog niet geoefend</h2>
+        <ul id="vg-rest-lijst"></ul>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p class="footer-brand">Berie's Exam Space</p>
+    <div class="footer-details">
+      <p>Duidelijk leren. Rustig groeien.</p>
+      <p class="project-label">A project of The Berie Foundation</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const auth = window.BES.auth;
+      const status = document.getElementById('vg-status');
+      const lijst = document.getElementById('vg-lijst');
+      const samenvatting = document.getElementById('vg-samenvatting');
+      const rest = document.getElementById('vg-rest');
+      const restLijst = document.getElementById('vg-rest-lijst');
+      const vakken = (window.BES_VAKKEN || []).filter(vak => vak.v2);
+      const jaren = Object.fromEntries((window.BES_JAREN || []).map(jaar => [jaar.id, jaar.naam]));
+      const gegevens = {};
+
+      // Hoofdstuknamen komen uit data.js van het vak; alleen laden voor vakken met voortgang, één tegelijk.
+      const laadVak = id => new Promise(resolve => {
+        if (gegevens[id]) { resolve(gegevens[id]); return; }
+        const script = document.createElement('script');
+        script.src = `vak/${id}/data.js?v=34`;
+        script.onload = () => { gegevens[id] = window.BES_VAK && window.BES_VAK.id === id ? window.BES_VAK : null; resolve(gegevens[id]); };
+        script.onerror = () => resolve(null);
+        document.head.append(script);
+      });
+
+      const procent = (goed, totaal) => totaal ? Math.round(goed / totaal * 100) : 0;
+      const el = (tag, klasse, tekst) => { const node = document.createElement(tag); if (klasse) node.className = klasse; if (tekst !== undefined) node.textContent = tekst; return node; };
+      const balk = (waarde, goed, klein) => {
+        const wrap = el('div', 'vg-balk');
+        const vul = el('i', goed ? 'is-goed' : '');
+        vul.style.width = '0%';
+        wrap.append(vul);
+        window.requestAnimationFrame(() => { vul.style.width = waarde + '%'; });
+        return wrap;
+      };
+
+      const toon = async rijen => {
+        const perVak = {};
+        for (const rij of rijen) {
+          if (rij.vak.endsWith('__hard')) continue; // Hard mode telt apart, nog niet in dit overzicht
+          (perVak[rij.vak] = perVak[rij.vak] || []).push(rij);
+        }
+        const geoefend = vakken.filter(vak => perVak[vak.id]?.some(rij => rij.laatst_totaal > 0));
+        let totHoofdstukken = 0;
+        let totAfgerond = 0;
+        lijst.replaceChildren();
+
+        const kaarten = [];
+        for (const vak of geoefend) {
+          const data = await laadVak(vak.id);
+          const rijenVak = perVak[vak.id].filter(rij => rij.laatst_totaal > 0);
+          const goed = rijenVak.reduce((som, rij) => som + rij.laatst_goed, 0);
+          const totaal = rijenVak.reduce((som, rij) => som + rij.laatst_totaal, 0);
+          const afgerond = rijenVak.filter(rij => rij.laatst_goed === rij.laatst_totaal).length;
+          const alleHoofdstukken = data?.hoofdstukken || rijenVak.map(rij => ({ id: rij.hoofdstuk, naam: rij.hoofdstuk }));
+          const score = procent(goed, totaal);
+          totHoofdstukken += rijenVak.length;
+          totAfgerond += afgerond;
+
+          const kaart = el('article', 'kaart vg-vak');
+          const kop = el('div', 'vg-kop');
+          const titel = el('h2', 'vg-naam', vak.naam);
+          titel.append(el('span', 'vg-jaar', jaren[vak.jaar] || ''));
+          const pct = el('span', 'vg-procent' + (score >= 80 ? ' is-goed' : ''), score + '%');
+          kop.append(titel, pct);
+          kaart.append(kop, balk(score, score >= 80));
+          const regel = el('div', 'vg-regel');
+          regel.append(el('span', '', `${rijenVak.length} van ${alleHoofdstukken.length} hoofdstukken geoefend · ${afgerond} afgerond`));
+          const link = el('a', '', 'Verder oefenen →');
+          link.href = `vak/${vak.id}/`;
+          regel.append(link);
+          kaart.append(regel);
+
+          const details = el('details', 'vg-hoofdstukken');
+          details.append(el('summary', '', 'Per hoofdstuk'));
+          const ul = el('ul', 'vg-hoofdstuk-lijst');
+          for (const hoofdstuk of alleHoofdstukken) {
+            const rij = rijenVak.find(item => item.hoofdstuk === hoofdstuk.id);
+            const li = el('li', 'vg-hoofdstuk' + (rij ? '' : ' is-leeg'));
+            li.append(el('span', '', hoofdstuk.naam));
+            if (rij) {
+              const p = procent(rij.laatst_goed, rij.laatst_totaal);
+              const klaar = rij.laatst_goed === rij.laatst_totaal;
+              li.append(balk(p, klaar, true), el('span', 'stand' + (klaar ? ' is-goed' : ''), klaar ? 'Afgerond ✓' : `${rij.laatst_goed} van ${rij.laatst_totaal}`));
+            } else {
+              li.append(balk(0, false, true), el('span', 'stand', 'Nog niet'));
+            }
+            ul.append(li);
+          }
+          details.append(ul);
+          kaart.append(details);
+          kaarten.push({ kaart, score });
+        }
+        // Laagste score bovenaan: daar is de meeste winst.
+        kaarten.sort((a, b) => a.score - b.score).forEach(item => lijst.append(item.kaart));
+
+        document.getElementById('vg-vakken').textContent = geoefend.length;
+        document.getElementById('vg-hoofdstukken').textContent = totHoofdstukken;
+        document.getElementById('vg-afgerond').textContent = totAfgerond;
+        samenvatting.hidden = !geoefend.length;
+
+        const nietGeoefend = vakken.filter(vak => !geoefend.includes(vak));
+        restLijst.replaceChildren(...nietGeoefend.map(vak => { const li = el('li'); const a = el('a', '', vak.naam); a.href = `vak/${vak.id}/`; li.append(a); return li; }));
+        rest.hidden = !nietGeoefend.length;
+
+        if (!geoefend.length) {
+          const leeg = el('div', 'kaart vg-leeg');
+          leeg.append(el('p', '', 'Je hebt nog niets geoefend. Kies een vak op de hub, dan verschijnt hier je voortgang per hoofdstuk.'));
+          const knop = el('a', 'knop', 'Naar de hub →');
+          knop.href = 'hub.html';
+          leeg.append(knop);
+          lijst.append(leeg);
+        }
+        status.textContent = '';
+      };
+
+      const laad = async () => {
+        await auth.gereed;
+        const user = await auth.gebruiker();
+        if (!user) { status.textContent = 'Log in om je voortgang te zien.'; return; }
+        status.textContent = 'Even laden.';
+        const { data, error } = await auth.client.from('voortgang').select('vak,hoofdstuk,beantwoord,goed,laatst_goed,laatst_totaal').eq('user_id', user.id);
+        if (error) { status.textContent = 'Laden is niet gelukt. Probeer het later opnieuw.'; return; }
+        await toon(data || []);
+      };
+      laad();
+    });
+  </script>
+</body>
+</html>

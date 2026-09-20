@@ -48,7 +48,7 @@ html[data-theme="dark"] .stap-beeld { background: linear-gradient(180deg, #4A4A4
   flex-direction: column;
   width: 250px;
   aspect-ratio: 9 / 19.5;
-  margin-bottom: -96px;
+  margin-bottom: -150px;
   border: 6px solid var(--tel-rand);
   border-radius: 46px;
   background: var(--bg);
@@ -178,6 +178,42 @@ html[data-theme="dark"] .stap-beeld { background: linear-gradient(180deg, #4A4A4
 .mini-nieuw .stap-updates .update-datum { font-size: .75rem; }
 .mini-nieuw-knop { justify-self: start; padding: 8px 14px; border: 1px solid var(--line); border-radius: var(--radius-pill); font-size: .8125rem; font-weight: 600; }
 
+/* Carrousel zoals bij Apple (hub): baan met dia's, balkjes die zich vullen, pauzeknop */
+.carrousel { --carrousel-breedte: calc(100cqw - 48px); --carrousel-duur: 8s; gap: 4px; }
+.carrousel-baan {
+  position: relative;
+  display: flex;
+  gap: 16px;
+  padding: 8px calc((100% - var(--carrousel-breedte)) / 2) 28px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.carrousel-baan::-webkit-scrollbar { display: none; }
+.carrousel-baan:focus-visible { outline: none; }
+.carrousel-baan:focus-visible .stap-kaart.is-actief { outline: 2px solid var(--accent); outline-offset: 4px; }
+.carrousel .stap-kaart.is-dia { flex: 0 0 var(--carrousel-breedte); min-height: 440px; scroll-snap-align: center; }
+.carrousel-bediening { display: flex; justify-content: center; align-items: center; gap: 12px; }
+.carrousel-stippen { display: flex; align-items: center; gap: 2px; min-height: 44px; padding: 0 10px; border-radius: var(--radius-pill); background: var(--surface); }
+.carrousel-stip { display: grid; place-items: center; width: 24px; min-width: 24px; height: 44px; padding: 0; border: 0; background: none; cursor: pointer; transition: width 300ms var(--ease), min-width 300ms var(--ease); }
+.carrousel-stip i { display: block; width: 8px; height: 8px; border-radius: 4px; background: var(--ink); opacity: .35; transition: width 300ms var(--ease), opacity 200ms; }
+.carrousel-stip[aria-selected="true"] { width: 52px; min-width: 52px; }
+.carrousel-stip[aria-selected="true"] i { position: relative; width: 36px; opacity: .25; overflow: hidden; }
+.carrousel-stip[aria-selected="true"] i::after { content: ''; position: absolute; inset: 0; width: 0; background: var(--ink); }
+.carrousel-stip[aria-selected="true"] i.is-bezig::after { animation: carrousel-vullen var(--carrousel-duur) linear forwards; }
+.carrousel.is-gepauzeerd .carrousel-stip i::after { animation-play-state: paused; }
+.carrousel-stip:focus-visible { outline: 2px solid var(--accent); outline-offset: -6px; border-radius: 12px; }
+.carrousel-pauze { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: var(--surface); color: var(--ink); cursor: pointer; transition: background 150ms var(--ease), transform 150ms var(--ease); }
+.carrousel-pauze svg { width: 14px; height: 14px; fill: currentColor; }
+.carrousel-pauze .carrousel-ico-speel { display: none; }
+.carrousel.is-gepauzeerd .carrousel-pauze .carrousel-ico-pauze { display: none; }
+.carrousel.is-gepauzeerd .carrousel-pauze .carrousel-ico-speel { display: block; }
+:where(html.has-hover) .carrousel-pauze:hover { background: var(--line); }
+.carrousel-pauze:active { transform: scale(.94); }
+@keyframes carrousel-vullen { from { width: 0; } to { width: 100%; } }
+
 /* Bediening: Vorige, Volgende */
 .stap-bediening { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .stap-vorige { padding: 10px 8px; font-size: .9375rem; }
@@ -216,7 +252,9 @@ html[data-theme="dark"] .stap-beeld { background: linear-gradient(180deg, #4A4A4
   .stap-titel { font-size: 1.5rem; }
   .stap-uitleg { font-size: .9375rem; }
   .stap-beeld { padding: 16px 22px 0; }
-  .tel { width: 210px; margin-bottom: -170px; }
+  .tel { width: 210px; margin-bottom: -190px; }
+  .carrousel { --carrousel-breedte: calc(100cqw - 32px); }
+  .carrousel .stap-kaart.is-dia { min-height: 0; }
   .toestellen { gap: 10px; }
   .tel.is-klein { width: 96px; margin-bottom: -40px; }
   .laptop { width: 230px; }
@@ -238,6 +276,8 @@ html[data-theme="dark"] .stap-beeld { background: linear-gradient(180deg, #4A4A4
   .stap-volgende.knop { min-width: 0; flex: 1 1 auto; }
 }
 @media (prefers-reduced-motion: reduce) {
+  .carrousel-baan { scroll-behavior: auto; }
+  .carrousel-stip[aria-selected="true"] i::after { animation: none !important; width: 100%; }
   .stap-kaart, .stap-kaart * { animation: none !important; }
   .stap-kaart .anim-vul { width: var(--doel, 100%); }
   .stap-kaart .anim-kies { border-color: var(--accent); background: var(--accent-zacht); }

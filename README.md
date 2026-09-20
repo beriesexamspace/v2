@@ -24,6 +24,7 @@ jaar-3ba.html         vakken 3de bachelor
 whatsapp.html         uitleg, link en QR-code (assets/whatsapp-qr.svg, gemaakt met `npx qrcode`) naar de WhatsApp-groep
 feedback.html         feedback sturen (fout in een vraag, idee, iets anders) naar de tabel feedback
 leren.html            leren leren: slim studeren, concentratie en hulplijnen; gelinkt vanaf de hub (Tools) en boven elk tabblad Studie-hacks
+voortgang.html        Jouw voortgang: per vak en per hoofdstuk wat je kent (tabel voortgang, hoofdstuknamen uit vak/<id>/data.js, laagste score bovenaan); kaart bij Tools op de hub
 privacy.html          wat we bewaren, waar, cookies, rechten en contact; gelinkt in elke voettekst en onder het aanmeldformulier
 beheer.html           alleen voor de beheerder: hoeveel accounts per dag oefenden (aantallen, geen namen)
 404.html              nette foutpagina van GitHub Pages; gebruikt absolute paden /v2/ (bij de lancering aanpassen)
@@ -61,7 +62,7 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 33), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 34), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.
@@ -196,7 +197,7 @@ De handgeschreven "Berie's Exam Space" op de startpagina heeft sinds 20-09-2026 
 
 ## Hoe werkt het (hub)
 
-Sinds 20-09-2026 staan hier de vier uitleg-stappen van de intro (`soorten: ['uitleg'], lus: true`: na de laatste stap "Opnieuw"). De uitklapbare volledige uitleg is op verzoek van Berat weggehaald. Bij Tools staat een vierde kaart "Praat met Comit" met het label Binnenkort (nog geen link). De navigatiebalk heeft geen link Wat is nieuw meer; de sectie op de hub bestaat nog wel (`#nieuw`).
+Sinds 20-09-2026 (nacht) staat hier de Apple-carrousel `BES.carrousel(element, { soorten: ['uitleg'] })` uit assets/intro.js: dezelfde vijf uitleg-stappen als dia's, schuift elke 8 seconden door, balkjes die zich vullen, pauzeknop, swipen; loopt alleen zolang hij in beeld is. Het welkomstscherm blijft stap voor stap (BES.stappen). De uitklapbare volledige uitleg is op verzoek van Berat weggehaald. Bij Tools staat een vierde kaart "Praat met Comit" met het label Binnenkort (nog geen link). De navigatiebalk heeft geen link Wat is nieuw meer; de sectie op de hub bestaat nog wel (`#nieuw`).
 
 De sectie `hub.html#hoe-werkt-het` bestaat uit vier korte kaarten (Log in, Kies je jaar en vak, Kies hoofdstukken en oefenvorm, Zie je voortgang groeien) en daaronder een `details` "Volledige uitleg →" met tien tekststappen (Waar / Klik op / Daarna) met de exacte knopnamen van de site. Vaste regel: uitleg op de hub is tekst. Geen screenshots van de site in de site, geen nagemaakte muis, geen animaties in uitleg; maximaal vier kaarten zichtbaar, de rest ingeklapt. Verandert een knopnaam, pas dan ook de tekst hier aan.
 
