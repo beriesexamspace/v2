@@ -3,11 +3,55 @@
 window.BES = window.BES || {};
 
 (() => {
+  const BASIS = (document.querySelector('script[src*="highlights.js"]')?.getAttribute('src') || '').replace(/assets\/highlights\.js.*$/, '');
   const STATUS = '<div class="tel-status"><span>9:41</span><span>●●●</span></div>';
   const telefoon = scherm => `<div class="tel">${STATUS}<div class="tel-scherm">${scherm}</div></div>`;
 
+  // soort: intro (alleen welkomstscherm), uitleg (ook op de hub), groep (WhatsApp), nieuw (Wat is nieuw)
   const DIAS = [
     {
+      soort: 'intro',
+      naam: 'Welkom',
+      label: 'Welkom',
+      titel: "Berie's Exam Space is vernieuwd.",
+      tekst: 'Nieuwe stijl, een account dat je voortgang bewaart, en alle vakken van je jaar op één plek. In een paar dia\'s zie je wat er veranderd is en hoe het werkt.',
+      beeld: `
+        <div class="hl-merk">
+          <span class="hl-merk-b" aria-hidden="true">B</span>
+          <span class="hl-merk-naam">Berie's Exam Space</span>
+          <span class="hl-merk-sub">Duidelijk leren. Rustig groeien.</span>
+        </div>`
+    },
+    {
+      soort: 'intro',
+      naam: 'Oud naast nieuw',
+      label: 'Oud naast nieuw',
+      titel: 'Zelfde vragen, nieuwe jas.',
+      tekst: 'De oude site was één lange pagina per vak. Nu kies je eerst je jaar en je vak, vink je hoofdstukken aan en oefen je in <strong>Training</strong> of <strong>Simulatie</strong>. Je voortgang blijft bewaard.',
+      beeld: `
+        <div class="oudnieuw">
+          <div class="mini is-oud">
+            <span class="mini-label">Oud</span>
+            <span class="mini-oud-kop">Berie's Exam Space</span>
+            <span class="mini-oud-link">Statistiek I</span>
+            <span class="mini-oud-link">Inleiding pedagogiek</span>
+            <span class="mini-oud-vraag">Vraag 12. Welke maat hoort bij een ordinale schaal?</span>
+            <span class="mini-oud-optie">a) gemiddelde</span>
+            <span class="mini-oud-optie">b) mediaan</span>
+            <span class="mini-oud-optie">c) standaardafwijking</span>
+          </div>
+          <div class="mini is-nieuw">
+            <span class="mini-label">Nieuw</span>
+            <span class="tel-kop">Kies je hoofdstukken</span>
+            <div class="tel-kaart"><span class="tel-vink is-aan">✓</span>Meetschalen</div>
+            <div class="tel-kaart"><span class="tel-vink is-aan">✓</span>Centrummaten</div>
+            <div class="tel-kaart"><span class="tel-vink"></span>Spreiding</div>
+            <div class="tel-knop">Start →</div>
+          </div>
+        </div>`
+    },
+    {
+      soort: 'uitleg',
       naam: 'Vakken',
       label: 'Vakken',
       titel: 'Alle vakken van je jaar, op één plek.',
@@ -23,6 +67,7 @@ window.BES = window.BES || {};
         <div class="tel-kaart">Examen-info<span class="tel-pijl">→</span></div>`)
     },
     {
+      soort: 'uitleg',
       naam: 'Examensimulatie',
       label: 'Examensimulatie',
       titel: 'Oefen zoals op het examen.',
@@ -38,6 +83,7 @@ window.BES = window.BES || {};
         <div class="tel-knop">Volgende →</div>`)
     },
     {
+      soort: 'uitleg',
       naam: 'Hoofdstukken kiezen',
       label: 'Hoe werkt het',
       titel: 'Vink je hoofdstukken aan en start.',
@@ -51,6 +97,7 @@ window.BES = window.BES || {};
         <div class="tel-knop">Start →</div>`)
     },
     {
+      soort: 'uitleg',
       naam: 'Voortgang',
       label: 'Hoe werkt het',
       titel: 'Zie je voortgang groeien.',
@@ -74,6 +121,25 @@ window.BES = window.BES || {};
         </div>`)
     },
     {
+      soort: 'groep',
+      naam: 'WhatsApp-groep',
+      label: 'WhatsApp-groep',
+      titel: 'Blijf op de hoogte.',
+      tekst: 'In de groep hoor je als eerste wat er nieuw is: vakken, vragen en verbeteringen. Alleen updates, geen drukte.<br><a class="knop hl-whatsapp" href="https://chat.whatsapp.com/Ci1d1PQzvWr6VPcq10l7bK">Word lid →</a>',
+      beeld: `
+        <div class="hl-qr">
+          <img src="${BASIS}assets/whatsapp-qr.svg" width="200" height="200" alt="">
+          <span>Scan met je telefoon</span>
+        </div>
+        <div class="hl-groep" aria-hidden="true">
+          <span class="hl-groep-icoon">B</span>
+          <span class="hl-groep-naam">Berie's Exam Space</span>
+          <span class="hl-groep-sub">WhatsApp-groep · alleen updates</span>
+          <span class="hl-groep-sub">Bijna 200 studenten</span>
+        </div>`
+    },
+    {
+      soort: 'nieuw',
       naam: 'Wat is nieuw',
       label: 'Wat is nieuw',
       titel: 'Dit is er de laatste tijd veranderd.',
@@ -86,14 +152,15 @@ window.BES = window.BES || {};
     + '<svg class="hl-ico-speel" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.5v11a.8.8 0 0 0 1.2.7l9-5.5a.8.8 0 0 0 0-1.4l-9-5.5A.8.8 0 0 0 3 1.5z"/></svg>';
 
   window.BES.highlights = (root, opties = {}) => {
-    const dias = DIAS.filter(dia => opties.metNieuw !== false || !dia.lijst);
+    const soorten = opties.soorten || ['intro', 'uitleg', 'groep', 'nieuw'];
+    const dias = DIAS.filter(dia => soorten.includes(dia.soort) && (opties.metNieuw !== false || !dia.lijst));
     const naam = root.id || 'hl';
     const kop = opties.kopniveau || 'h3';
     root.classList.add('hl');
     root.innerHTML = `
       <div class="hl-baan" tabindex="0">
         ${dias.map((dia, n) => `
-          <article class="hl-kaart${dia.lijst ? ' is-lijst' : ''}" id="${naam}-dia-${n + 1}" aria-roledescription="dia" aria-label="${n + 1} van ${dias.length}: ${dia.naam}">
+          <article class="hl-kaart is-${dia.soort}${dia.lijst ? ' is-lijst' : ''}" id="${naam}-dia-${n + 1}" aria-roledescription="dia" aria-label="${n + 1} van ${dias.length}: ${dia.naam}">
             <div class="hl-tekst">
               <p class="hl-label">${dia.lijst && window.BES_VERSIE ? `${dia.label} · Versie ${window.BES_VERSIE}` : dia.label}</p>
               <${kop} class="hl-titel">${dia.titel}</${kop}>
