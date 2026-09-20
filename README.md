@@ -64,7 +64,7 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 37), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 38), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.
@@ -174,6 +174,10 @@ create policy "eigen feedback lezen" on public.feedback for select using (auth.u
 ```
 
 Zolang de tabel ontbreekt, toont de pagina de rode regel "Feedback is nog niet ingeschakeld." en verwijst ze naar de WhatsApp-groep.
+
+## Examen-info
+
+26 vragen sinds 15-09-2026, plus sinds 21-09-2026 de categorie "Volgend jaar" met vijf vragen over herinschrijving en studievoortgang (OER art. 60 §4, 88 §1 tot §3, 59 §3; bron: het geverifieerde rapport in Backup-D-schijf/Bestanden/Notities/examen-info-vub-geverifieerd.md). Zoekvak en categorieën bestonden al. Onderaan een kaart "Mijn vraag staat er niet bij →" naar feedback.html; de lege zoekstaat verwijst ook naar Feedback in plaats van de WhatsApp-groep. Nooit iets uit het rapportdeel "Nog te bevestigen" publiceren.
 
 ## Persoonlijke studiekalender
 

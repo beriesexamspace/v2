@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="assets/deur.js?v=37"></script>
+  <script src="assets/deur.js?v=38"></script>
   <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta property="og:type" content="website">
@@ -30,13 +30,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=37">
-  <script src="assets/app.js?v=37"></script>
-  <script src="assets/config.js?v=37" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=38">
+  <script src="assets/app.js?v=38"></script>
+  <script src="assets/config.js?v=38" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=37" defer></script>
-  <script src="assets/activiteit.js?v=37" defer></script>
+  <script src="assets/auth.js?v=38" defer></script>
+  <script src="assets/activiteit.js?v=38" defer></script>
   <style>
+    .info-vraag-ontbreekt { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 20px; margin-top: 28px; }
+    .info-vraag-ontbreekt p { margin: 0; max-width: 34rem; color: var(--ink-soft); font-size: .9375rem; line-height: 1.6; }
+    .info-vraag-ontbreekt .knop-secundair { width: auto; min-width: 0; margin: 0; text-decoration: none; }
     .info-wrap { max-width: 808px; }
     .info-wrap .pagina-kop .eyebrow { margin: 0 0 20px; color: var(--accent); font-size: .875rem; }
     .info-filters { margin: 0 0 28px; }
@@ -103,6 +106,7 @@
           <button class="knop-secundair info-tab" type="button" role="tab" id="categorie-punten" aria-selected="false" aria-controls="info-resultaten" tabindex="-1" data-cat="punten">Je puntenblad</button>
           <button class="knop-secundair info-tab" type="button" role="tab" id="categorie-cijfer" aria-selected="false" aria-controls="info-resultaten" tabindex="-1" data-cat="cijfer">Eindcijfer &amp; graad</button>
           <button class="knop-secundair info-tab" type="button" role="tab" id="categorie-inzage" aria-selected="false" aria-controls="info-resultaten" tabindex="-1" data-cat="inzage">Inzage &amp; beroep</button>
+          <button class="knop-secundair info-tab" type="button" role="tab" id="categorie-volgend" aria-selected="false" aria-controls="info-resultaten" tabindex="-1" data-cat="volgend">Volgend jaar</button>
         </div>
       </div>
 
@@ -317,11 +321,55 @@
               <a class="info-bron" href="https://www.vub.be/sites/default/files/2025-07/2025_Reglementen_OER_2025-2026_NL.pdf" rel="noopener">OER Art. 114 + PE ↗</a>
             </div>
           </article>
+          <article class="kaart info-kaart" data-cat="volgend">
+            <h2>Moet ik mij elk jaar opnieuw inschrijven?</h2>
+            <p class="info-antwoord">Ja. De herinschrijving voor een volgend academiejaar is iets anders dan de inschrijving voor de tweede zit. De administratieve herinschrijving voor het volgende jaar doe je uiterlijk op 15 februari. Voor de tweede zit schrijf je je apart in tussen 15 en 30 juni.</p>
+            <div class="info-bronnen">
+              <span class="label">Bevestigd</span>
+              <a class="info-bron" href="https://www.vub.be/sites/default/files/2025-07/2025_Reglementen_OER_2025-2026_NL.pdf" rel="noopener">OER Art. 60 §4 en Art. 107 §2 ↗</a>
+            </div>
+          </article>
+          <article class="kaart info-kaart" data-cat="volgend">
+            <h2>Wat is studievoortgangsbewaking?</h2>
+            <p class="info-antwoord">Haal je in je eerste jaar niet voor alle vakken een credit of een getolereerde onvoldoende, dan moet je die vakken bij je tweede inschrijving alsnog halen. Dat is een bindende voorwaarde: lukt het niet, dan mag je je niet opnieuw inschrijven voor dezelfde opleiding, behalve bij overmacht of bijzondere omstandigheden.</p>
+            <div class="info-bronnen">
+              <span class="label">Bevestigd</span>
+              <a class="info-bron" href="https://www.vub.be/sites/default/files/2025-07/2025_Reglementen_OER_2025-2026_NL.pdf" rel="noopener">OER Art. 88 §1 ↗</a>
+            </div>
+          </article>
+          <article class="kaart info-kaart" data-cat="volgend">
+            <h2>Ik haalde minder dan 30 procent van mijn studiepunten. Wat nu?</h2>
+            <p class="info-antwoord">Wie na de eerste inschrijving minder dan 30 procent studierendement heeft, kan zich niet opnieuw inschrijven voor dezelfde opleiding, behalve bij overmacht of bijzondere omstandigheden. Hoe het rendement precies berekend wordt, vraag je na bij Studiebegeleiding.</p>
+            <div class="info-bronnen">
+              <span class="label">Bevestigd</span>
+              <a class="info-bron" href="https://www.vub.be/sites/default/files/2025-07/2025_Reglementen_OER_2025-2026_NL.pdf" rel="noopener">OER Art. 88 §2 ↗</a>
+            </div>
+          </article>
+          <article class="kaart info-kaart" data-cat="volgend">
+            <h2>Ik zit onder 60 procent van mijn studiepunten. Wat betekent dat?</h2>
+            <p class="info-antwoord">Dan krijg je bij je volgende herinschrijving een bindende voorwaarde: slagen voor 75 procent van de opgenomen studiepunten, en voor elk vak waarvoor je al twee keer zonder credit ingeschreven was. Je mag maximaal 60 studiepunten opnemen en de faculteit kan studiebegeleiding verplichten.</p>
+            <div class="info-bronnen">
+              <span class="label">Bevestigd</span>
+              <a class="info-bron" href="https://www.vub.be/sites/default/files/2025-07/2025_Reglementen_OER_2025-2026_NL.pdf" rel="noopener">OER Art. 88 §3 ↗</a>
+            </div>
+          </article>
+          <article class="kaart info-kaart" data-cat="volgend">
+            <h2>Heb ik recht op een gesprek en op genoeg studiepunten?</h2>
+            <p class="info-antwoord">Ja. Bij zo een bindende voorwaarde heb je recht op een gesprek met Studiebegeleiding, en op minstens 45 studiepunten in je programma, tenzij de volgtijdelijkheid van vakken dat verhindert.</p>
+            <div class="info-bronnen">
+              <span class="label">Bevestigd</span>
+              <a class="info-bron" href="https://www.vub.be/sites/default/files/2025-07/2025_Reglementen_OER_2025-2026_NL.pdf" rel="noopener">OER Art. 88 §3 en Art. 59 §3 ↗</a>
+            </div>
+          </article>
         </div>
-        <p class="info-leeg" id="info-leeg" hidden>Geen antwoord gevonden. <a href="whatsapp.html">Stel je vraag in de WhatsApp-groep.</a></p>
+        <p class="info-leeg" id="info-leeg" hidden>Geen antwoord gevonden. <a href="feedback.html">Stel je vraag via Feedback</a>, dan voegen we hem toe.</p>
       </section>
 
-      <p class="info-brondatum">Bron: VUB-reglement 2025-2026. Referentie overgenomen op 15-09-2026.<br>Klopt er iets niet meer? <a href="whatsapp.html">Laat het weten in de WhatsApp-groep.</a></p>
+      <div class="kaart info-vraag-ontbreekt">
+        <p>Staat je vraag er niet bij? Stuur hem in, dan zoeken we het antwoord op in het reglement en zetten we hem hier neer.</p>
+        <a class="knop-secundair" href="feedback.html">Mijn vraag staat er niet bij →</a>
+      </div>
+      <p class="info-brondatum">Bron: VUB-reglement 2025-2026. Referentie overgenomen op 15-09-2026, aangevuld op 21-09-2026.<br>Klopt er iets niet meer? <a href="feedback.html">Laat het weten via Feedback.</a></p>
     </div>
   </main>
 
