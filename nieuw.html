@@ -29,45 +29,36 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=26">
-  <link rel="stylesheet" href="assets/highlights.css?v=26">
-  <script src="assets/app.js?v=26"></script>
-  <script src="assets/updates.js?v=26"></script>
-  <script src="assets/highlights.js?v=26"></script>
-  <script src="assets/config.js?v=26" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=27">
+  <link rel="stylesheet" href="assets/intro.css?v=27">
+  <script src="assets/app.js?v=27"></script>
+  <script src="assets/updates.js?v=27"></script>
+  <script src="assets/intro.js?v=27"></script>
+  <script src="assets/config.js?v=27" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=26" defer></script>
-  <script src="assets/activiteit.js?v=26" defer></script>
+  <script src="assets/auth.js?v=27" defer></script>
+  <script src="assets/activiteit.js?v=27" defer></script>
   <style>
-    /* Alles in één scherm: kop, carrousel, balkjes en de knop Begrepen, zonder scrollen. */
+    /* Alles in één scherm: kop, de stap, en de knoppen, zonder scrollen. */
     html, body { height: 100%; overflow: hidden; }
-    .nieuw-pagina { display: flex; flex-direction: column; height: 100vh; height: 100dvh; padding: 36px 0 14px; overflow: hidden; }
+    .nieuw-pagina { display: flex; flex-direction: column; height: 100vh; height: 100dvh; padding: 36px 0 16px; overflow: hidden; }
     .nieuw-pagina .pagina-kop { margin-bottom: 12px; }
     .nieuw-pagina .pagina-kop .eyebrow { margin: 0 0 10px; color: var(--accent); font-size: .9375rem; }
     .nieuw-pagina .pagina-kop h1 { font-size: clamp(1.625rem, 3.2vw, 2.5rem); }
     .nieuw-pagina .pagina-kop p { margin-top: 10px; font-size: clamp(.9375rem, 1.2vw, 1.125rem); }
-    .nieuw-pagina .hl { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; }
-    .nieuw-pagina .hl-baan { flex: 1 1 auto; min-height: 0; padding-top: 6px; padding-bottom: 14px; }
-    .nieuw-pagina .hl-kaart { min-height: 0; }
-    .nieuw-pagina .hl-bediening { flex: none; margin-top: 0; }
-    .nieuw-verder { display: flex; flex: none; justify-content: center; margin-top: 12px; }
-    .nieuw-begrepen:disabled,
-    .nieuw-begrepen:disabled:hover,
-    .nieuw-begrepen:disabled:active { opacity: .45; transform: none; box-shadow: var(--shadow-primary); cursor: default; }
+    .nieuw-intro { flex: 1 1 auto; min-height: 0; width: 100%; max-width: 1100px; margin: 0 auto; padding: 0 24px; box-sizing: border-box; }
+    .nieuw-intro .stap-kaart { flex: 1 1 auto; min-height: 0; }
     .site-footer { display: none; }
     @media (max-width: 767px) {
-      .nieuw-pagina { padding-top: 24px; }
+      .nieuw-pagina { padding-top: 22px; }
       .nieuw-pagina .pagina-kop { margin-bottom: 8px; padding-right: 56px; }
-      .nieuw-pagina .hl-kaart { grid-template-rows: auto minmax(0, 1fr); }
-      .nieuw-pagina .hl-tekst { padding: 20px 20px 12px; }
-      .nieuw-pagina .hl-beeld { padding-top: 12px; }
-      .nieuw-pagina .hl-updates { padding-bottom: 20px; }
+      .nieuw-intro { padding: 0 16px; }
     }
     /* Te weinig hoogte (bijvoorbeeld een telefoon in de breedte): dan mag de pagina gewoon scrollen. */
     @media (max-height: 560px) {
       html, body { height: auto; overflow: auto; }
       .nieuw-pagina { height: auto; min-height: 100vh; min-height: 100dvh; overflow: visible; }
-      .nieuw-pagina .hl-kaart { min-height: 380px; }
+      .nieuw-intro .stap-kaart { min-height: 380px; }
     }
   </style>
 </head>
@@ -78,15 +69,11 @@
       <header class="pagina-kop">
         <p class="eyebrow">Berie's Exam Space</p>
         <h1 id="nieuw-titel">Welkom.</h1>
-        <p>Swipe zelf, of laat het even lopen. Daarna weet je hoe alles werkt.</p>
+        <p>Klik op Volgende, of sla over. Daarna weet je hoe alles werkt.</p>
       </header>
     </div>
 
-    <section class="hl" id="hl" aria-roledescription="carrousel" aria-label="Highlights van Berie's Exam Space"></section>
-
-    <div class="wrap nieuw-verder">
-      <button class="knop nieuw-begrepen" id="nieuw-begrepen" type="button" disabled aria-disabled="true">Begrepen →</button>
-    </div>
+    <section class="nieuw-intro" id="intro" aria-label="Kennismaking met Berie's Exam Space"></section>
   </main>
 
   <footer class="site-footer">
@@ -94,25 +81,15 @@
     <div class="footer-details">
       <p>Duidelijk leren. Rustig groeien.</p>
       <p class="project-label">A project of The Berie Foundation</p>
-      <p class="footer-links"><a href="privacy.html">Privacy</a><span aria-hidden="true"> · </span><a href="mailto:berie007yldrm@gmail.com">berie007yldrm@gmail.com</a></p>
     </div>
   </footer>
 
   <script>
     (() => {
-      const verder = document.getElementById('nieuw-begrepen');
-      window.BES.highlights(document.getElementById('hl'), {
-        metNieuw: true,
-        kopniveau: 'h2',
-        bijLaatste: () => {
-          verder.disabled = false;
-          verder.setAttribute('aria-disabled', 'false');
-        }
-      });
-
-      verder.addEventListener('click', async () => {
-        if (verder.disabled) return;
-        verder.disabled = true;
+      let klaar = false;
+      const afronden = async () => {
+        if (klaar) return;
+        klaar = true;
         const versie = window.BES_VERSIE || 0;
         try {
           window.localStorage.setItem('bes_versie_gezien', String(versie));
@@ -124,6 +101,12 @@
           if (await auth.gebruiker()) await auth.profielBijwerken({ versieGezien: versie });
         } catch {}
         window.location.assign('hub.html' + window.location.hash);
+      };
+      window.BES.stappen(document.getElementById('intro'), {
+        kopniveau: 'h2',
+        overslaan: true,
+        laatsteTekst: 'Begrepen →',
+        bijKlaar: afronden
       });
     })();
   </script>

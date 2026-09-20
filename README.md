@@ -37,8 +37,8 @@ assets/vak.css        aanvullende stijl van de vakpagina
 assets/vak.js         logica van de vakpagina
 assets/vakken.js      lijst van alle vakken per jaar
 assets/updates.js     updates voor de sectie Wat is nieuw op de hub
-assets/highlights.css gedeelde stijl van de highlights-carrousel (welkomstscherm en Hoe werkt het op de hub)
-assets/highlights.js  bouwt de carrousel: BES.highlights(element, { metNieuw, kopniveau, bijLaatste })
+assets/intro.css      stijl van de stap-voor-stap-intro (welkomstscherm en Hoe werkt het op de hub), inclusief de animaties per stap
+assets/intro.js       bouwt de stappen: BES.stappen(element, { soorten, kopniveau, overslaan, lus, laatsteTekst, bijKlaar })
 assets/icoon-*.png    beginscherm-iconen (180 Apple, 192 en 512 manifest); assets/deel.png is het deelvoorbeeld (1200x630) voor WhatsApp en co
 assets/activiteit.js  persoonlijke dagtotalen, bezoeksessies en studiekalender
 assets/kalender.css   aanvullende stijl voor de studiekalender
@@ -60,7 +60,7 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 26), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 27), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.
@@ -111,7 +111,7 @@ Hoe het bijhoudt wie het gezien heeft: "Begrepen →" zet `localStorage.bes_vers
 
 **Nieuwe versie uitbrengen** (alleen als Berat het zegt, alle wijzigingen van de tussenliggende periode samen): 1) de updates toevoegen met `versie: N`, 2) `window.BES_VERSIE = N`, 3) cachenummer verhogen. Daarna ziet iedereen die inlogt het scherm één keer.
 
-`nieuw.html` is sinds 20-09-2026 een highlights-carrousel met acht dia's: Welkom, Oud naast nieuw (getekende schermpjes van de oude en de nieuwe site), Vakken, Examensimulatie, Hoofdstukken kiezen, Voortgang, WhatsApp-groep (QR op desktop, groepskaartje plus knop op de telefoon) en Wat is nieuw. Elke dia heeft een `soort` (intro, uitleg, groep, nieuw); de hub toont alleen `soorten: ['uitleg']`. Hij loopt vanzelf door (8 seconden per dia, balkje vult zich), stopt bij de pauzeknop, bij een verborgen tabblad en bij "prefers-reduced-motion", en laat zich swipen, scrollen, met de pijltoetsen en via de stippen bedienen. De beelden zijn getekende telefoons in gewone opmaak (geen screenshots van de site). "Begrepen →" wordt actief zodra de laatste dia in beeld is geweest. Het welkomstscherm heeft bewust geen navigatiebalk (alleen de losse themaknop); "Begrepen →" zet ook `sessionStorage.bes_nav_intro`, waarna `hub.html` die sleutel meteen wist en de klasse `nav-intro` op `<html>` zet, zodat de balk daar één keer van boven binnenschuift (`nav-binnen`, niet bij "prefers-reduced-motion"). Vaste regel: geen `scroll-snap-stop: always` op de dia's, anders stopt een sprong over meerdere dia's halverwege.
+`nieuw.html` is sinds 20-09-2026 (avond) een stap-voor-stap-intro: één kaart per stap met "Volgende →", "← Vorige", "Overslaan" en een teller, acht stappen (Welkom, Oud naast nieuw, Vakken, Examensimulatie, Hoofdstukken kiezen, Voortgang, WhatsApp-groep met QR, Wat is nieuw). Niets loopt vanzelf; elke stap heeft korte animaties (elementen komen na elkaar binnen, vinkjes tikken aan, balken vullen, een antwoord wordt gekozen) via klassen `anim`, `anim-pop`, `anim-vink`, `anim-vul` (met `--doel`), `anim-kies`, `anim-teal`, `anim-puls` en `--i` voor de volgorde; bij "prefers-reduced-motion" staan ze uit en staat alles meteen in de eindstand. Vegen werkt op de telefoon, pijltoetsen op de pc. De laatste knop heet "Begrepen →"; Overslaan telt ook als gezien. De beelden zijn getekende telefoons in gewone opmaak (geen screenshots van de site). Let op: de klasse `.intro` bestaat al in style.css (startpagina), daarom heten de klassen hier `.stappen` en `.stap-*`.
 
 De licht/donkerkeuze staat in `localStorage.bes_thema` (`licht` of `donker`). Zonder keuze volgt de pagina het systeem. Bij ingelogde accounts wordt de keuze ook opgeslagen in `user_metadata.thema`; de accountkeuze wordt toegepast zodra de sessie geladen is. Het kleine script vóór de stylesheet past de lokaal bekende keuze al vóór het eerste beeld toe. Op een nieuw toestel kan de accountkeuze pas worden toegepast zodra de accountgegevens beschikbaar zijn. `BES.themaToepassen()` past een keuze toe en bewaart die lokaal.
 
@@ -133,7 +133,7 @@ Zolang de bucket ontbreekt, meldt de profielpagina "Foto's zijn nog niet ingesch
 
 ## Privacy, account wissen en beheer
 
-- `privacy.html` beschrijft in gewone taal wat er bewaard wordt. Elke voettekst linkt ernaar (`.footer-links`, samen met het contactadres berie007yldrm@gmail.com); het aanmeldformulier heeft er een regel over onder de knop.
+- `privacy.html` beschrijft in gewone taal wat er bewaard wordt. De link en het contactadres berie007yldrm@gmail.com staan op Over mij (bij de sociale links) en het adres ook op de feedbackpagina; het aanmeldformulier heeft een regel over privacy onder de knop. In de voettekst staan ze bewust niet (Berat, 20-09-2026).
 - Account wissen: onderaan `profiel.html` (alleen ingelogd zichtbaar). Eerst WISSEN typen, dan roept de pagina `rpc('account_verwijderen')` aan. Die functie (security definer) wist de avatar in de bucket, de rijen in voortgang, feedback en studieactiviteit en de rij in auth.users. Daarna signOut en terug naar de startpagina.
 - Beheer: `beheer.html` roept `studie_totalen()` en `studie_dagcijfers(30)` aan. Beide geven alleen rijen terug als de ingelogde gebruiker in de tabel `beheerders` staat (gevuld via de SQL-editor, nooit een e-mailadres in de code). Een dag telt zodra iemand minstens 60 seconden leertijd of één bezoek had.
 - De SQL staat in `supabase/account-en-beheer.sql`.
@@ -185,9 +185,13 @@ Voer [supabase/studieactiviteit.sql](supabase/studieactiviteit.sql) één keer u
 
 Zonder tabel, functie of verbinding blijft de kalender lokaal werken en vermeldt hij expliciet dat synchronisatie niet beschikbaar is. Verwar deze lokale werking niet met een bevestigde koppeling tussen apparaten. Na inrichting moeten een echt testaccount op twee apparaten en de toegangscontrole met een tweede testaccount nog worden gecontroleerd. De geautomatiseerde controles gebruiken nagebootste accounts en een nagebootste database.
 
+## Startpagina
+
+De handgeschreven "Berie's Exam Space" op de startpagina heeft sinds 20-09-2026 een dikke lijn (stroke-width 9, krul 7, verbindingen 6, opacity .95) op verzoek van Berat: zelfde beweging en kleur, alleen dikker.
+
 ## Hoe werkt het (hub)
 
-Sinds 20-09-2026 staat hier dezelfde highlights-carrousel als op het welkomstscherm (zonder de dia Wat is nieuw en zonder pauzeknop, `metPauze: false`). De uitklapbare volledige uitleg is op verzoek van Berat weggehaald. De carrousel loopt alleen door zolang hij in beeld is. De navigatiebalk heeft geen link Wat is nieuw meer; de sectie op de hub bestaat nog wel (`#nieuw`).
+Sinds 20-09-2026 staan hier de vier uitleg-stappen van de intro (`soorten: ['uitleg'], lus: true`: na de laatste stap "Opnieuw"). De uitklapbare volledige uitleg is op verzoek van Berat weggehaald. Bij Tools staat een vierde kaart "Praat met Comit" met het label Binnenkort (nog geen link). De navigatiebalk heeft geen link Wat is nieuw meer; de sectie op de hub bestaat nog wel (`#nieuw`).
 
 De sectie `hub.html#hoe-werkt-het` bestaat uit vier korte kaarten (Log in, Kies je jaar en vak, Kies hoofdstukken en oefenvorm, Zie je voortgang groeien) en daaronder een `details` "Volledige uitleg →" met tien tekststappen (Waar / Klik op / Daarna) met de exacte knopnamen van de site. Vaste regel: uitleg op de hub is tekst. Geen screenshots van de site in de site, geen nagemaakte muis, geen animaties in uitleg; maximaal vier kaarten zichtbaar, de rest ingeklapt. Verandert een knopnaam, pas dan ook de tekst hier aan.
 

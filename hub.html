@@ -14,7 +14,7 @@
   <meta property="og:image:height" content="630">
   <meta property="og:url" content="https://beriesexamspace.com/v2/hub.html">
   <meta name="twitter:card" content="summary_large_image">
-  <script src="assets/updates.js?v=26"></script>
+  <script src="assets/updates.js?v=27"></script>
   <script>
     // Welkomstscherm (Wat is nieuw) één keer per persoon per versie.
     // Op dit toestel al gezien: meteen door. Anders even wachten op het account (misschien al gezien op een ander toestel).
@@ -58,14 +58,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=26">
-  <link rel="stylesheet" href="assets/highlights.css?v=26">
-  <script src="assets/app.js?v=26"></script>
-  <script src="assets/highlights.js?v=26"></script>
-  <script src="assets/config.js?v=26" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=27">
+  <link rel="stylesheet" href="assets/intro.css?v=27">
+  <script src="assets/app.js?v=27"></script>
+  <script src="assets/intro.js?v=27"></script>
+  <script src="assets/config.js?v=27" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=26" defer></script>
-  <script src="assets/activiteit.js?v=26" defer></script>
+  <script src="assets/auth.js?v=27" defer></script>
+  <script src="assets/activiteit.js?v=27" defer></script>
   <style>
     html { scroll-behavior: smooth; }
 
@@ -121,6 +121,8 @@
     :where(html.has-hover) a.kaart.jaar[data-jaar]:not([aria-disabled="true"]):active { transform: scale(.985); }
 
     .hub-sectie { scroll-margin-top: 88px; }
+    .kaart-binnenkort { cursor: default; opacity: .8; }
+    .kaart-binnenkort .kaart-label { flex: 0 0 auto; padding: 4px 10px; border-radius: var(--radius-pill); background: var(--surface); color: var(--ink-soft); font-size: .75rem; font-weight: 600; line-height: 1.4; white-space: nowrap; }
 
 
 
@@ -156,8 +158,7 @@
       .hub-update { grid-template-columns: minmax(0, 1fr); gap: 4px; }
     }
 
-    .hub-hl { --hl-breedte: calc(100cqw - 48px); margin: 0 -24px; }
-    .hub-hl .hl-kaart { min-height: 440px; }
+    .hub-intro .stap-kaart { min-height: 440px; }
 
     html.versie-check body { visibility: hidden; }
 
@@ -268,6 +269,13 @@
             </span>
             <span class="pijl" aria-hidden="true">→</span>
           </a>
+          <div class="kaart kaart-pijl kaart-binnenkort" aria-disabled="true">
+            <span class="kaart-tekst">
+              <span class="kaart-titel">Praat met Comit</span>
+              <span class="kaart-sub">Je studiemaatje op de site. Komt binnenkort.</span>
+            </span>
+            <span class="kaart-label">Binnenkort</span>
+          </div>
         </div>
       </section>
 
@@ -281,7 +289,7 @@
 
       <section class="sectie hub-sectie" id="hoe-werkt-het" aria-labelledby="hoe-werkt-het-kop">
         <h2 class="sectie-kop" id="hoe-werkt-het-kop">Hoe werkt het</h2>
-        <section class="hl hub-hl" id="hub-hl" aria-roledescription="carrousel" aria-label="Hoe werkt het, in vier dia's"></section>
+        <section class="hub-intro" id="hub-intro" aria-label="Hoe werkt het, in vier stappen"></section>
 
       </section>
 
@@ -293,7 +301,6 @@
     <div class="footer-details">
       <p>Duidelijk leren. Rustig groeien.</p>
       <p class="project-label">A project of The Berie Foundation</p>
-      <p class="footer-links"><a href="privacy.html">Privacy</a><span aria-hidden="true"> · </span><a href="mailto:berie007yldrm@gmail.com">berie007yldrm@gmail.com</a></p>
     </div>
   </footer>
 
@@ -335,7 +342,7 @@
         });
       });
 
-      window.BES.highlights(document.getElementById('hub-hl'), { soorten: ['uitleg'], metPauze: false });
+      window.BES.stappen(document.getElementById('hub-intro'), { soorten: ['uitleg'], lus: true });
 
       const updates = document.getElementById('hub-updates');
       const updatesKnop = document.getElementById('hub-updates-knop');
