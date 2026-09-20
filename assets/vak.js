@@ -629,10 +629,51 @@
           byId('overzicht-vragen').append(item);
         });
       }
+      renderComit(answers, correct);
       showScreen('einde');
       byId('score-kop').focus({ preventScroll: true });
       byId('eindscherm').scrollIntoView({ block: 'start', behavior: 'instant' });
       scheduleSync();
+    }
+
+    // Comit-basis zonder AI: sterke en zwakke hoofdstukken uit deze ronde, plus één tip met een knop.
+    function renderComit(answers, correct) {
+      const kaart = byId('comit');
+      if (!kaart) return;
+      const perHoofdstuk = data.hoofdstukken.map(chapter => {
+        const group = answers.filter(entry => entry.question.h === chapter.id);
+        return { chapter, totaal: group.length, goed: group.filter(correct).length };
+      }).filter(item => item.totaal);
+      const sterk = perHoofdstuk.filter(item => item.goed === item.totaal);
+      const zwak = perHoofdstuk.filter(item => item.goed < item.totaal).sort((a, b) => (a.goed / a.totaal) - (b.goed / b.totaal));
+      const namen = lijst => lijst.map(item => item.chapter.naam);
+      const opsomming = lijst => lijst.length <= 1 ? lijst.join('') : lijst.slice(0, -1).join(', ') + ' en ' + lijst[lijst.length - 1];
+      const regels = [];
+      let tip = '';
+      let knopTekst = '';
+      let knopActie = null;
+      if (!zwak.length) {
+        regels.push(perHoofdstuk.length === 1 ? `Alles goed in ${perHoofdstuk[0].chapter.naam}.` : `Alles goed: ${opsomming(namen(sterk))}.`);
+        const hardKan = hasLevels && session.level !== 'hard' && data.hardVragen.length >= 8;
+        tip = hardKan ? 'Klaar voor een stap verder? Probeer dezelfde stof in Hard mode.' : 'Kies een volgend hoofdstuk, of doe deze ronde over een paar dagen nog eens; dan blijft het zitten.';
+        knopTekst = 'Terug naar het vak';
+        knopActie = () => { showScreen('keuzes'); scrollNaar(byId('vak-keuzes')); };
+      } else {
+        if (sterk.length) regels.push(`Sterk: ${opsomming(namen(sterk))}.`);
+        const eerste = zwak[0];
+        regels.push(`Nog even oefenen: ${eerste.chapter.naam}, ${eerste.goed} van ${eerste.totaal} goed${zwak.length > 1 ? `, en ook ${opsomming(namen(zwak.slice(1, 3)))}` : ''}.`);
+        const vragen = questionsFor(session.level).filter(question => question.h === eerste.chapter.id);
+        if (session.mode === 'simulatie') tip = `Doe ${eerste.chapter.naam} nog eens in Training. Daar krijg je bij elke vraag meteen uitleg.`;
+        else if (eerste.goed / eerste.totaal < .5) tip = `Lees eerst de theorie van ${eerste.chapter.naam} en doe het hoofdstuk daarna opnieuw.`;
+        else tip = `Bijna. Doe ${eerste.chapter.naam} nog één keer, dan zit het.`;
+        knopTekst = `Oefen ${eerste.chapter.naam} →`;
+        knopActie = () => start(vragen, 'training', session.level);
+      }
+      byId('comit-regels').replaceChildren(...regels.map(regel => create('p', '', regel)));
+      byId('comit-tip').textContent = tip;
+      const knop = byId('comit-knop');
+      knop.textContent = knopTekst;
+      knop.onclick = knopActie;
     }
 
     function renderContent() {

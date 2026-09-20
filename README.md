@@ -64,7 +64,7 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 35), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 36), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.
@@ -204,6 +204,10 @@ Sinds 20-09-2026 (nacht) staat hier de Apple-carrousel `BES.carrousel(element, {
 De sectie `hub.html#hoe-werkt-het` bestaat uit vier korte kaarten (Log in, Kies je jaar en vak, Kies hoofdstukken en oefenvorm, Zie je voortgang groeien) en daaronder een `details` "Volledige uitleg →" met tien tekststappen (Waar / Klik op / Daarna) met de exacte knopnamen van de site. Vaste regel: uitleg op de hub is tekst. Geen screenshots van de site in de site, geen nagemaakte muis, geen animaties in uitleg; maximaal vier kaarten zichtbaar, de rest ingeklapt. Verandert een knopnaam, pas dan ook de tekst hier aan.
 
 ## Vakpagina
+
+### Comit-basis (21-09-2026)
+
+Op het eindscherm van elke ronde staat een kaart van Comit (`renderComit` in `vak.js`, markup `#comit` in het sjabloon), zonder AI: sterke hoofdstukken (alles goed), het zwakste hoofdstuk met de score, en één tip die afhangt van modus en score (na een simulatie: doe het hoofdstuk in Training; onder de helft goed: eerst de theorie; anders: nog één keer). De knop start meteen een training van dat hoofdstuk op het huidige niveau. Bij alles goed: tip richting Hard mode (als er minstens 8 Hard-vragen zijn) en de knop Terug naar het vak. Het uiterlijk van Comit is voorlopig een teal rondje met een C; Berat kiest later hoe hij eruitziet.
 
 Sinds 21-09-2026 staat er geen reco-link meer op de vakpagina's (examenreconstructies insturen is niet toegestaan; het reconstructiesysteem is geschrapt).
 

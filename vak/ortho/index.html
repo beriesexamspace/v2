@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="../../assets/deur.js?v=35"></script>
+  <script src="../../assets/deur.js?v=36"></script>
   <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta property="og:type" content="website">
@@ -31,15 +31,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../assets/style.css?v=35">
-  <link rel="stylesheet" href="../../assets/vak.css?v=35">
-  <script src="../../assets/app.js?v=35"></script>
-  <script src="../../assets/config.js?v=35" defer></script>
+  <link rel="stylesheet" href="../../assets/style.css?v=36">
+  <link rel="stylesheet" href="../../assets/vak.css?v=36">
+  <script src="../../assets/app.js?v=36"></script>
+  <script src="../../assets/config.js?v=36" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="../../assets/auth.js?v=35" defer></script>
-  <script src="../../assets/activiteit.js?v=35" defer></script>
+  <script src="../../assets/auth.js?v=36" defer></script>
+  <script src="../../assets/activiteit.js?v=36" defer></script>
   <script src="data.js?v=12" defer></script>
-  <script src="../../assets/vak.js?v=35" defer></script>
+  <script src="../../assets/vak.js?v=36" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#inhoud">Ga naar inhoud</a>
@@ -175,6 +175,15 @@
           <p class="label oefening-niveau" id="score-niveau"></p>
           <p class="vak-score-tekst" id="score-tekst"></p>
           <div class="score-hoofdstukken" id="score-hoofdstukken"></div>
+          <aside class="kaart comit" id="comit" aria-labelledby="comit-naam">
+            <span class="comit-gezicht" aria-hidden="true">C</span>
+            <div class="comit-tekst">
+              <p class="comit-naam" id="comit-naam">Comit</p>
+              <div class="comit-regels" id="comit-regels"></div>
+              <p class="comit-tip" id="comit-tip"></p>
+              <button class="knop-secundair comit-knop" type="button" id="comit-knop"></button>
+            </div>
+          </aside>
           <div class="vak-knoppen">
             <button class="knop" type="button" id="fouten-opnieuw">Fouten opnieuw →</button>
             <button class="knop-secundair" type="button" id="opnieuw">Opnieuw</button>

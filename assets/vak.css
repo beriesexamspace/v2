@@ -153,3 +153,14 @@
 @media (prefers-reduced-motion: reduce) {
   .vak-pagina[data-niveaus] .niveau-keuze:is(:hover, :active) { transform: none !important; }
 }
+
+/* Comit-basis op het eindscherm: gezicht, drie regels, één knop. Uiterlijk van Comit is nog voorlopig. */
+.comit { display: flex; gap: 16px; align-items: flex-start; margin: 20px 0 0; padding: 18px 20px; text-align: left; }
+.comit-gezicht { display: grid; place-items: center; flex: 0 0 auto; width: 44px; height: 44px; border-radius: 50%; background: var(--teal-zacht); color: var(--teal-tekst); font-size: 1.125rem; font-weight: 700; }
+.comit-tekst { display: grid; gap: 6px; min-width: 0; }
+.comit-naam { margin: 0; font-size: .8125rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--teal-tekst); }
+.comit-regels p { margin: 0; font-size: .9375rem; line-height: 1.55; }
+.comit-tip { margin: 2px 0 0; color: var(--ink-soft); font-size: .9375rem; line-height: 1.55; }
+.comit-knop.knop-secundair { justify-self: start; width: auto; max-width: 100%; min-width: 0; margin: 8px 0 0; padding: 10px 20px; line-height: 1.3; white-space: normal; text-align: center; }
+.comit-knop:empty { display: none; }
+@media (max-width: 480px) { .comit { flex-direction: column; } }
