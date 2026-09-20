@@ -33,25 +33,36 @@
   <link rel="stylesheet" href="/v2/assets/style.css?v=23">
   <script src="/v2/assets/app.js?v=23" defer></script>
   <style>
-    .niet-gevonden { display: flex; flex: 1 0 auto; align-items: center; justify-content: center; padding: 96px 24px 64px; text-align: center; }
-    .niet-gevonden-in { max-width: 34rem; }
-    .niet-gevonden .code { margin: 0 0 12px; color: var(--accent); font-size: .9375rem; font-weight: 600; letter-spacing: .04em; }
-    .niet-gevonden h1 { margin: 0; font-size: clamp(2rem, 4vw, 3rem); font-weight: 700; line-height: 1.1; letter-spacing: -.02em; text-wrap: balance; }
-    .niet-gevonden p { margin: 16px auto 0; max-width: 30rem; color: var(--ink-soft); font-size: 1.0625rem; line-height: 1.6; }
+    .niet-gevonden { display: flex; flex: 1 0 auto; align-items: center; justify-content: center; width: 100%; box-sizing: border-box; padding: 88px 16px 48px; }
+    .niet-gevonden-kaart { width: 100%; max-width: 36rem; min-width: 0; box-sizing: border-box; padding: clamp(28px, 6vw, 48px) clamp(20px, 5vw, 44px); text-align: center; }
+    .niet-gevonden-b { display: inline-grid; place-items: center; width: 56px; height: 56px; margin: 0 auto 20px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 1.625rem; font-weight: 700; }
+    .niet-gevonden .code { margin: 0 0 10px; color: var(--ink-soft); font-size: .8125rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+    .niet-gevonden h1 { margin: 0; font-size: clamp(1.75rem, 5vw, 2.5rem); font-weight: 700; line-height: 1.1; letter-spacing: -.02em; text-wrap: balance; overflow-wrap: anywhere; }
+    .niet-gevonden p { margin: 14px 0 0; color: var(--ink-soft); font-size: 1rem; line-height: 1.6; text-wrap: pretty; overflow-wrap: anywhere; }
     .niet-gevonden-knoppen { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 28px; }
+    .niet-gevonden-knoppen .knop, .niet-gevonden-knoppen .knop-secundair { flex: 1 1 200px; max-width: 100%; box-sizing: border-box; }
+    .niet-gevonden-tip { margin-top: 20px; color: var(--ink-soft); font-size: .875rem; }
+    .niet-gevonden-tip a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    :where(html.has-hover) .niet-gevonden-tip a:hover { text-decoration: underline; }
+    @media (max-width: 480px) {
+      .niet-gevonden { padding-top: 72px; }
+      .niet-gevonden-knoppen .knop, .niet-gevonden-knoppen .knop-secundair { flex-basis: 100%; }
+    }
   </style>
 </head>
 <body>
   <a class="skip-link" href="#inhoud">Ga naar inhoud</a>
   <main id="inhoud" class="niet-gevonden" aria-labelledby="niet-gevonden-titel">
-    <div class="niet-gevonden-in">
-      <p class="code">404</p>
+    <div class="kaart niet-gevonden-kaart">
+      <div class="niet-gevonden-b" aria-hidden="true">B</div>
+      <p class="code">Fout 404</p>
       <h1 id="niet-gevonden-titel">Deze pagina bestaat niet.</h1>
-      <p>De link klopt niet meer of de pagina is verhuisd. Alle vakken en tools vind je op de hub.</p>
+      <p>De link klopt niet meer, of de pagina is verhuisd. Alle vakken en tools vind je op de hub.</p>
       <div class="niet-gevonden-knoppen">
         <a class="knop" href="/v2/hub.html">Naar de hub →</a>
-        <a class="knop-secundair" href="/v2/index.html">Startpagina</a>
+        <a class="knop-secundair" id="vorige" href="/v2/index.html">Startpagina</a>
       </div>
+      <p class="niet-gevonden-tip">Klopt dit niet? Laat het weten via <a href="/v2/feedback.html">Feedback</a>.</p>
     </div>
   </main>
 
@@ -63,5 +74,17 @@
       <p class="footer-links"><a href="/v2/privacy.html">Privacy</a><span aria-hidden="true"> · </span><a href="mailto:berie007yldrm@gmail.com">berie007yldrm@gmail.com</a></p>
     </div>
   </footer>
+
+  <script>
+    // Kwam de bezoeker van een eigen pagina, dan wordt de tweede knop "Vorige pagina".
+    (() => {
+      const vorige = document.getElementById('vorige');
+      let vanEigenSite = false;
+      try { vanEigenSite = Boolean(document.referrer) && new URL(document.referrer).origin === window.location.origin && window.history.length > 1; } catch {}
+      if (!vanEigenSite) return;
+      vorige.textContent = '← Vorige pagina';
+      vorige.addEventListener('click', event => { event.preventDefault(); window.history.back(); });
+    })();
+  </script>
 </body>
 </html>
