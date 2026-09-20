@@ -3,6 +3,8 @@
 Nieuwe versie van beriesexamspace.com, in opbouw. Live voorbeeld (niet delen tot het af is): https://beriesexamspace.com/v2/
 
 ## Hoe we hieraan werken
+
+Voor Codex staat de volledige context in `AGENTS.md` (wordt door Codex automatisch gelezen) en staan de losse opdrachten in `codex/opdrachten/`; zie `codex/opdrachten/LEESMIJ.md`.
 - Claude Code bouwt alle stappen (sinds 14-09-2026). Codex springt alleen bij als Berat dat vraagt, in een eigen branch met een PR. Nooit tegelijk aan hetzelfde bestand.
 - Elke stap is een eigen commit met de stapnaam in het bericht, bijvoorbeeld `Stap 2: gedeelde basis`.
 - Voor je begint: eerst de laatste versie ophalen (`git pull`). Na je stap: alles committen en pushen.
