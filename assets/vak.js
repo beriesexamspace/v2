@@ -436,6 +436,9 @@
     function showScreen(value) {
       screen = value;
       byId('stop-bevestiging').hidden = true;
+      // Tijdens het oefenen alleen de vraag en Stop in beeld; bij een simulatie ook zonder navigatiebalk.
+      document.documentElement.classList.toggle('is-oefenen', value === 'oefenen');
+      document.documentElement.classList.toggle('is-examen', value === 'oefenen' && session?.mode === 'simulatie');
       [['keuzes', 'vak-keuzes'], ['oefenen', 'oefenscherm'], ['einde', 'eindscherm']].forEach(([name, id]) => {
         byId(id).hidden = name !== value;
         if (name === value) fade(byId(id));
