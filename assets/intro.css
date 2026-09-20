@@ -153,6 +153,14 @@ html[data-theme="dark"] .stappen { --tel-rand: #3A3A3C; --tel-glans: rgba(255,25
 .stap-updates .update-label-verbeterd { background: var(--surface); color: var(--ink-soft); }
 
 
+/* Stap Wat is nieuw: het blok van de hub, in het klein */
+.mini-nieuw { display: grid; gap: 12px; width: 100%; max-width: 400px; margin-bottom: 28px; padding: 18px 20px; border: 1px solid var(--line); border-radius: 18px; background: var(--bg); align-self: center; box-shadow: var(--shadow-soft); }
+.mini-nieuw-kop { font-size: 1rem; font-weight: 700; letter-spacing: -.01em; }
+.mini-nieuw .stap-updates { gap: 10px; padding: 0; }
+.mini-nieuw .stap-updates .nieuw-update { font-size: .8125rem; line-height: 1.45; }
+.mini-nieuw .stap-updates .update-datum { font-size: .75rem; }
+.mini-nieuw-knop { justify-self: start; padding: 8px 14px; border: 1px solid var(--line); border-radius: var(--radius-pill); font-size: .8125rem; font-weight: 600; }
+
 /* Bediening: Vorige, Volgende */
 .stap-bediening { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .stap-vorige { padding: 10px 8px; font-size: .9375rem; }
@@ -207,6 +215,8 @@ html[data-theme="dark"] .stappen { --tel-rand: #3A3A3C; --tel-glans: rgba(255,25
   .oudnieuw { max-width: 100%; margin-bottom: 0; }
   .mini { min-height: 0; }
   .stap-updates { gap: 14px; padding: 0 22px 24px; }
+  .mini-nieuw { max-width: 100%; margin-bottom: 8px; padding: 14px 16px; }
+  .mini-nieuw .stap-updates { padding: 0; }
   .stap-volgende.knop { min-width: 0; flex: 1 1 auto; }
 }
 @media (prefers-reduced-motion: reduce) {

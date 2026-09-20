@@ -187,9 +187,14 @@ window.BES = window.BES || {};
       soort: 'nieuw',
       naam: 'Wat is nieuw',
       label: 'Wat is nieuw',
-      titel: 'Dit is er de laatste tijd veranderd.',
-      tekst: 'Elke update staat hier, en ook op de hub onder <strong>Wat is nieuw</strong>.',
-      lijst: true
+      titel: 'Nieuw op de site? Dat zie je op de hub.',
+      tekst: 'Onder de tools staat het blok <strong>Wat is nieuw</strong>. Elk nieuw vak, elke nieuwe vraag en elke verbetering komt daar met datum bij. Is er een grote nieuwe versie, dan zie je deze kennismaking één keer opnieuw.',
+      beeld: `
+        <div class="mini-nieuw anim-pop" style="--i:1">
+          <span class="mini-nieuw-kop">Wat is nieuw</span>
+          <ul class="stap-updates is-mini" data-max="3" aria-label="Laatste updates"></ul>
+          <span class="mini-nieuw-knop">Alles bekijken →</span>
+        </div>`
     }
   ];
 
@@ -239,10 +244,11 @@ window.BES = window.BES || {};
       if (!lijst || !window.BES.updateRij) return;
       const versie = window.BES_VERSIE;
       const updates = (window.BES_UPDATES || []).filter(update => !versie || !update.versie || update.versie === versie);
-      updates.slice(0, 5).forEach((update, n) => {
+      const max = Number(lijst.dataset.max) || 5;
+      updates.slice(0, max).forEach((update, n) => {
         const rij = window.BES.updateRij(update, 'nieuw');
         rij.classList.add('anim');
-        rij.style.setProperty('--i', String(n + 2));
+        rij.style.setProperty('--i', String(n + 3));
         lijst.append(rij);
       });
     };
