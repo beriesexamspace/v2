@@ -33,6 +33,20 @@ html[data-theme="dark"] .stappen { --tel-rand: #3A3A3C; --tel-glans: rgba(255,25
 .stap-uitleg { margin: 4px 0 0; max-width: 34rem; color: var(--ink-soft); font-size: 1.0625rem; line-height: 1.6; }
 .stap-uitleg strong { color: var(--ink); font-weight: 600; }
 .stap-beeld { position: relative; display: flex; align-items: flex-end; justify-content: center; padding: 48px 40px 0; background: linear-gradient(180deg, var(--surface) 0%, var(--card) 100%); }
+/* In de donkere modus is het beeldvak wit, zodat de donkere iPhone en laptop duidelijk blijven. De tekst erin krijgt lichte kleuren. */
+html[data-theme="dark"] .stap-beeld {
+  background: #FFFFFF;
+  color: #1D1D1F;
+  --bg: #FFFFFF; --card: #FFFFFF; --surface: #F5F5F7; --line: #E9E7F3; --ink: #1D1D1F; --ink-soft: #6E6E73; --muted: #6E6E73;
+  --accent: #0071e3; --accent-zacht: rgba(0,113,227,.06); --teal-zacht: rgba(63,185,178,.12); --teal-tekst: #15756f;
+  --tel-rand: #1D1D1F; --tel-glans: rgba(255,255,255,.18);
+  --shadow-soft: 0 1px 2px rgba(29,29,31,.06), 0 8px 24px rgba(29,29,31,.1); --shadow-primary: 0 8px 24px rgba(0,113,227,.16);
+}
+html[data-theme="dark"] .stap-beeld :is(.tel, .laptop-scherm) {
+  --bg: #0B0B0C; --card: #1C1C1E; --surface: #2C2C2E; --line: rgba(255,255,255,.12); --ink: #F5F5F7; --ink-soft: #A1A1A6; --muted: #A1A1A6;
+  --accent: #0A84FF; --accent-zacht: rgba(10,132,255,.16); --teal-zacht: rgba(63,185,178,.18); --teal-tekst: #5fd0c9;
+  color: var(--ink);
+}
 
 .tel {
   position: relative;
@@ -52,18 +66,16 @@ html[data-theme="dark"] .stappen { --tel-rand: #3A3A3C; --tel-glans: rgba(255,25
 .tel::before { content: ''; position: absolute; top: 9px; left: 50%; width: 84px; height: 24px; border-radius: 14px; background: var(--tel-rand); transform: translateX(-50%); }
 .tel::after { content: ''; position: absolute; bottom: 7px; left: 50%; width: 96px; height: 4px; border-radius: 2px; background: var(--ink); opacity: .3; transform: translateX(-50%); }
 .tel-status { display: flex; justify-content: space-between; align-items: center; padding: 15px 26px 0; font-size: 12px; font-weight: 600; }
-.tel-status-icoontjes { display: inline-flex; gap: 4px; }
-.tel-status-icoontjes i { display: block; width: 6px; height: 9px; border-radius: 1px; background: var(--ink); }
-.tel-status-icoontjes i:nth-child(2) { width: 10px; }
-.tel-status-icoontjes i:nth-child(3) { width: 16px; border-radius: 3px; }
+.tel-batterij { position: relative; display: inline-block; width: 24px; height: 11px; border: 1.5px solid var(--ink); border-radius: 4px; opacity: .9; }
+.tel-batterij::after { content: ''; position: absolute; top: 2px; right: -4.5px; width: 2px; height: 4px; border-radius: 0 1px 1px 0; background: var(--ink); }
+.tel-batterij i { position: absolute; inset: 1.5px; width: 85%; border-radius: 2px; background: var(--ink); }
 .tel.is-klein { width: 128px; margin-bottom: -60px; border-width: 4px; border-radius: 26px; font-size: 8px; }
 .tel.is-klein::before { top: 4px; width: 30%; height: 10px; border-radius: 6px; }
 .tel.is-klein::after { bottom: 4px; width: 36px; height: 3px; }
 .tel.is-klein .tel-status { padding: 6px 9px 0; font-size: 6.5px; }
-.tel.is-klein .tel-status-icoontjes { gap: 2px; }
-.tel.is-klein .tel-status-icoontjes i { width: 3px; height: 5px; }
-.tel.is-klein .tel-status-icoontjes i:nth-child(2) { width: 5px; }
-.tel.is-klein .tel-status-icoontjes i:nth-child(3) { width: 9px; border-radius: 2px; }
+.tel.is-klein .tel-batterij { width: 13px; height: 6px; border-width: 1px; border-radius: 2px; }
+.tel.is-klein .tel-batterij::after { top: 1px; right: -2.5px; width: 1px; height: 2px; }
+.tel.is-klein .tel-batterij i { inset: 1px; }
 .tel.is-klein .tel-scherm { gap: 5px; padding: 8px 8px; }
 .tel.is-klein .tel-kop { font-size: 9px; }
 .tel.is-klein .tel-kaart { gap: 5px; padding: 6px 7px; border-radius: 8px; font-size: 7px; }
@@ -165,7 +177,8 @@ html[data-theme="dark"] .stappen { --tel-rand: #3A3A3C; --tel-glans: rgba(255,25
 .stap-bediening { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .stap-vorige { padding: 10px 8px; font-size: .9375rem; }
 .stap-vorige.is-onzichtbaar { visibility: hidden; }
-.stap-volgende.knop { width: auto; min-width: 180px; margin: 0; }
+.stap-volgende.knop { width: auto; min-width: 180px; margin: 0; transition: transform 520ms var(--ease); }
+.stappen.is-laatste .stap-vorige { opacity: .6; }
 
 /* Animaties per stap. --i = volgorde, --doel = eindbreedte van een balk. */
 .stap-kaart .anim { animation: stap-op 480ms var(--ease) both; animation-delay: calc(var(--i, 0) * 110ms + 180ms); }

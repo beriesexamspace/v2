@@ -7,7 +7,7 @@ window.BES = window.BES || {};
 
 (() => {
   const BASIS = (document.querySelector('script[src*="intro.js"]')?.getAttribute('src') || '').replace(/assets\/intro\.js.*$/, '');
-  const STATUS = '<div class="tel-status"><span>9:41</span><span class="tel-status-icoontjes" aria-hidden="true"><i></i><i></i><i></i></span></div>';
+  const STATUS = '<div class="tel-status"><span>9:41</span><span class="tel-batterij" aria-hidden="true"><i></i></span></div>';
   // De iPhone: eerste keer veert hij binnen (anim-pop), bij de volgende telefoon-stap blijft hij staan en wisselt alleen het scherm.
   const telefoon = (scherm, pop = true) => `<div class="tel${pop ? ' anim-pop' : ''}" style="--i:0">${STATUS}<div class="tel-scherm">${scherm}</div></div>`;
 
@@ -277,6 +277,16 @@ window.BES = window.BES || {};
       vorige.disabled = index === 0;
       volgende.textContent = laatste ? (opties.lus ? 'Opnieuw' : laatsteTekst) : 'Volgende →';
       if (overslaan) overslaan.hidden = !opties.overslaan || laatste;
+      // Op de laatste stap (niet in de lus) schuift de knop naar het midden.
+      const bediening = root.querySelector('.stap-bediening');
+      if (laatste && !opties.lus) {
+        const dx = bediening.clientWidth / 2 - (volgende.offsetLeft + volgende.offsetWidth / 2);
+        volgende.style.transform = `translateX(${Math.round(dx)}px) scale(1.06)`;
+        root.classList.add('is-laatste');
+      } else {
+        volgende.style.transform = '';
+        root.classList.remove('is-laatste');
+      }
     };
 
     const gaNaar = (index, richting) => {
