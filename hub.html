@@ -20,6 +20,12 @@
     // Op dit toestel al gezien: meteen door. Anders even wachten op het account (misschien al gezien op een ander toestel).
     (() => {
       try {
+        // hub.html?welkom laat de hele kennismaking opnieuw zien (welkomstscherm, Begrepen, balk die binnenschuift).
+        if (new URLSearchParams(window.location.search).has('welkom')) {
+          window.localStorage.removeItem('bes_versie_gezien');
+          window.location.replace('nieuw.html' + window.location.hash);
+          return;
+        }
         const versie = window.BES_VERSIE || 0;
         const gezien = Number(window.localStorage.getItem('bes_versie_gezien')) || 0;
         if (gezien >= versie) return;
