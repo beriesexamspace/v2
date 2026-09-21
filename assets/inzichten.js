@@ -57,7 +57,7 @@ window.BES = window.BES || {};
         lijst.append(li);
       }
       kaart.append(lijst);
-      const meer = el('a', 'tekstlink inz-meer', 'Alles per hoofdstuk →');
+      const meer = el('a', 'tekstlink inz-meer', 'Weekoverzicht →');
       meer.href = `${prefix}voortgang.html`;
       kaart.append(meer);
     }

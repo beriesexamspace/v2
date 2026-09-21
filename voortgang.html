@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="assets/deur.js?v=39"></script>
+  <script src="assets/deur.js?v=40"></script>
   <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta name="robots" content="noindex">
@@ -21,13 +21,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=39">
-  <script src="assets/app.js?v=39" defer></script>
-  <script src="assets/vakken.js?v=39"></script>
-  <script src="assets/config.js?v=39" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=40">
+  <script src="assets/app.js?v=40" defer></script>
+  <script src="assets/vakken.js?v=40"></script>
+  <script src="assets/config.js?v=40" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=39" defer></script>
-  <script src="assets/activiteit.js?v=39" defer></script>
+  <script src="assets/auth.js?v=40" defer></script>
+  <script src="assets/activiteit.js?v=40" defer></script>
   <style>
     .vg-wrap { max-width: 860px; }
     .vg-status { margin: 0 0 16px; color: var(--ink-soft); }
@@ -36,6 +36,29 @@
     .vg-tegel { padding: 18px 20px; }
     .vg-tegel .getal { display: block; font-size: 1.75rem; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
     .vg-tegel .uitleg { display: block; margin-top: 4px; color: var(--ink-soft); font-size: .875rem; }
+    .vg-week { margin: 0 0 28px; padding: 20px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); }
+    .vg-week h2, .vg-blok h2 { margin: 0 0 16px; font-size: 1.125rem; }
+    .vg-week svg { display: block; width: 100%; height: 236px; }
+    .vg-week text { fill: var(--ink-soft); font: 12px var(--font); text-anchor: middle; }
+    .vg-week .is-vandaag { fill: var(--ink); font-weight: 700; }
+    .vg-week figcaption { display: flex; flex-wrap: wrap; gap: 18px; color: var(--ink-soft); font-size: .8125rem; }
+    .vg-legenda { display: inline-flex; align-items: center; gap: 7px; }
+    .vg-legenda i { width: 12px; height: 12px; background: var(--accent-zacht); border: 1.5px solid var(--accent); }
+    .vg-legenda .is-goed { background: var(--teal); border-color: var(--teal); }
+    .vg-week-leeg { margin: 18px 0 0; color: var(--ink-soft); line-height: 1.6; }
+    .vg-week-leeg a { color: var(--accent); }
+    .vg-blok { margin: 0 0 32px; }
+    .vg-blok .vg-samenvatting { margin-bottom: 12px; }
+    .vg-verschil { margin: 0; color: var(--ink-soft); font-size: .875rem; }
+    .vg-verschil.is-beter { color: var(--teal-tekst); }
+    .vg-verbeter-lijst { display: grid; gap: 12px; }
+    .vg-verbeter-kaart { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px; }
+    .vg-verbeter-kaart h3 { margin: 4px 0 8px; font-size: 1rem; }
+    .vg-verbeter-vak { margin: 0; color: var(--ink-soft); font-size: .8125rem; }
+    .vg-verbeter-score { margin: 0; font-size: .875rem; color: var(--ink-soft); }
+    .vg-verbeter-kaart .knop-secundair { min-height: 44px; padding: 10px 16px; white-space: normal; text-align: center; }
+    .vg-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .vg-chips li { max-width: 100%; padding: 9px 13px; border-radius: var(--radius-pill); background: var(--teal-zacht); color: var(--teal-tekst); font-size: .8125rem; line-height: 1.6; overflow-wrap: anywhere; }
     .vg-lijst { display: grid; gap: 14px; }
     .vg-vak { padding: 20px 22px; }
     .vg-kop { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
@@ -69,6 +92,8 @@
     .vg-leeg p { margin: 0 0 16px; color: var(--ink-soft); }
     @media (max-width: 640px) {
       .vg-samenvatting { grid-template-columns: minmax(0, 1fr); }
+      .vg-week { padding: 16px; }
+      .vg-verbeter-kaart { align-items: stretch; flex-direction: column; }
       .vg-hoofdstuk { grid-template-columns: minmax(0, 1fr) 80px; }
       .vg-hoofdstuk .vg-balk { grid-column: 1 / -1; }
     }
@@ -105,6 +130,32 @@
       </header>
 
       <p class="vg-status" id="vg-status" role="status">Even laden.</p>
+      <figure class="vg-week" id="vg-week" aria-labelledby="vg-week-kop" hidden>
+        <h2 id="vg-week-kop">Laatste zeven dagen</h2>
+        <svg id="vg-week-grafiek" role="img" aria-label=""></svg>
+        <figcaption>
+          <span class="vg-legenda"><i aria-hidden="true"></i>gemaakt</span>
+          <span class="vg-legenda"><i class="is-goed" aria-hidden="true"></i>goed</span>
+        </figcaption>
+        <p class="vg-week-leeg" id="vg-week-leeg" hidden>Deze week nog niets geoefend. <a href="hub.html">Kies een vak op de hub.</a></p>
+      </figure>
+      <section class="vg-blok" id="vg-deze-week" aria-labelledby="vg-deze-week-kop" hidden>
+        <h2 id="vg-deze-week-kop">Deze week</h2>
+        <div class="vg-samenvatting">
+          <div class="kaart vg-tegel"><span class="getal" id="vg-week-sessies">0</span><span class="uitleg">sessies</span></div>
+          <div class="kaart vg-tegel"><span class="getal" id="vg-week-vragen">0</span><span class="uitleg">vragen gemaakt</span></div>
+          <div class="kaart vg-tegel"><span class="getal" id="vg-week-score">0%</span><span class="uitleg">goed beantwoord</span></div>
+        </div>
+        <p class="vg-verschil" id="vg-verschil" hidden></p>
+      </section>
+      <section class="vg-blok" id="vg-verbeter" aria-labelledby="vg-verbeter-kop" hidden>
+        <h2 id="vg-verbeter-kop">Verbeterpunten</h2>
+        <div class="vg-verbeter-lijst" id="vg-verbeter-lijst"></div>
+      </section>
+      <section class="vg-blok" id="vg-goed" aria-labelledby="vg-goed-kop" hidden>
+        <h2 id="vg-goed-kop">Gaat goed</h2>
+        <ul class="vg-chips" id="vg-chips"></ul>
+      </section>
       <div class="vg-samenvatting" id="vg-samenvatting" hidden>
         <div class="kaart vg-tegel"><span class="getal" id="vg-vakken">0</span><span class="uitleg">vakken geoefend</span></div>
         <div class="kaart vg-tegel"><span class="getal" id="vg-hoofdstukken">0</span><span class="uitleg">hoofdstukken geoefend</span></div>
@@ -142,7 +193,7 @@
       const laadVak = id => new Promise(resolve => {
         if (gegevens[id]) { resolve(gegevens[id]); return; }
         const script = document.createElement('script');
-        script.src = `vak/${id}/data.js?v=39`;
+        script.src = `vak/${id}/data.js?v=40`;
         script.onload = () => { gegevens[id] = window.BES_VAK && window.BES_VAK.id === id ? window.BES_VAK : null; resolve(gegevens[id]); };
         script.onerror = () => resolve(null);
         document.head.append(script);
@@ -159,10 +210,97 @@
         return wrap;
       };
 
+      const toonWeek = (sessies, vandaag) => {
+        const dag = offset => new Date(vandaag.getFullYear(), vandaag.getMonth(), vandaag.getDate() + offset);
+        const sleutel = datum => `${datum.getFullYear()}-${datum.getMonth()}-${datum.getDate()}`;
+        const dagen = Array.from({ length: 14 }, (_, i) => ({ datum: dag(i - 13), sessies: 0, totaal: 0, goed: 0 }));
+        const perDag = new Map(dagen.map(item => [sleutel(item.datum), item]));
+        for (const sessie of sessies) {
+          const item = perDag.get(sleutel(new Date(sessie.gemaakt_op)));
+          if (!item) continue;
+          item.sessies += 1;
+          item.totaal += sessie.totaal;
+          item.goed += sessie.goed;
+        }
+        const som = lijst => lijst.reduce((totaal, item) => ({ sessies: totaal.sessies + item.sessies, totaal: totaal.totaal + item.totaal, goed: totaal.goed + item.goed }), { sessies: 0, totaal: 0, goed: 0 });
+        const deze = som(dagen.slice(7));
+        const vorige = som(dagen.slice(0, 7));
+        document.getElementById('vg-week-sessies').textContent = deze.sessies;
+        document.getElementById('vg-week-vragen').textContent = deze.totaal;
+        document.getElementById('vg-week-score').textContent = procent(deze.goed, deze.totaal) + '%';
+        document.getElementById('vg-deze-week').hidden = false;
+        document.getElementById('vg-week-leeg').hidden = deze.totaal > 0;
+        const verschil = document.getElementById('vg-verschil');
+        const punten = procent(deze.goed, deze.totaal) - procent(vorige.goed, vorige.totaal);
+        verschil.hidden = deze.sessies === 0;
+        verschil.classList.toggle('is-beter', vorige.sessies > 0 && punten > 0);
+        verschil.textContent = !vorige.sessies ? 'Vorige week nog niets geoefend' : !punten ? 'Gelijk aan vorige week' : `${punten > 0 ? '+' : ''}${punten} punten tegenover vorige week`;
+
+        const figuur = document.getElementById('vg-week');
+        const grafiek = document.getElementById('vg-week-grafiek');
+        const week = dagen.slice(7);
+        const dagnaam = new Intl.DateTimeFormat('nl-BE', { weekday: 'short' });
+        const maximum = Math.max(1, ...week.map(item => item.totaal));
+        const svgNode = (tag, attributen, tekst) => {
+          const node = document.createElementNS('http://www.w3.org/2000/svg', tag);
+          Object.entries(attributen).forEach(([naam, waarde]) => node.setAttribute(naam, waarde));
+          if (tekst !== undefined) node.textContent = tekst;
+          return node;
+        };
+        grafiek.setAttribute('aria-label', week.map(item => `${dagnaam.format(item.datum)} ${item.totaal} vragen, ${item.goed} goed`).join('; '));
+        figuur.hidden = false;
+        const teken = () => {
+          const breedte = Math.max(280, grafiek.clientWidth);
+          const stap = breedte / 7;
+          const staaf = Math.min(56, stap - 12);
+          grafiek.setAttribute('viewBox', `0 0 ${breedte} 236`);
+          grafiek.replaceChildren();
+          week.forEach((item, i) => {
+            const x = stap * (i + .5) - staaf / 2;
+            const hoogte = item.totaal / maximum * 160;
+            const goedHoogte = item.goed / maximum * 160;
+            const groep = svgNode('g', { 'data-dag': sleutel(item.datum) });
+            if (item.totaal) {
+              groep.append(
+                svgNode('rect', { class: 'vg-staaf', x, y: 190 - hoogte, width: staaf, height: hoogte, fill: 'var(--accent-zacht)' }),
+                svgNode('rect', { class: 'vg-staaf-goed', x, y: 190 - goedHoogte, width: staaf, height: goedHoogte, fill: 'var(--teal)' }),
+                svgNode('rect', { x, y: 190 - hoogte, width: staaf, height: hoogte, fill: 'none', stroke: 'var(--accent)', 'stroke-width': 1.5 }),
+                svgNode('text', { x: x + staaf / 2, y: 180 - hoogte }, item.totaal)
+              );
+            } else {
+              groep.append(svgNode('rect', { class: 'vg-staaf-leeg', x, y: 188, width: staaf, height: 2, fill: 'var(--surface)' }));
+            }
+            groep.append(svgNode('text', { x: x + staaf / 2, y: 218, class: i === 6 ? 'is-vandaag' : '' }, dagnaam.format(item.datum)));
+            grafiek.append(groep);
+          });
+        };
+        teken();
+        new ResizeObserver(teken).observe(grafiek);
+      };
+
+      const toonHoofdstukken = hoofdstukken => {
+        const verbeter = hoofdstukken.filter(item => item.verhouding < .8).sort((a, b) => a.verhouding - b.verhouding).slice(0, 3);
+        const goed = hoofdstukken.filter(item => item.verhouding >= .8).sort((a, b) => b.verhouding - a.verhouding);
+        document.getElementById('vg-verbeter').hidden = !verbeter.length;
+        document.getElementById('vg-goed').hidden = !goed.length;
+        document.getElementById('vg-verbeter-lijst').replaceChildren(...verbeter.map(item => {
+          const kaart = el('article', 'kaart vg-verbeter-kaart');
+          const tekst = el('div');
+          tekst.append(el('p', 'vg-verbeter-vak', item.vak.naam), el('h3', '', item.naam), el('p', 'vg-verbeter-score', `${procent(item.goed, item.totaal)}% goed`));
+          const link = el('a', 'knop-secundair', 'Oefen dit hoofdstuk →');
+          link.href = `vak/${item.vak.id}/?hoofdstuk=${encodeURIComponent(item.id)}`;
+          kaart.append(tekst, link);
+          return kaart;
+        }));
+        const chips = goed.slice(0, 6).map(item => el('li', '', `${item.vak.naam} · ${item.naam} · ${procent(item.goed, item.totaal)}%`));
+        if (goed.length > 6) chips.push(el('li', '', `en ${goed.length - 6} meer`));
+        document.getElementById('vg-chips').replaceChildren(...chips);
+      };
+
       const toon = async rijen => {
         const perVak = {};
         for (const rij of rijen) {
-          if (rij.vak.endsWith('__hard')) continue; // Hard mode telt apart, nog niet in dit overzicht
+          if (rij.vak.endsWith('__hard')) continue; // Hoofdstukblokken tonen alleen normale voortgang.
           (perVak[rij.vak] = perVak[rij.vak] || []).push(rij);
         }
         const geoefend = vakken.filter(vak => perVak[vak.id]?.some(rij => rij.laatst_totaal > 0));
@@ -171,6 +309,7 @@
         lijst.replaceChildren();
 
         const kaarten = [];
+        const hoofdstukken = [];
         for (const vak of geoefend) {
           const data = await laadVak(vak.id);
           const rijenVak = perVak[vak.id].filter(rij => rij.laatst_totaal > 0);
@@ -178,6 +317,10 @@
           const totaal = rijenVak.reduce((som, rij) => som + rij.laatst_totaal, 0);
           const afgerond = rijenVak.filter(rij => rij.laatst_goed === rij.laatst_totaal).length;
           const alleHoofdstukken = data?.hoofdstukken || rijenVak.map(rij => ({ id: rij.hoofdstuk, naam: rij.hoofdstuk }));
+          for (const rij of rijenVak.filter(item => item.laatst_totaal >= 3)) {
+            const hoofdstuk = alleHoofdstukken.find(item => item.id === rij.hoofdstuk);
+            if (hoofdstuk) hoofdstukken.push({ vak, id: hoofdstuk.id, naam: hoofdstuk.naam, goed: rij.laatst_goed, totaal: rij.laatst_totaal, verhouding: rij.laatst_goed / rij.laatst_totaal });
+          }
           const score = procent(goed, totaal);
           totHoofdstukken += rijenVak.length;
           totAfgerond += afgerond;
@@ -218,6 +361,7 @@
         }
         // Laagste score bovenaan: daar is de meeste winst.
         kaarten.sort((a, b) => a.score - b.score).forEach(item => lijst.append(item.kaart));
+        toonHoofdstukken(hoofdstukken);
 
         document.getElementById('vg-vakken').textContent = geoefend.length;
         document.getElementById('vg-hoofdstukken').textContent = totHoofdstukken;
@@ -244,11 +388,34 @@
         const user = await auth.gebruiker();
         if (!user) { status.textContent = 'Log in om je voortgang te zien.'; return; }
         status.textContent = 'Even laden.';
-        const { data, error } = await auth.client.from('voortgang').select('vak,hoofdstuk,beantwoord,goed,laatst_goed,laatst_totaal').eq('user_id', user.id);
-        if (error) { status.textContent = 'Laden is niet gelukt. Probeer het later opnieuw.'; return; }
-        await toon(data || []);
+        const vandaag = new Date();
+        const vanaf = new Date(vandaag.getFullYear(), vandaag.getMonth(), vandaag.getDate() - 13);
+        const tot = new Date(vandaag.getFullYear(), vandaag.getMonth(), vandaag.getDate() + 1);
+        const haalSessies = async () => {
+          const rijen = [];
+          let aantal;
+          do {
+            const resultaat = await auth.client.from('sessies').select('vak,niveau,modus,goed,totaal,gemaakt_op', { count: 'exact' })
+              .eq('user_id', user.id).gte('gemaakt_op', vanaf.toISOString()).lt('gemaakt_op', tot.toISOString())
+              .order('gemaakt_op').order('id').range(rijen.length, rijen.length + 999);
+            if (resultaat.error) return resultaat;
+            const deel = resultaat.data || [];
+            aantal = resultaat.count;
+            if (!deel.length) break;
+            rijen.push(...deel);
+            if (aantal == null && deel.length < 1000) break;
+          } while (aantal == null || rijen.length < aantal);
+          return { data: rijen, error: null };
+        };
+        const [voortgang, sessies] = await Promise.all([
+          auth.client.from('voortgang').select('vak,hoofdstuk,beantwoord,goed,laatst_goed,laatst_totaal').eq('user_id', user.id),
+          haalSessies()
+        ]);
+        if (!sessies.error) toonWeek(sessies.data || [], vandaag);
+        if (!voortgang.error) await toon(voortgang.data || []);
+        if (voortgang.error || sessies.error) status.textContent = 'Niet alle voortgang kon geladen worden. Probeer het later opnieuw.';
       };
-      laad();
+      laad().catch(() => { status.textContent = 'Laden is niet gelukt. Probeer het later opnieuw.'; });
     });
   </script>
 </body>

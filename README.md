@@ -66,7 +66,7 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 39), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 40), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.
@@ -184,6 +184,8 @@ Zolang de tabel ontbreekt, toont de pagina de rode regel "Feedback is nog niet i
 ## Inzichten (Free)
 
 Sinds 21-09-2026 bewaart `vak.js` na elke afgeronde ronde één rij in de tabel `sessies` (`bewaarSessie`: vak, niveau, modus, goed, totaal; SQL in `supabase/sessies.sql`, uitgevoerd). Op `profiel.html` staat boven de studiekalender de sectie Jouw voortgang (`assets/inzichten.js`, element `[data-inzichten]`): per geoefend vak een balk met het gemiddelde van de laatste score per hoofdstuk (laagste bovenaan, maximaal zes, link naar voortgang.html) en de laatste vijf sessies. Hard mode telt hier niet mee. Plus en Pro bouwen hierop voort (wekelijks overzicht, grafieken, verbeterpunten).
+
+De link "Weekoverzicht →" op Profiel opent `voortgang.html` voor ieder ingelogd account. Boven de bestaande vaklijst staan de laatste zeven lokale kalenderdagen, weeksessies, gemaakte vragen en de gewogen score, met het verschil tussen de afgeronde scores van deze zeven dagen en de zeven dagen daarvoor. Hard-sessies tellen daarin mee; de drie verbeterpunten en maximaal zes sterke hoofdstukken gebruiken alleen normale hoofdstukresultaten met minstens drie vragen. "Oefen dit hoofdstuk →" start direct een normale Training via `?hoofdstuk=<id>`; na het starten verdwijnt de parameter, zodat herladen niet opnieuw begint. De pagina leest de bestaande tabellen `sessies` en `voortgang`; er is geen betaalgrens of nieuwe database-inrichting.
 
 ## Persoonlijke studiekalender
 

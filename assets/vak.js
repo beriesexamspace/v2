@@ -133,6 +133,7 @@
     let lastRun = null;
     let loggedSyncError = false;
     let lastSyncSent = 0;
+    let chapterFromUrl = new URL(window.location.href).searchParams.get('hoofdstuk');
     const choiceHint = create('p', 'vak-hint vraag-keuze-hint');
     choiceHint.id = 'vraag-keuze-hint';
     choiceHint.hidden = true;
@@ -307,6 +308,16 @@
       renderSimulation();
       updateStart();
       banks.forEach(bank => loadRemote(bank.get(owner), authGeneration));
+      if (owner && chapterFromUrl && data.hoofdstukken.some(chapter => chapter.id === chapterFromUrl)) {
+        const questions = data.vragen.filter(question => question.h === chapterFromUrl);
+        chapterFromUrl = null;
+        setLevel('normaal');
+        setMode('training');
+        start(questions, 'training', 'normaal');
+        const url = new URL(window.location.href);
+        url.searchParams.delete('hoofdstuk');
+        window.history.replaceState(window.history.state, '', url);
+      }
     }
 
     function setLevel(value) {
