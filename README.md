@@ -66,7 +66,7 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 40), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 41), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.
@@ -224,6 +224,8 @@ Zodra een ronde start zet `showScreen` de klasse `is-oefenen` op `<html>` (vakti
 ### Comit-basis (21-09-2026)
 
 Op het eindscherm van elke ronde staat een kaart van Comit (`renderComit` in `vak.js`, markup `#comit` in het sjabloon), zonder AI: sterke hoofdstukken (alles goed), het zwakste hoofdstuk met de score, en één tip die afhangt van modus en score (na een simulatie: doe het hoofdstuk in Training; onder de helft goed: eerst de theorie; anders: nog één keer). De knop start meteen een training van dat hoofdstuk op het huidige niveau. Bij alles goed: tip richting Hard mode (als er minstens 8 Hard-vragen zijn) en de knop Terug naar het vak. Het uiterlijk van Comit is voorlopig een teal rondje met een C; Berat kiest later hoe hij eruitziet.
+
+Het resultaatscherm gebruikt één gecentreerde kolom van maximaal 640 px, met de score bovenaan, een apart blok met hoofdstukresultaten en een compacte Comit-kaart. Het advies noemt het te oefenen hoofdstuk één keer en de knop heet "Oefen dit hoofdstuk →". Onder het advies staan de acties met 32 px tussenruimte; op mobiel staan ze onder elkaar. Bij alles goed is Opnieuw de primaire knop en vervalt de dubbele terugknop in het advies. Scoreberekening, vragen, voortgang en het oefenen zelf zijn ongewijzigd.
 
 Sinds 21-09-2026 staat er geen reco-link meer op de vakpagina's (examenreconstructies insturen is niet toegestaan; het reconstructiesysteem is geschrapt).
 
