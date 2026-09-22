@@ -13,7 +13,7 @@
 .kalender-dag[data-intensiteit="4"], .kalender-staal[data-intensiteit="4"] { background: var(--accent-dark); color: var(--white); }
 html[data-theme="dark"] .kalender-dag[data-intensiteit="3"], html[data-theme="dark"] .kalender-dag[data-intensiteit="4"] { color: var(--bg); }
 .kalender-dag.is-onbekend { border-style: dashed; color: var(--ink-soft); background: transparent; }
-.kalender-dag.is-toekomst { background: transparent; color: var(--ink-soft); }
+.kalender-dag.is-toekomst { background: transparent; color: var(--ink-soft); border-style: dotted; opacity: .6; }
 .kalender-dag[aria-current="date"] { box-shadow: inset 0 0 0 1px var(--ink-soft); }
 .kalender-dag[aria-pressed="true"] { outline: 2px solid var(--accent); outline-offset: 2px; }
 .kalender-dag:focus-visible, .kalender-maandknop:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }

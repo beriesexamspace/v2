@@ -66,7 +66,7 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 39), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 40), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.
@@ -114,6 +114,8 @@ Voeg voor deze flow `https://beriesexamspace.com/v2/profiel.html?email=bevestige
 Een project op het instapplan kan na een week zonder voldoende gebruik pauzeren. Open dan het project in het Supabase-dashboard en kies "Resume project". Zie de [Supabase-uitleg over projectpauzes](https://supabase.com/docs/guides/platform/free-project-pausing).
 
 ## Versies en het welkomstscherm
+
+Sinds 22-09-2026 toont de stap "Oud naast nieuw: startpagina" echte schermafbeeldingen (`assets/intro/oud-start.png` en `nieuw-start.png`, 480 px breed op 2x, met headless Chrome gemaakt; de nieuwe in het lichte thema). De knop "Word lid" in de WhatsApp-stap heeft het WhatsApp-icoon.
 
 Het welkomstscherm (`nieuw.html`, de highlights-carrousel met de dia Wat is nieuw) verschijnt **één keer per persoon per versie**. Het versienummer staat in `assets/updates.js` als `window.BES_VERSIE`; elke update in `BES_UPDATES` heeft een `versie`. De dia Wat is nieuw toont alleen de updates van de huidige versie (maximaal vijf) met het label "Versie N"; de hub toont onder Wat is nieuw alles.
 
@@ -183,9 +185,13 @@ Zolang de tabel ontbreekt, toont de pagina de rode regel "Feedback is nog niet i
 
 ## Inzichten (Free)
 
+`voortgang.html` groepeert de vakken per jaar (1ste, 2de, 3de bachelor) en toont alleen vakken die geoefend zijn; de lijst "Nog niet geoefend" is op 22-09-2026 weggehaald.
+
 Sinds 21-09-2026 bewaart `vak.js` na elke afgeronde ronde één rij in de tabel `sessies` (`bewaarSessie`: vak, niveau, modus, goed, totaal; SQL in `supabase/sessies.sql`, uitgevoerd). Op `profiel.html` staat boven de studiekalender de sectie Jouw voortgang (`assets/inzichten.js`, element `[data-inzichten]`): per geoefend vak een balk met het gemiddelde van de laatste score per hoofdstuk (laagste bovenaan, maximaal zes, link naar voortgang.html) en de laatste vijf sessies. Hard mode telt hier niet mee. Plus en Pro bouwen hierop voort (wekelijks overzicht, grafieken, verbeterpunten).
 
 ## Persoonlijke studiekalender
+
+De kalender loopt tot en met de zondag van de huidige week; dagen die nog komen staan er gestippeld en lichter bij, de rest van de maand verschijnt pas als de week voorbij is.
 
 `assets/activiteit.js` wordt na `auth.js` geladen. Alleen ingelogde accounts worden gemeten. Lokale dagsamenvattingen staan onder `bes_studieactiviteit_<account-id>`. De willekeurige browser-ID in `bes_studieapparaat` bevat geen persoonsgegevens. Alleen leertijd en bezoeken per dag worden gesynchroniseerd, geen antwoorden of bezochte pagina's.
 
@@ -208,6 +214,8 @@ Zonder tabel, functie of verbinding blijft de kalender lokaal werken en vermeldt
 De handgeschreven "Berie's Exam Space" op de startpagina heeft sinds 20-09-2026 een dikke lijn (stroke-width 9, krul 7, verbindingen 6, opacity .95) op verzoek van Berat: zelfde beweging en kleur, alleen dikker.
 
 ## Hoe werkt het (hub)
+
+De eerste dia schuift na 3,5 seconde door (`EERSTE_DUUR` in `intro.js`), daarna 8 seconden per dia; zo ziet iedereen meteen dat de carrousel beweegt. Het blok Wat is nieuw op de hub heeft label en datum in een linkerkolom en een lijntje tussen de regels.
 
 Sinds 20-09-2026 (nacht) staat hier de Apple-carrousel `BES.carrousel(element, { soorten: ['uitleg'] })` uit assets/intro.js: dezelfde vijf uitleg-stappen als dia's, schuift elke 8 seconden door, balkjes die zich vullen, pauzeknop, swipen; loopt alleen zolang hij in beeld is. Het welkomstscherm blijft stap voor stap (BES.stappen). De uitklapbare volledige uitleg is op verzoek van Berat weggehaald. Bij Tools staat een vierde kaart "Praat met Comit" met het label Binnenkort (nog geen link). De navigatiebalk heeft geen link Wat is nieuw meer; de sectie op de hub bestaat nog wel (`#nieuw`).
 

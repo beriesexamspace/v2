@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="assets/deur.js?v=39"></script>
+  <script src="assets/deur.js?v=40"></script>
   <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta property="og:type" content="website">
@@ -15,7 +15,7 @@
   <meta property="og:image:height" content="630">
   <meta property="og:url" content="https://beriesexamspace.com/v2/hub.html">
   <meta name="twitter:card" content="summary_large_image">
-  <script src="assets/updates.js?v=39"></script>
+  <script src="assets/updates.js?v=40"></script>
   <script>
     // Welkomstscherm (Wat is nieuw) één keer per persoon per versie.
     // Op dit toestel al gezien: meteen door. Anders even wachten op het account (misschien al gezien op een ander toestel).
@@ -59,14 +59,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=39">
-  <link rel="stylesheet" href="assets/intro.css?v=39">
-  <script src="assets/app.js?v=39"></script>
-  <script src="assets/intro.js?v=39"></script>
-  <script src="assets/config.js?v=39" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=40">
+  <link rel="stylesheet" href="assets/intro.css?v=40">
+  <script src="assets/app.js?v=40"></script>
+  <script src="assets/intro.js?v=40"></script>
+  <script src="assets/config.js?v=40" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=39" defer></script>
-  <script src="assets/activiteit.js?v=39" defer></script>
+  <script src="assets/auth.js?v=40" defer></script>
+  <script src="assets/activiteit.js?v=40" defer></script>
   <style>
     html { scroll-behavior: smooth; }
 
@@ -129,22 +129,27 @@
 
     .hub-updates {
       display: grid;
-      gap: 20px;
+      gap: 0;
       margin: 0;
       padding: 0;
       list-style: none;
     }
 
+    /* Label en datum links in één kolom, de tekst ernaast bovenaan; een dun lijntje tussen de regels. */
     .hub-update {
       display: grid;
-      grid-template-columns: 160px minmax(0, 1fr);
-      gap: 24px;
+      grid-template-columns: 150px minmax(0, 1fr);
+      gap: 20px;
+      padding: 16px 0;
       font-size: .9375rem;
       line-height: 1.6;
     }
+    .hub-update:first-child { padding-top: 0; }
+    .hub-update + .hub-update { border-top: 1px solid var(--line); }
+    .hub-update > span:last-child { padding-top: 1px; }
 
-    .update-meta { display: flex; flex-wrap: wrap; align-content: start; align-items: center; gap: 6px 8px; }
-    .update-datum { color: var(--ink-soft); }
+    .update-meta { display: grid; gap: 4px; justify-items: start; align-content: start; }
+    .update-datum { color: var(--ink-soft); font-size: .8125rem; line-height: 1.5; }
     .update-label { display: inline-flex; padding: 2px 8px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 600; line-height: 1.5; }
     .update-label-nieuw { background: var(--teal-zacht); color: var(--teal-tekst); }
     .update-label-verbeterd { background: var(--surface); color: var(--ink-soft); }
@@ -156,7 +161,8 @@
     }
 
     @media (max-width: 767px) {
-      .hub-update { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+      .hub-update { grid-template-columns: minmax(0, 1fr); gap: 6px; padding: 14px 0; }
+      .update-meta { grid-auto-flow: column; align-items: center; gap: 8px; }
     }
 
     .hub-intro { margin: 0 -24px; }
@@ -301,7 +307,7 @@
     <p class="footer-brand">Berie's Exam Space</p>
     <div class="footer-details">
       <p>Duidelijk leren. Rustig groeien.</p>
-      <p class="project-label">A project of The Berie Foundation</p>
+      <p class="project-label">Een project van The Berie Foundation</p>
     </div>
   </footer>
 

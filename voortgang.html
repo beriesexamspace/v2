@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="assets/deur.js?v=39"></script>
+  <script src="assets/deur.js?v=40"></script>
   <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta name="robots" content="noindex">
@@ -21,13 +21,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=39">
-  <script src="assets/app.js?v=39" defer></script>
-  <script src="assets/vakken.js?v=39"></script>
-  <script src="assets/config.js?v=39" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=40">
+  <script src="assets/app.js?v=40" defer></script>
+  <script src="assets/vakken.js?v=40"></script>
+  <script src="assets/config.js?v=40" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=39" defer></script>
-  <script src="assets/activiteit.js?v=39" defer></script>
+  <script src="assets/auth.js?v=40" defer></script>
+  <script src="assets/activiteit.js?v=40" defer></script>
   <style>
     .vg-wrap { max-width: 860px; }
     .vg-status { margin: 0 0 16px; color: var(--ink-soft); }
@@ -40,7 +40,6 @@
     .vg-vak { padding: 20px 22px; }
     .vg-kop { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
     .vg-naam { margin: 0; font-size: 1.0625rem; font-weight: 600; line-height: 1.35; }
-    .vg-jaar { display: block; margin-top: 2px; color: var(--ink-soft); font-size: .8125rem; }
     .vg-procent { flex: 0 0 auto; font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
     .vg-procent.is-goed { color: var(--teal-tekst); }
     .vg-balk { height: 10px; margin-top: 14px; border-radius: 5px; background: var(--surface); overflow: hidden; }
@@ -60,11 +59,8 @@
     .vg-hoofdstuk .stand { text-align: right; color: var(--ink-soft); font-variant-numeric: tabular-nums; white-space: nowrap; }
     .vg-hoofdstuk .stand.is-goed { color: var(--teal-tekst); font-weight: 600; }
     .vg-hoofdstuk.is-leeg { color: var(--ink-soft); }
-    .vg-rest { margin-top: 28px; }
-    .vg-rest h2 { margin: 0 0 10px; font-size: 1rem; font-weight: 600; }
-    .vg-rest ul { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
-    .vg-rest a { display: inline-flex; align-items: center; min-height: 36px; padding: 0 12px; border: 1px solid var(--line); border-radius: var(--radius-pill); background: var(--card); color: var(--ink); font-size: .8125rem; text-decoration: none; }
-    :where(html.has-hover) .vg-rest a:hover { border-color: var(--accent); }
+    .vg-jaar-kop { margin: 12px 0 0; font-size: 1.125rem; }
+    .vg-jaar-kop:first-child { margin-top: 0; }
     .vg-leeg { padding: 28px; text-align: center; }
     .vg-leeg p { margin: 0 0 16px; color: var(--ink-soft); }
     @media (max-width: 640px) {
@@ -111,10 +107,6 @@
         <div class="kaart vg-tegel"><span class="getal" id="vg-afgerond">0</span><span class="uitleg">hoofdstukken afgerond</span></div>
       </div>
       <div class="vg-lijst" id="vg-lijst"></div>
-      <section class="vg-rest" id="vg-rest" hidden aria-labelledby="vg-rest-kop">
-        <h2 id="vg-rest-kop">Nog niet geoefend</h2>
-        <ul id="vg-rest-lijst"></ul>
-      </section>
     </div>
   </main>
 
@@ -122,7 +114,7 @@
     <p class="footer-brand">Berie's Exam Space</p>
     <div class="footer-details">
       <p>Duidelijk leren. Rustig groeien.</p>
-      <p class="project-label">A project of The Berie Foundation</p>
+      <p class="project-label">Een project van The Berie Foundation</p>
     </div>
   </footer>
 
@@ -132,8 +124,6 @@
       const status = document.getElementById('vg-status');
       const lijst = document.getElementById('vg-lijst');
       const samenvatting = document.getElementById('vg-samenvatting');
-      const rest = document.getElementById('vg-rest');
-      const restLijst = document.getElementById('vg-rest-lijst');
       const vakken = (window.BES_VAKKEN || []).filter(vak => vak.v2);
       const jaren = Object.fromEntries((window.BES_JAREN || []).map(jaar => [jaar.id, jaar.naam]));
       const gegevens = {};
@@ -142,7 +132,7 @@
       const laadVak = id => new Promise(resolve => {
         if (gegevens[id]) { resolve(gegevens[id]); return; }
         const script = document.createElement('script');
-        script.src = `vak/${id}/data.js?v=39`;
+        script.src = `vak/${id}/data.js?v=40`;
         script.onload = () => { gegevens[id] = window.BES_VAK && window.BES_VAK.id === id ? window.BES_VAK : null; resolve(gegevens[id]); };
         script.onerror = () => resolve(null);
         document.head.append(script);
@@ -185,7 +175,6 @@
           const kaart = el('article', 'kaart vg-vak');
           const kop = el('div', 'vg-kop');
           const titel = el('h2', 'vg-naam', vak.naam);
-          titel.append(el('span', 'vg-jaar', jaren[vak.jaar] || ''));
           const pct = el('span', 'vg-procent' + (score >= 80 ? ' is-goed' : ''), score + '%');
           kop.append(titel, pct);
           kaart.append(kop, balk(score, score >= 80));
@@ -214,19 +203,22 @@
           }
           details.append(ul);
           kaart.append(details);
-          kaarten.push({ kaart, score });
+          kaarten.push({ kaart, score, jaar: vak.jaar });
         }
-        // Laagste score bovenaan: daar is de meeste winst.
-        kaarten.sort((a, b) => a.score - b.score).forEach(item => lijst.append(item.kaart));
+        // Per jaar een kopje; binnen het jaar de laagste score bovenaan, daar is de meeste winst.
+        kaarten.sort((a, b) => a.score - b.score);
+        for (const jaar of window.BES_JAREN || []) {
+          const groep = kaarten.filter(item => item.jaar === jaar.id);
+          if (!groep.length) continue;
+          lijst.append(el('h2', 'vg-jaar-kop', jaar.naam));
+          groep.forEach(item => lijst.append(item.kaart));
+        }
 
         document.getElementById('vg-vakken').textContent = geoefend.length;
         document.getElementById('vg-hoofdstukken').textContent = totHoofdstukken;
         document.getElementById('vg-afgerond').textContent = totAfgerond;
         samenvatting.hidden = !geoefend.length;
 
-        const nietGeoefend = vakken.filter(vak => !geoefend.includes(vak));
-        restLijst.replaceChildren(...nietGeoefend.map(vak => { const li = el('li'); const a = el('a', '', vak.naam); a.href = `vak/${vak.id}/`; li.append(a); return li; }));
-        rest.hidden = !nietGeoefend.length;
 
         if (!geoefend.length) {
           const leeg = el('div', 'kaart vg-leeg');

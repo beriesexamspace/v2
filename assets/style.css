@@ -652,6 +652,12 @@ html.page-fade.page-ready body { animation: page-in 250ms ease-out both; }
   .intro { max-width: 58rem; white-space: nowrap; }
 }
 
+/* Tussen 768 en 959 px past de volledige balk niet; dan alleen de B en iets smallere knoppen, zodat er niets afgesneden wordt. */
+@media (min-width: 768px) and (max-width: 959px) {
+  .brand-name { display: none; }
+  .navigation-links a { padding: 9px 9px; }
+}
+
 @media (min-width: 768px) and (max-width: 1100px) {
   .navigation-links { min-width: 0; overflow-x: auto; scrollbar-width: none; }
   .navigation-links::-webkit-scrollbar { display: none; }

@@ -313,8 +313,12 @@
     const offset = (month.getDay() + 6) % 7;
     for (let i = 0; i < offset; i++) grid.append(create('span', 'kalender-leeg'));
     const number = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
+    // De kalender loopt tot en met de zondag van deze week; de dagen daarna komen pas in beeld als de week voorbij is.
+    const eindeWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() + (6 - (today.getDay() + 6) % 7));
+    const eindeWeekKey = dayKey(eindeWeek);
     for (let i = 1; i <= number; i++) {
       const key = dayKey(new Date(month.getFullYear(), month.getMonth(), i));
+      if (key > eindeWeekKey) break;
       const button = create('button', 'kalender-dag', String(i));
       const day = days[key];
       button.type = 'button';
