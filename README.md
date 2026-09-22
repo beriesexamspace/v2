@@ -66,7 +66,7 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 40), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 41), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.
@@ -217,7 +217,7 @@ De handgeschreven "Berie's Exam Space" op de startpagina heeft sinds 20-09-2026 
 
 ## Hoe werkt het (hub)
 
-De eerste dia schuift na 3,5 seconde door (`EERSTE_DUUR` in `intro.js`), daarna 8 seconden per dia; zo ziet iedereen meteen dat de carrousel beweegt. Het blok Wat is nieuw op de hub heeft label en datum in een linkerkolom en een lijntje tussen de regels.
+De eerste dia schuift na 3 seconden door (`EERSTE_DUUR` in `intro.js`), daarna 6 seconden per dia; zo ziet iedereen meteen dat de carrousel beweegt. Het blok Wat is nieuw op de hub heeft label en datum in een linkerkolom en een lijntje tussen de regels.
 
 Sinds 20-09-2026 (nacht) staat hier de Apple-carrousel `BES.carrousel(element, { soorten: ['uitleg'] })` uit assets/intro.js: dezelfde vijf uitleg-stappen als dia's, schuift elke 8 seconden door, balkjes die zich vullen, pauzeknop, swipen; loopt alleen zolang hij in beeld is. Het welkomstscherm blijft stap voor stap (BES.stappen). De uitklapbare volledige uitleg is op verzoek van Berat weggehaald. Bij Tools staat een vierde kaart "Praat met Comit" met het label Binnenkort (nog geen link). De navigatiebalk heeft geen link Wat is nieuw meer; de sectie op de hub bestaat nog wel (`#nieuw`).
 

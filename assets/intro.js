@@ -399,8 +399,8 @@ window.BES = window.BES || {};
     const kop = opties.kopniveau || 'h3';
     const naam = root.id || 'carrousel';
     const rustig = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const DUUR = 8000;
-    const EERSTE_DUUR = 3500; // de eerste dia schuift sneller door, zodat je meteen ziet dat het beweegt
+    const DUUR = 6000;
+    const EERSTE_DUUR = 3000; // de eerste dia schuift sneller door, zodat je meteen ziet dat het beweegt
     let eersteRonde = true;
     root.classList.add('stappen', 'carrousel');
     root.innerHTML = `
