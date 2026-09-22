@@ -1,5 +1,7 @@
 # Opdracht: examensimulatie met tijdklok
 
+> Vervangen door codex/opdrachten/oefenen-stappen.md (22-09-2026). Niet meer uitvoeren.
+
 ## Doel
 Een echte examensfeer: de Examensimulatie krijgt een aftellende klok. Training blijft zonder klok.
 
