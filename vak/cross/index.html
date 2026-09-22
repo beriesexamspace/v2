@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="../../assets/deur.js?v=41"></script>
+  <script src="../../assets/deur.js?v=42"></script>
   <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta property="og:type" content="website">
@@ -31,15 +31,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../assets/style.css?v=41">
-  <link rel="stylesheet" href="../../assets/vak.css?v=41">
-  <script src="../../assets/app.js?v=41"></script>
-  <script src="../../assets/config.js?v=41" defer></script>
+  <link rel="stylesheet" href="../../assets/style.css?v=42">
+  <link rel="stylesheet" href="../../assets/vak.css?v=42">
+  <script src="../../assets/app.js?v=42"></script>
+  <script src="../../assets/config.js?v=42" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="../../assets/auth.js?v=41" defer></script>
-  <script src="../../assets/activiteit.js?v=41" defer></script>
+  <script src="../../assets/auth.js?v=42" defer></script>
+  <script src="../../assets/activiteit.js?v=42" defer></script>
   <script src="data.js?v=12" defer></script>
-  <script src="../../assets/vak.js?v=41" defer></script>
+  <script src="../../assets/vak.js?v=42" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#inhoud">Ga naar inhoud</a>
@@ -87,7 +87,7 @@
             <a class="terug" href="../../jaar-1ba.html" data-vak-jaar-link>← Terug naar het jaar</a>
           </div>
           <div id="vak-instellingen">
-            <section class="sectie" aria-labelledby="modus-kop">
+            <section class="sectie oefen-stap" id="stap-modus" aria-labelledby="modus-kop">
               <p class="keuze-stap">Stap 1</p>
               <h2 class="sectie-kop" id="modus-kop">Hoe wil je oefenen?</h2>
               <p class="vak-hint" id="laatste-simulatie" hidden></p>
@@ -107,7 +107,7 @@
               </div>
             </section>
 
-            <section class="sectie" aria-labelledby="niveau-kop">
+            <section class="sectie oefen-stap" id="stap-niveau" aria-labelledby="niveau-kop" hidden>
               <p class="keuze-stap">Stap 2</p>
               <h2 class="sectie-kop" id="niveau-kop">Kies je niveau</h2>
               <div class="niveau-keuzes" id="niveau-keuzes" role="radiogroup" aria-labelledby="niveau-kop" aria-describedby="niveau-uitleg">
@@ -117,8 +117,25 @@
               <p class="vak-hint" id="niveau-uitleg">Oefen met de bestaande vragen en bouw je kennis op.</p>
             </section>
 
-            <section class="sectie" aria-labelledby="hoofdstukken-kop">
+            <section class="sectie oefen-stap" id="stap-tijd" aria-labelledby="tijd-kop" hidden>
               <p class="keuze-stap">Stap 3</p>
+              <h2 class="sectie-kop" id="tijd-kop">Hoe lang doe je erover?</h2>
+              <div class="niveau-keuzes" id="tijd-keuzes" role="radiogroup" aria-labelledby="tijd-kop">
+                <button class="niveau-keuze" type="button" role="radio" data-tijd="zonder" aria-checked="true" tabindex="0">Zonder tijd</button>
+                <button class="niveau-keuze" type="button" role="radio" data-tijd="met" aria-checked="false" tabindex="-1">Met tijd</button>
+              </div>
+              <div class="tijd-instellingen" id="tijd-instellingen" hidden>
+                <div class="tijd-label">
+                  <label for="tijd-per-vraag">Tijd per vraag</label>
+                  <output id="tijd-waarde" for="tijd-per-vraag">1 min 15 per vraag</output>
+                </div>
+                <input type="range" id="tijd-per-vraag" min="45" max="120" step="15" value="75" aria-describedby="tijd-totaal">
+                <p class="vak-hint" id="tijd-totaal"></p>
+              </div>
+            </section>
+
+            <section class="sectie oefen-stap" id="stap-hoofdstukken" aria-labelledby="hoofdstukken-kop" hidden>
+              <p class="keuze-stap">Stap 4</p>
               <div class="vak-sectie-kop">
                 <div>
                   <h2 class="sectie-kop" id="hoofdstukken-kop">Kies je hoofdstukken</h2>
@@ -135,10 +152,10 @@
               <p class="vak-hint" id="simulatie-uitleg" hidden>Simulatie gebruikt alle beschikbare hoofdstukken.</p>
             </section>
 
-            <div class="kaart vak-start keuze-start">
+            <div class="kaart vak-start keuze-start oefen-stap" id="stap-start" hidden>
               <div class="keuze-overzicht">
                 <p class="keuze-stap">Jouw oefening</p>
-                <p id="keuze-samenvatting" aria-live="polite" aria-atomic="true"></p>
+                <dl id="keuze-samenvatting" aria-live="polite" aria-atomic="true"></dl>
                 <p class="vak-hint" id="keuze-aantal"></p>
               </div>
               <button class="knop" type="button" id="start-oefening" aria-describedby="keuze-samenvatting keuze-aantal start-hint">Start →</button>
@@ -158,6 +175,8 @@
           </div>
           <div class="voortgang-balk" id="vraag-balk" role="progressbar" aria-label="Voortgang van deze oefening" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
           <p class="eyebrow" id="vraag-teller"></p>
+          <p class="vak-hint tijdklok" id="tijdklok" aria-live="off" hidden></p>
+          <p class="vak-sr-only" id="tijd-melding" aria-live="polite" aria-atomic="true"></p>
           <p class="label oefening-niveau" id="niveau-status"></p>
           <p class="vak-hint" id="simulatie-melding" hidden>Examensimulatie: uitslag aan het einde.</p>
           <h2 id="vraag-tekst" tabindex="-1"></h2>
@@ -171,8 +190,10 @@
 
         <section class="eindscherm" id="eindscherm" aria-labelledby="score-kop" hidden>
           <svg class="vinkje" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30"></circle><path d="M20 33 l9 9 l17 -18"></path></svg>
+          <p class="vak-hint" id="tijd-om" hidden>De tijd was om. Onbeantwoorde vragen tellen als fout.</p>
           <h2 id="score-kop" tabindex="-1"></h2>
           <p class="label oefening-niveau" id="score-niveau"></p>
+          <p class="vak-hint" id="tijd-resultaat" hidden></p>
           <p class="vak-score-tekst" id="score-tekst"></p>
           <div class="score-hoofdstukken" id="score-hoofdstukken"></div>
           <aside class="kaart comit" id="comit" aria-labelledby="comit-naam">
