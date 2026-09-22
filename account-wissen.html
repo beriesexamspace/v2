@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="assets/deur.js?v=41"></script>
+  <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
+  <link rel="manifest" href="/v2/manifest.webmanifest">
+  <meta name="robots" content="noindex">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Berie's Exam Space">
+  <meta property="og:title" content="Account wissen | Berie's Exam Space">
+  <meta property="og:description" content="Wis je account bij Berie's Exam Space: wat er verdwijnt, waarom je weggaat, en de laatste bevestiging.">
+  <meta property="og:image" content="https://beriesexamspace.com/v2/assets/deel.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="https://beriesexamspace.com/v2/account-wissen.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="description" content="Wis je account bij Berie's Exam Space: wat er verdwijnt, waarom je weggaat, en de laatste bevestiging.">
+  <meta name="theme-color" content="#FFFFFF">
+  <script>
+    (() => {
+      let keuze;
+      try { keuze = window.localStorage.getItem('bes_thema'); } catch {}
+      const donker = keuze === 'donker' || (keuze !== 'licht' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.dataset.theme = donker ? 'dark' : 'light';
+      document.querySelector('meta[name="theme-color"]').content = donker ? '#0B0B0C' : '#FFFFFF';
+    })();
+  </script>
+  <title>Account wissen | Berie's Exam Space</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css?v=41">
+  <script src="assets/app.js?v=41" defer></script>
+  <script src="assets/config.js?v=41" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
+  <script src="assets/auth.js?v=41" defer></script>
+  <style>
+    .wissen-wrap { max-width: 640px; }
+    .wissen-legenda { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0; clip-path: inset(50%); overflow: hidden; white-space: nowrap; }
+    .wissen-stappen { display: flex; align-items: center; gap: 8px; margin: 0 0 20px; color: var(--ink-soft); font-size: .8125rem; }
+    .wissen-stappen i { display: block; width: 28px; height: 4px; border-radius: 2px; background: var(--surface); }
+    .wissen-stappen i.is-nu { background: var(--fout); }
+    .wissen-stappen i.is-klaar { background: var(--ink-soft); }
+    .wissen-kaart { padding: clamp(22px, 5vw, 36px); font-size: .9375rem; line-height: 1.7; }
+    .wissen-kaart h2 { margin: 0 0 16px; font-size: 1.25rem; line-height: 1.3; }
+    .wissen-kaart p { max-width: 62ch; margin: 0; }
+    .wissen-kaart p + p, .wissen-kaart ul + p, .wissen-kaart p + ul { margin-top: 16px; }
+    .wissen-lijst { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+    .wissen-lijst li { display: grid; grid-template-columns: 22px minmax(0, 1fr); column-gap: 12px; }
+    .wissen-lijst li::before { content: '·'; color: var(--fout); font-weight: 700; line-height: inherit; }
+    .wissen-redenen { display: grid; gap: 10px; margin: 0; padding: 0; border: 0; }
+    .wissen-reden { display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 12px 16px; border: 1px solid var(--line); border-radius: 14px; cursor: pointer; }
+    .wissen-reden input { width: 18px; height: 18px; flex: 0 0 auto; accent-color: var(--accent); }
+    .wissen-reden:has(input:checked) { border-color: var(--accent); background: var(--accent-zacht); }
+    .wissen-reden:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .wissen-toelichting { width: 100%; min-height: 96px; margin-top: 4px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); color: var(--ink); font: inherit; font-size: .9375rem; resize: vertical; }
+    .wissen-toelichting:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .wissen-knoppen { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 28px; }
+    .wissen-knoppen .knop, .wissen-knoppen .knop-secundair { width: auto; min-width: 0; margin: 0; }
+    .knop-gevaar-vol { background: var(--fout); border-color: var(--fout); box-shadow: none; }
+    .knop-gevaar-vol:disabled { opacity: .45; cursor: default; }
+    :where(html.has-hover) .knop-gevaar-vol:not(:disabled):hover { background: var(--fout); box-shadow: none; }
+    .wissen-terug { color: var(--ink-soft); }
+    .wissen-fout { margin-top: 16px; }
+    .wissen-klaar { display: grid; gap: 16px; justify-items: start; }
+    @media (max-width: 480px) { .wissen-knoppen .knop, .wissen-knoppen .knop-secundair { width: 100%; } }
+  </style>
+</head>
+<body data-nav="vast">
+  <a class="skip-link" href="#inhoud">Ga naar inhoud</a>
+  <header class="site-header">
+    <nav class="navigation" aria-label="Hoofdnavigatie">
+      <a class="brand" href="index.html" aria-label="Berie's Exam Space, startpagina">
+        <span class="brand-symbol" aria-hidden="true">B</span>
+        <span class="brand-name"><span>Berie's</span> <span>Exam Space</span></span>
+      </a>
+      <a class="home-knop" href="hub.html" aria-label="Home" title="Home">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5M5 9v12h5v-7h4v7h5V9"/></svg>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu">Menu</button>
+      <ul class="navigation-links" id="site-menu">
+        <li><a href="hub.html#hoe-werkt-het">Hoe werkt het</a></li>
+        <li><a href="over-mij.html">Over mij</a></li>
+        <li><a href="whatsapp.html">WhatsApp-groep</a></li>
+        <li><a href="feedback.html">Feedback</a></li>
+      </ul>
+      <a class="pill login-button" href="inloggen.html">Inloggen →</a>
+    </nav>
+  </header>
+
+  <main id="inhoud" class="pagina" aria-labelledby="wissen-titel">
+    <div class="wrap wissen-wrap">
+      <a class="terug tekstlink" href="profiel.html" data-terug="profiel.html" data-terug-tekst="Terug">← Terug naar je profiel</a>
+      <header class="pagina-kop">
+        <h1 id="wissen-titel">Account wissen</h1>
+        <p class="pagina-sub">Drie korte stappen. Je kan tot het einde stoppen.</p>
+      </header>
+
+      <p class="wissen-stappen" id="wissen-stappen" aria-hidden="true"><i class="is-nu"></i><i></i><i></i></p>
+
+      <section class="kaart wissen-kaart" id="stap-1" aria-labelledby="stap-1-kop">
+        <h2 id="stap-1-kop">Wat er gebeurt</h2>
+        <p>Als je je account wist, verdwijnt dit meteen en voorgoed:</p>
+        <ul class="wissen-lijst">
+          <li><div>Je voortgang per vak en per hoofdstuk, en je opgeslagen sessies.</div></li>
+          <li><div>Je studiekalender met je leertijd per dag.</div></li>
+          <li><div>Je naam, je e-mailadres, je profielfoto en je instellingen.</div></li>
+          <li><div>De feedback die je stuurde.</div></li>
+        </ul>
+        <p>Heb je een betaald abonnement, dan stopt dat op hetzelfde moment. De maand die al betaald is wordt niet terugbetaald. Wil je alleen stoppen met betalen, zeg dan je abonnement op en laat je account gewoon staan; je voortgang blijft dan bewaard.</p>
+        <p><strong>Dit kan niet ongedaan gemaakt worden.</strong> Je kan later een nieuw account maken, maar je oude voortgang komt niet terug.</p>
+        <div class="wissen-knoppen">
+          <button class="knop-secundair" type="button" data-volgende="2">Verder →</button>
+          <a class="tekstlink wissen-terug" href="profiel.html">Toch niet</a>
+        </div>
+      </section>
+
+      <section class="kaart wissen-kaart" id="stap-2" aria-labelledby="stap-2-kop" hidden>
+        <h2 id="stap-2-kop">Waarom ga je weg?</h2>
+        <p>Dit helpt om de site beter te maken. We bewaren alleen je antwoord, zonder je naam of e-mailadres.</p>
+        <fieldset class="wissen-redenen" id="wissen-redenen">
+          <legend class="wissen-legenda">Kies een reden</legend>
+          <label class="wissen-reden"><input type="radio" name="reden" value="klaar"><span>Ik ben klaar met mijn opleiding</span></label>
+          <label class="wissen-reden"><input type="radio" name="reden" value="gebruik-niet"><span>Ik gebruik het niet meer</span></label>
+          <label class="wissen-reden"><input type="radio" name="reden" value="te-weinig-vakken"><span>Mijn vakken staan er niet bij</span></label>
+          <label class="wissen-reden"><input type="radio" name="reden" value="werkt-niet"><span>Er werkt iets niet goed</span></label>
+          <label class="wissen-reden"><input type="radio" name="reden" value="anders"><span>Een andere reden</span></label>
+        </fieldset>
+        <p><label for="wissen-toelichting">Wil je er iets bij zeggen? (optioneel)</label></p>
+        <textarea class="wissen-toelichting" id="wissen-toelichting" maxlength="500" placeholder="Bijvoorbeeld: wat had beter gekund?"></textarea>
+        <div class="wissen-knoppen">
+          <button class="knop-secundair" type="button" data-volgende="3">Verder →</button>
+          <button class="tekstlink wissen-terug" type="button" data-terug-stap="1">← Vorige</button>
+        </div>
+      </section>
+
+      <section class="kaart wissen-kaart" id="stap-3" aria-labelledby="stap-3-kop" hidden>
+        <h2 id="stap-3-kop">Weet je het zeker?</h2>
+        <p>Dit is de laatste stap. Na het klikken is je account weg en word je uitgelogd.</p>
+        <div class="wissen-knoppen">
+          <button class="knop knop-gevaar-vol" id="wissen-definitief" type="button">Account verwijderen</button>
+          <button class="tekstlink wissen-terug" type="button" data-terug-stap="2">← Vorige</button>
+        </div>
+        <p class="auth-error wissen-fout" id="wissen-fout" role="alert" hidden></p>
+      </section>
+
+      <section class="kaart wissen-kaart" id="stap-klaar" aria-labelledby="stap-klaar-kop" hidden>
+        <div class="wissen-klaar">
+          <h2 id="stap-klaar-kop">Je account is gewist.</h2>
+          <p role="status">Bedankt voor het gebruiken van Berie's Exam Space. Je wordt naar de startpagina gebracht.</p>
+          <a class="knop-secundair" href="index.html">Naar de startpagina →</a>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p class="footer-brand">Berie's Exam Space</p>
+    <div class="footer-details">
+      <p>Duidelijk leren. Rustig groeien.</p>
+      <p class="project-label">Een project van The Berie Foundation</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const auth = window.BES.auth;
+      const stappen = document.getElementById('wissen-stappen');
+      const fout = document.getElementById('wissen-fout');
+      const knop = document.getElementById('wissen-definitief');
+      const toelichting = document.getElementById('wissen-toelichting');
+      let bezig = false;
+
+      const toon = nummer => {
+        [1, 2, 3].forEach(n => { document.getElementById('stap-' + n).hidden = n !== nummer; });
+        document.getElementById('stap-klaar').hidden = true;
+        stappen.hidden = false;
+        [...stappen.children].forEach((balk, i) => {
+          balk.className = i + 1 === nummer ? 'is-nu' : i + 1 < nummer ? 'is-klaar' : '';
+        });
+        const kop = document.getElementById('stap-' + nummer).querySelector('h2');
+        kop.setAttribute('tabindex', '-1');
+        kop.focus({ preventScroll: true });
+        window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      };
+
+      document.querySelectorAll('[data-volgende]').forEach(button => {
+        button.addEventListener('click', () => toon(Number(button.dataset.volgende)));
+      });
+      document.querySelectorAll('[data-terug-stap]').forEach(button => {
+        button.addEventListener('click', () => toon(Number(button.dataset.terugStap)));
+      });
+
+      // De reden gaat als losse rij naar Supabase, zonder gebruikers-id, vlak voor het wissen zelf.
+      const redenBewaren = async () => {
+        const gekozen = document.querySelector('input[name="reden"]:checked');
+        if (!gekozen || !auth.client) return;
+        const tekst = toelichting.value.trim().slice(0, 500);
+        try {
+          await auth.client.from('vertrek_redenen').insert({ reden: gekozen.value, toelichting: tekst || null });
+        } catch {}
+      };
+
+      knop.addEventListener('click', async () => {
+        if (bezig || !auth.client) return;
+        bezig = true;
+        knop.disabled = true;
+        knop.textContent = 'Even geduld…';
+        fout.hidden = true;
+        try {
+          await redenBewaren();
+          const { error } = await auth.client.rpc('account_verwijderen');
+          if (error) throw error;
+          [1, 2, 3].forEach(n => { document.getElementById('stap-' + n).hidden = true; });
+          stappen.hidden = true;
+          document.getElementById('stap-klaar').hidden = false;
+          document.getElementById('stap-klaar-kop').setAttribute('tabindex', '-1');
+          document.getElementById('stap-klaar-kop').focus({ preventScroll: true });
+          try { await auth.client.auth.signOut(); } catch {}
+          window.setTimeout(() => window.location.replace('index.html'), 2500);
+        } catch {
+          bezig = false;
+          knop.disabled = false;
+          knop.textContent = 'Account verwijderen';
+          fout.textContent = 'Wissen is niet gelukt. Probeer het later opnieuw of mail naar berie007yldrm@gmail.com.';
+          fout.hidden = false;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

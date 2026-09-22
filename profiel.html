@@ -97,18 +97,6 @@
     .inz-sessie-score { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
     @media (max-width: 520px) { .inz-sessie { grid-template-columns: 56px minmax(0, 1fr) auto; } .inz-sessie-modus { display: none; } }
     @media (prefers-reduced-motion: reduce) { .inz-balk i { transition: none; } }
-    .profiel-wissen { margin-top: 24px; }
-    .profiel-wissen h2 { margin: 0 0 16px; font-size: 1.25rem; }
-    .profiel-wissen .kaart p { margin: 0 0 16px; color: var(--ink-soft); font-size: .9375rem; line-height: 1.6; }
-    .profiel-wissen .kaart p strong { color: var(--ink); }
-    .knop-gevaar { color: var(--fout); border-color: var(--fout); }
-    .knop-gevaar-vol { background: var(--fout); border-color: var(--fout); box-shadow: none; }
-    .knop-gevaar-vol:disabled { opacity: .45; cursor: default; }
-    :where(html.has-hover) .knop-gevaar:hover { background: var(--fout-zacht); border-color: var(--fout); }
-    :where(html.has-hover) .knop-gevaar-vol:not(:disabled):hover { background: var(--fout); box-shadow: none; }
-    .wissen-bevestiging { display: grid; gap: 14px; margin-top: 8px; }
-    .wissen-bevestiging .auth-input { max-width: 260px; }
-    .wissen-knoppen { display: flex; flex-wrap: wrap; gap: 12px; }
     @media (prefers-reduced-motion: reduce) { .profiel-opgeslagen { transition: none; } }
   </style>
 </head>
@@ -228,26 +216,9 @@
 
       <div class="profiel-onderaan" id="profiel-onderaan" data-uitloggen-groep hidden>
         <button class="knop-secundair" id="profiel-uitloggen" type="button" data-account-uitloggen>Uitloggen</button>
-        <button class="tekstlink profiel-wissen-link" id="wissen-openen" type="button" aria-expanded="false" aria-controls="account-wissen">Account wissen</button>
+        <a class="tekstlink profiel-wissen-link" href="account-wissen.html">Account wissen</a>
       </div>
 
-      <section class="sectie profiel-wissen" id="account-wissen" aria-labelledby="wissen-kop" hidden>
-        <h2 id="wissen-kop">Account wissen</h2>
-        <div class="kaart">
-          <p>Dit wist je account met je voortgang, studiekalender, feedback en profielfoto. <strong>Dit kan niet ongedaan gemaakt worden.</strong></p>
-          <button class="knop-secundair knop-gevaar" id="wissen-start" type="button">Account wissen</button>
-          <div class="wissen-bevestiging" id="wissen-bevestiging" hidden>
-            <p><strong>Weet je het zeker?</strong> Typ WISSEN om te bevestigen.</p>
-            <input class="auth-input" id="wissen-invoer" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Typ WISSEN om te bevestigen" placeholder="WISSEN">
-            <div class="wissen-knoppen">
-              <button class="knop knop-gevaar-vol" id="wissen-bevestig" type="button" disabled>Ja, wis mijn account</button>
-              <button class="knop-secundair" id="wissen-annuleer" type="button">Annuleren</button>
-            </div>
-            <p class="auth-error" id="wissen-fout" role="alert" hidden></p>
-            <p class="auth-help" id="wissen-status" role="status" aria-live="polite" hidden>Je account is gewist. Tot ziens.</p>
-          </div>
-        </div>
-      </section>
     </div>
   </main>
 
@@ -340,7 +311,6 @@
           editButton.hidden = true;
           editButton.setAttribute('aria-expanded', 'false');
           bottomRow.hidden = true;
-          document.getElementById('account-wissen').hidden = true;
           if (auth.emailBevestiging.teruggekeerd) {
             confirmation.hidden = false;
             document.getElementById('profiel-bevestiging-tekst').textContent = auth.emailBevestiging.fout
@@ -405,60 +375,6 @@
         setEditing(false);
         editButton.focus({ preventScroll: true });
       });
-
-      // Account wissen: eerst WISSEN typen, dan de functie account_verwijderen in Supabase.
-      (() => {
-        const opener = document.getElementById('wissen-openen');
-        const section = document.getElementById('account-wissen');
-        opener.addEventListener('click', () => {
-          const open = opener.getAttribute('aria-expanded') === 'true';
-          opener.setAttribute('aria-expanded', String(!open));
-          section.hidden = open;
-          if (!open) section.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
-        });
-        const start = document.getElementById('wissen-start');
-        const box = document.getElementById('wissen-bevestiging');
-        const input = document.getElementById('wissen-invoer');
-        const confirmButton = document.getElementById('wissen-bevestig');
-        const cancel = document.getElementById('wissen-annuleer');
-        const fault = document.getElementById('wissen-fout');
-        const status = document.getElementById('wissen-status');
-        let deleting = false;
-        const reset = () => {
-          box.hidden = true;
-          start.hidden = false;
-          input.value = '';
-          confirmButton.disabled = true;
-          fault.hidden = true;
-        };
-        start.addEventListener('click', () => {
-          box.hidden = false;
-          start.hidden = true;
-          input.focus();
-        });
-        cancel.addEventListener('click', reset);
-        input.addEventListener('input', () => { confirmButton.disabled = input.value.trim().toUpperCase() !== 'WISSEN'; });
-        confirmButton.addEventListener('click', async () => {
-          if (deleting || confirmButton.disabled || !auth.client) return;
-          deleting = true;
-          confirmButton.disabled = true;
-          cancel.disabled = true;
-          fault.hidden = true;
-          try {
-            const { error: rpcError } = await auth.client.rpc('account_verwijderen');
-            if (rpcError) throw rpcError;
-            status.hidden = false;
-            try { await auth.client.auth.signOut(); } catch {}
-            window.setTimeout(() => window.location.assign('index.html'), 1200);
-          } catch (caught) {
-            deleting = false;
-            cancel.disabled = false;
-            confirmButton.disabled = false;
-            fault.textContent = 'Wissen is niet gelukt. Probeer het later opnieuw of mail naar berie007yldrm@gmail.com.';
-            fault.hidden = false;
-          }
-        });
-      })();
 
       const setBusy = value => {
         busy = value;
