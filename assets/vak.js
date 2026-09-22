@@ -470,7 +470,6 @@
           else selected.delete(chapter.id);
           renderChapters();
           updateStart();
-          if (aangevinkt) scrollNaar(byId('start-oefening')?.closest('.vak-start') || byId('start-oefening'));
         });
         list.append(row);
       });
