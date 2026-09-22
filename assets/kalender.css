@@ -15,7 +15,9 @@ html[data-theme="dark"] .kalender-dag[data-intensiteit="3"], html[data-theme="da
 .kalender-dag.is-onbekend { border-style: dashed; color: var(--ink-soft); background: transparent; }
 .kalender-dag.is-toekomst { background: transparent; color: var(--ink-soft); border-style: dotted; opacity: .6; }
 .kalender-dag[aria-current="date"] { box-shadow: inset 0 0 0 1px var(--ink-soft); }
-.kalender-dag[aria-pressed="true"] { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* Muis erover: een blauwe rand die weer weggaat. Gekozen dag: blauwe rand plus een zachte ring, zodat je hem ook na het weghalen van de muis ziet. */
+.kalender-dag.is-hover { outline: 2px solid var(--accent); outline-offset: 2px; }
+.kalender-dag[aria-pressed="true"] { outline: 2px solid var(--accent); outline-offset: 2px; border-color: var(--accent); box-shadow: 0 0 0 5px var(--accent-zacht); }
 .kalender-dag:focus-visible, .kalender-maandknop:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .kalender-daginfo { min-height: 3em; margin: 18px 0 10px; font-size: .9rem; line-height: 1.5; color: var(--ink); }
 .kalender-legenda { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; font-size: .72rem; color: var(--ink-soft); }

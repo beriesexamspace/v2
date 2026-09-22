@@ -254,6 +254,7 @@
   }
 
   function previewOff() {
+    grid?.querySelectorAll('.is-hover').forEach(button => button.classList.remove('is-hover'));
     if (!details) return;
     details.textContent = activeDay ? description(activeDay, totals()) : 'Kies een dag om je bezoeken en leertijd te zien.';
   }
@@ -339,8 +340,8 @@
       button.setAttribute('aria-label', description(key, days));
       button.setAttribute('aria-pressed', String(activeDay === key));
       if (key === dayKey(today)) button.setAttribute('aria-current', 'date');
-      button.addEventListener('pointerenter', () => previewDay(key));
-      button.addEventListener('pointerleave', previewOff);
+      button.addEventListener('pointerenter', () => { button.classList.add('is-hover'); previewDay(key); });
+      button.addEventListener('pointerleave', () => { button.classList.remove('is-hover'); previewOff(); });
       button.addEventListener('focus', () => showDay(key));
       button.addEventListener('click', () => showDay(key));
       grid.append(button);
