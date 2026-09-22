@@ -112,6 +112,7 @@
     }
 
     const hasLevels = Boolean(document.querySelector('main.vak-pagina[data-niveaus]'));
+    const showLevelStep = hasLevels && data.hardVragen.length > 0;
     const levels = hasLevels ? ['normaal', 'hard'] : ['normaal'];
     const levelLabel = value => value === 'hard' ? 'Hard mode' : 'Normaal';
     const modeLabel = value => value === 'simulatie' ? 'Examensimulatie' : 'Examen Training';
@@ -133,6 +134,9 @@
     let lastRun = null;
     let loggedSyncError = false;
     let lastSyncSent = 0;
+    let timed = false;
+    let secondsPerQuestion = 75;
+    let clockTimer = 0;
     const choiceHint = create('p', 'vak-hint vraag-keuze-hint');
     choiceHint.id = 'vraag-keuze-hint';
     choiceHint.hidden = true;
@@ -142,6 +146,77 @@
     checkAnswer.type = 'button';
     checkAnswer.hidden = true;
     byId('volgende-vraag').before(checkAnswer);
+
+    const steps = ['modus', ...(showLevelStep ? ['niveau'] : []), 'tijd', 'hoofdstukken'];
+    steps.forEach((name, index) => {
+      byId(`stap-${name}`).querySelector('.keuze-stap').textContent = `Stap ${index + 1}`;
+    });
+
+    function revealStep(name, scroll = true) {
+      const step = byId(`stap-${name}`);
+      if (step.hidden) {
+        step.hidden = false;
+        if (!reducedMotion.matches) {
+          step.classList.add('is-nieuw');
+          step.addEventListener('animationend', () => step.classList.remove('is-nieuw'), { once: true });
+        }
+      }
+      if (scroll) scrollNaar(step);
+    }
+
+    function chooseMode(value) {
+      setMode(value);
+      revealStep(showLevelStep ? 'niveau' : 'tijd');
+    }
+
+    function chooseLevel(value) {
+      setLevel(value);
+      revealStep('tijd');
+    }
+
+    function setTime(value, reveal = false) {
+      timed = value === 'met';
+      byId('tijd-keuzes').querySelectorAll('[data-tijd]').forEach(button => {
+        const active = (button.dataset.tijd === 'met') === timed;
+        button.setAttribute('aria-checked', String(active));
+        button.tabIndex = active ? 0 : -1;
+      });
+      byId('tijd-instellingen').hidden = !timed;
+      updateStart();
+      if (reveal) {
+        revealStep('hoofdstukken', false);
+        revealStep('start', false);
+        scrollNaar(timed ? byId('tijd-instellingen') : byId('stap-hoofdstukken'));
+      }
+    }
+
+    function stopClock() {
+      window.clearInterval(clockTimer);
+      clockTimer = 0;
+    }
+
+    function timeExpired() {
+      if (!session || screen !== 'oefenen' || session.endedAt !== null || !session.durationMs) return false;
+      if (Date.now() < session.startedAt + session.durationMs) return false;
+      finish(true);
+      return true;
+    }
+
+    function updateClock() {
+      if (!session || screen !== 'oefenen' || session.endedAt !== null || !session.durationMs) return;
+      if (timeExpired()) return;
+      const seconds = Math.max(0, Math.ceil((session.startedAt + session.durationMs - Date.now()) / 1000));
+      const clock = byId('tijdklok');
+      const text = `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
+      if (clock.textContent !== text) clock.textContent = text;
+      clock.classList.toggle('is-bijna-om', seconds <= 60);
+      // Bij een sprong over beide grenzen meldt de klok alleen de meest dringende waarschuwing.
+      const warnings = [300, 60].filter(limit => session.durationMs >= limit * 1000 && seconds <= limit && !session.warnings.has(limit));
+      if (warnings.length) {
+        warnings.forEach(limit => session.warnings.add(limit));
+        byId('tijd-melding').textContent = warnings.includes(60) ? 'Nog 1 minuut' : 'Nog 5 minuten';
+      }
+    }
 
     function cleanProgress(raw) {
       const result = Object.create(null);
@@ -299,6 +374,7 @@
       });
       context = banks.get(level).get(owner);
       if (previous !== context) {
+        stopClock();
         session = null;
         lastRun = null;
         if (screen !== 'keuzes') showScreen('keuzes');
@@ -407,14 +483,20 @@
       byId('start-hint').textContent = emptySelection
         ? 'Kies minstens één hoofdstuk.'
         : tooFewHard ? `Kies voor Hard mode minstens ${minimumHard} vragen, dus meer hoofdstukken (nu ${countText(amount)}).` : '';
-      if (hasLevels) {
-        const chapters = mode === 'simulatie' ? 'Alle beschikbare hoofdstukken' : selected.size
-          ? data.hoofdstukken.filter(chapter => selected.has(chapter.id)).map(chapter => chapter.naam).join(', ')
-          : 'Nog geen hoofdstukken gekozen';
-        if (byId('keuze-samenvatting')) byId('keuze-samenvatting').textContent = `${modeLabel(mode)} · ${levelLabel(level)} · ${chapters}`;
-        if (byId('keuze-aantal')) byId('keuze-aantal').textContent = `${countText(amount)}${mode === 'simulatie' ? ' · Uitslag en uitleg aan het einde.' : ' · Uitleg na ieder antwoord.'}`;
-        byId('simulatie-uitleg').textContent = `De simulatie kiest ${countText(amount)} uit alle beschikbare hoofdstukken op ${levelLabel(level)}. Je krijgt je uitslag en uitleg aan het einde.`;
-      }
+      const chapters = mode === 'simulatie' ? 'Alle beschikbare hoofdstukken' : selected.size
+        ? data.hoofdstukken.filter(chapter => selected.has(chapter.id)).map(chapter => chapter.naam).join(', ')
+        : 'Nog geen hoofdstukken gekozen';
+      const minutes = Math.ceil(amount * secondsPerQuestion / 60);
+      const duration = `${minutes} ${minutes === 1 ? 'minuut' : 'minuten'}`;
+      const perQuestion = secondsPerQuestion < 60 ? `${secondsPerQuestion} sec per vraag`
+        : `${Math.floor(secondsPerQuestion / 60)} min${secondsPerQuestion % 60 ? ` ${secondsPerQuestion % 60}` : ''} per vraag`;
+      byId('tijd-waarde').textContent = perQuestion;
+      byId('tijd-per-vraag').setAttribute('aria-valuetext', perQuestion);
+      byId('tijd-totaal').textContent = `${countText(amount)}, ${duration}`;
+      const summary = [['Modus', modeLabel(mode)], ['Niveau', levelLabel(level)], ['Tijd', timed ? `${duration}, ${perQuestion}` : 'Zonder tijd'], ['Hoofdstukken', chapters]];
+      byId('keuze-samenvatting').replaceChildren(...summary.flatMap(([label, value]) => [create('dt', '', label), create('dd', '', value)]));
+      byId('keuze-aantal').textContent = `${countText(amount)}${mode === 'simulatie' ? ' · Uitslag en uitleg aan het einde.' : ' · Uitleg na ieder antwoord.'}`;
+      byId('simulatie-uitleg').textContent = `De simulatie kiest ${countText(amount)} uit alle beschikbare hoofdstukken op ${levelLabel(level)}. Je krijgt je uitslag en uitleg aan het einde.`;
     }
 
     function setMode(value) {
@@ -434,6 +516,7 @@
     }
 
     function showScreen(value) {
+      if (value !== 'oefenen') stopClock();
       screen = value;
       byId('stop-bevestiging').hidden = true;
       // Tijdens het oefenen alleen de vraag en Stop in beeld; bij een simulatie ook zonder navigatiebalk.
@@ -445,19 +528,30 @@
       });
     }
 
-    function start(questions, runMode = mode, runLevel = level) {
+    function start(questions, runMode = mode, runLevel = level, runSeconds = timed ? secondsPerQuestion : 0) {
       if (!questions.length || !context.authReady || runLevel !== level) return;
+      stopClock();
       session = {
         mode: runMode, level: runLevel, owner: context, index: 0,
+        secondsPerQuestion: runSeconds, startedAt: Date.now(), durationMs: questions.length * runSeconds * 1000,
+        endedAt: null, warnings: new Set(),
         questions: shuffle(questions).map(question => {
           const answers = Array.isArray(question.a) ? question.a : [question.a];
           return { question, options: shuffle(question.o.map((text, index) => ({ text, correct: answers.includes(index) }))), pending: new Set(), selected: null };
         }),
         chapters: Object.fromEntries(data.hoofdstukken.map(({ id }) => [id, { answered: 0, good: 0, total: questions.filter(question => question.h === id).length }]))
       };
+      byId('tijdklok').hidden = !runSeconds;
+      byId('tijdklok').textContent = '';
+      byId('tijdklok').classList.remove('is-bijna-om');
+      byId('tijd-melding').textContent = '';
       if (hasLevels && byId('niveau-status')) byId('niveau-status').textContent = `${modeLabel(runMode)} · ${levelLabel(runLevel)}`;
       showScreen('oefenen');
       renderQuestion();
+      if (runSeconds) {
+        updateClock();
+        clockTimer = window.setInterval(updateClock, 250);
+      }
     }
 
     function renderQuestion() {
@@ -503,6 +597,7 @@
 
     function answer(index) {
       if (!session || screen !== 'oefenen' || currentTab !== 'paneel-oefenen' || !byId('stop-bevestiging').hidden) return;
+      if (timeExpired()) return;
       const current = session.questions[session.index];
       if (current.selected !== null || !current.options[index]) return;
       if (Array.isArray(current.question.a)) {
@@ -527,6 +622,7 @@
 
     function confirmAnswer() {
       if (!session || screen !== 'oefenen' || currentTab !== 'paneel-oefenen' || !byId('stop-bevestiging').hidden) return;
+      if (timeExpired()) return;
       const current = session.questions[session.index];
       const expected = Array.isArray(current.question.a) ? current.question.a.length : 1;
       if (current.selected !== null || current.pending.size !== expected) return;
@@ -580,13 +676,30 @@
 
     function next() {
       if (!session || screen !== 'oefenen' || session.questions[session.index].selected === null || !byId('stop-bevestiging').hidden) return;
+      if (timeExpired()) return;
       if (session.index === session.questions.length - 1) finish();
       else { session.index += 1; renderQuestion(); }
     }
 
-    function finish() {
-      if (!session || session.owner !== context) return;
+    function finish(expired = false) {
+      if (!session || session.owner !== context || screen !== 'oefenen' || session.endedAt !== null) return;
+      stopClock();
+      const now = Date.now();
+      expired = expired || Boolean(session.durationMs && now >= session.startedAt + session.durationMs);
+      session.endedAt = session.durationMs ? Math.min(now, session.startedAt + session.durationMs) : now;
       const answers = session.questions;
+      if (expired) {
+        answers.filter(entry => entry.selected === null).forEach(entry => {
+          entry.unanswered = true;
+          entry.selected = [];
+          entry.pending.clear();
+          if (session.mode === 'training') recordAnswer(entry.question.h, false);
+        });
+      }
+      byId('tijd-om').hidden = !expired;
+      byId('tijd-resultaat').hidden = !session.durationMs;
+      byId('tijd-resultaat').textContent = session.durationMs
+        ? `Je deed er ${Math.ceil(Math.max(0, session.endedAt - session.startedAt) / 60000)} minuten over van de ${Math.ceil(session.durationMs / 60000)}.` : '';
       const correct = correctAnswer;
       const good = answers.filter(correct).length;
       const name = typeof BES.naamOphalen === 'function' ? BES.naamOphalen() : '';
@@ -604,7 +717,7 @@
         row.append(top, progressBar(amount, group.length));
         byId('score-hoofdstukken').append(row);
       });
-      lastRun = { mode: session.mode, level: session.level, questions: answers.map(entry => entry.question), wrong: answers.filter(entry => !correct(entry)).map(entry => entry.question) };
+      lastRun = { mode: session.mode, level: session.level, secondsPerQuestion: session.secondsPerQuestion, questions: answers.map(entry => entry.question), wrong: answers.filter(entry => !correct(entry)).map(entry => entry.question) };
       byId('fouten-opnieuw').hidden = !lastRun.wrong.length;
       const simulation = session.mode === 'simulatie';
       byId('simulatie-overzicht').hidden = !simulation;
@@ -617,6 +730,7 @@
         answers.forEach((entry, index) => {
           const item = create('article', 'overzicht-vraag kaart');
           item.append(create('h3', '', `${index + 1}. ${entry.question.q}`));
+          if (entry.unanswered) item.append(create('p', 'antwoord-fout', 'Niet beantwoord.'));
           if (Array.isArray(entry.question.a)) {
             entry.options.forEach((option, optionIndex) => {
               const chosen = entry.selected.includes(optionIndex);
@@ -625,7 +739,7 @@
               item.append(create('p', option.correct ? 'antwoord-goed' : 'antwoord-fout', `${label}: ${option.text}`));
             });
           } else {
-            item.append(create('p', correct(entry) ? 'antwoord-goed' : 'antwoord-fout', `Jouw antwoord: ${entry.options[entry.selected[0]].text}`));
+            if (!entry.unanswered) item.append(create('p', correct(entry) ? 'antwoord-goed' : 'antwoord-fout', `Jouw antwoord: ${entry.options[entry.selected[0]].text}`));
             item.append(create('p', '', `Juiste antwoord: ${entry.question.o[entry.question.a]}`));
           }
           item.append(create('p', '', entry.question.u));
@@ -679,7 +793,7 @@
         else if (eerste.goed / eerste.totaal < .5) tip = `Lees eerst de theorie van ${eerste.chapter.naam} en doe het hoofdstuk daarna opnieuw.`;
         else tip = `Bijna. Doe ${eerste.chapter.naam} nog één keer, dan zit het.`;
         knopTekst = `Oefen ${eerste.chapter.naam} →`;
-        knopActie = () => start(vragen, 'training', session.level);
+        knopActie = () => start(vragen, 'training', lastRun.level, lastRun.secondsPerQuestion);
       }
       byId('comit-regels').replaceChildren(...regels.map(regel => create('p', '', regel)));
       byId('comit-tip').textContent = tip;
@@ -777,24 +891,20 @@
       selectTab(tabs[target], true);
     });
     const modeButtons = [...byId('modus-keuzes').querySelectorAll('[data-modus]')];
-    modeButtons.forEach(button => button.addEventListener('click', () => {
-      setMode(button.dataset.modus);
-      scrollNaar(byId('niveau-kop')?.closest('section') || byId('hoofdstukken-kop')?.closest('section'));
-    }));
+    modeButtons.forEach(button => button.addEventListener('click', () => chooseMode(button.dataset.modus)));
     byId('modus-keuzes').addEventListener('keydown', event => {
       const current = modeButtons.indexOf(document.activeElement);
       if (current < 0 || !['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) return;
       event.preventDefault();
       const index = event.key === 'Home' ? 0 : event.key === 'End' ? modeButtons.length - 1 : (current + 1) % modeButtons.length;
-      setMode(modeButtons[index].dataset.modus);
-      modeButtons[index].focus();
+      chooseMode(modeButtons[index].dataset.modus);
+      modeButtons[index].focus({ preventScroll: true });
     });
     if (hasLevels && byId('niveau-keuzes')) {
       const levelButtons = [...byId('niveau-keuzes').querySelectorAll('[data-niveau]')];
       levelButtons.forEach(button => button.addEventListener('click', () => {
         if (button.disabled) return;
-        setLevel(button.dataset.niveau);
-        scrollNaar(byId('hoofdstukken-kop')?.closest('section'));
+        chooseLevel(button.dataset.niveau);
       }));
       byId('niveau-keuzes').addEventListener('keydown', event => {
         const enabled = levelButtons.filter(button => !button.disabled);
@@ -803,11 +913,25 @@
         event.preventDefault();
         const step = ['ArrowLeft', 'ArrowUp'].includes(event.key) ? -1 : 1;
         const index = event.key === 'Home' ? 0 : event.key === 'End' ? enabled.length - 1 : (current + step + enabled.length) % enabled.length;
-        setLevel(enabled[index].dataset.niveau);
-        enabled[index].focus();
+        chooseLevel(enabled[index].dataset.niveau);
+        enabled[index].focus({ preventScroll: true });
       });
       setLevel('normaal');
     }
+    const timeButtons = [...byId('tijd-keuzes').querySelectorAll('[data-tijd]')];
+    timeButtons.forEach(button => button.addEventListener('click', () => setTime(button.dataset.tijd, true)));
+    byId('tijd-keuzes').addEventListener('keydown', event => {
+      const current = timeButtons.indexOf(document.activeElement);
+      if (current < 0 || !['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) return;
+      event.preventDefault();
+      const index = event.key === 'Home' ? 0 : event.key === 'End' ? timeButtons.length - 1 : (current + 1) % timeButtons.length;
+      setTime(timeButtons[index].dataset.tijd, true);
+      timeButtons[index].focus({ preventScroll: true });
+    });
+    byId('tijd-per-vraag').addEventListener('input', event => {
+      secondsPerQuestion = Number(event.target.value);
+      updateStart();
+    });
     byId('kies-alles').addEventListener('click', () => { data.hoofdstukken.forEach(({ id }) => { if (counts[id]) selected.add(id); }); renderChapters(); updateStart(); });
     byId('kies-niets').addEventListener('click', () => { selected.clear(); renderChapters(); updateStart(); });
     byId('start-oefening').addEventListener('click', () => {
@@ -817,15 +941,17 @@
     });
     byId('volgende-vraag').addEventListener('click', next);
     checkAnswer.addEventListener('click', confirmAnswer);
-    byId('stop-oefening').addEventListener('click', () => { fade(byId('stop-bevestiging')); byId('stop-nee').focus(); });
+    byId('stop-oefening').addEventListener('click', () => { if (timeExpired()) return; fade(byId('stop-bevestiging')); byId('stop-nee').focus(); });
     byId('stop-nee').addEventListener('click', () => { byId('stop-bevestiging').hidden = true; byId('stop-oefening').focus(); });
-    byId('stop-ja').addEventListener('click', () => { session = null; showScreen('keuzes'); byId('start-oefening').focus(); scheduleSync(); });
-    byId('fouten-opnieuw').addEventListener('click', () => { if (lastRun) start(lastRun.wrong, 'training', lastRun.level); });
+    byId('stop-ja').addEventListener('click', () => { if (timeExpired()) return; session = null; showScreen('keuzes'); byId('start-oefening').focus(); scheduleSync(); });
+    byId('fouten-opnieuw').addEventListener('click', () => { if (lastRun) start(lastRun.wrong, 'training', lastRun.level, lastRun.secondsPerQuestion); });
     byId('opnieuw').addEventListener('click', () => {
       if (!lastRun) return;
       const questions = lastRun.mode === 'simulatie' ? shuffle(questionsFor(lastRun.level)).slice(0, 20) : lastRun.questions;
-      start(questions, lastRun.mode, lastRun.level);
+      start(questions, lastRun.mode, lastRun.level, lastRun.secondsPerQuestion);
     });
+    window.addEventListener('focus', updateClock);
+    document.addEventListener('visibilitychange', updateClock);
     byId('terug-vak').addEventListener('click', () => { session = null; showScreen('keuzes'); byId('start-oefening').focus(); });
     document.addEventListener('keydown', event => {
       if (!session || screen !== 'oefenen' || currentTab !== 'paneel-oefenen' || event.repeat || event.ctrlKey || event.metaKey || event.altKey || !byId('stop-bevestiging').hidden) return;
@@ -843,6 +969,7 @@
     renderSimulation();
     renderContent();
     setMode('training');
+    setTime('zonder');
     let authEvents = 0;
     window.addEventListener('bes:auth', event => { authEvents += 1; setAccount(event.detail?.user); });
     const initialEvents = authEvents;
