@@ -66,7 +66,7 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 45), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 46), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.
@@ -282,6 +282,8 @@ window.BES_VAK = {
 - Lege hoofdstukken tonen "Nog geen vragen". Lege lijsten voor vragen, hacks en theorie hebben ieder een eigen lege melding.
 
 ### Oefenen en voortgang
+
+Sinds 22-09-2026 blijft de pagina op dezelfde plek bij het aan- of uitvinken van hoofdstukken, ook bij het eerste vinkje en bij Alles en Niets. Na het kiezen van modus, niveau en tijd schuift de pagina nog wel mee naar de volgende stap.
 
 Alle 34 vakpagina's (en het sjabloon `vak/voorbeeld/index.html`) hebben sinds 22-09-2026 dezelfde oefenkeuze in stappen, met `data-niveaus` op `.vak-pagina`: Examen Training of Examensimulatie, Normaal of Hard mode, Zonder tijd of Met tijd, en de hoofdstukken. Eerst is alleen de modus zichtbaar; na iedere keuze verschijnt de volgende stap. Eerdere stappen blijven zichtbaar en hun keuzes blijven bewaard. Zonder geldige `hardVragen` wordt de niveaustap overgeslagen en schuift de nummering op. Alle hoofdstukken met vragen zijn standaard aangevinkt; Alles en Niets blijven werken. De kaart Jouw oefening toont Modus, Niveau, Tijd en Hoofdstukken op aparte regels, met het aantal vragen en Start ernaast (op de telefoon eronder). Nieuwe stappen verschijnen in 200 ms en de pagina schuift ernaartoe; bij minder beweging staan beide effecten uit. De pagina's verschillen alleen in de titel, og-regels en de versie van `data.js`.
 
