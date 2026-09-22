@@ -77,27 +77,30 @@
     return { tekst: `Deze week: ${deze.sessies} sessies, ${deze.totaal} vragen, ${procent(deze.goed, deze.totaal)} procent goed.\n${verschil}`, knoppen };
   }
 
+  // Alleen duidelijke vragen over de site zelf krijgen een vast antwoord; al het andere gaat naar Comit met AI.
+  const lijktOp = (tekst, ...patronen) => patronen.some(patroon => patroon.test(tekst));
+
   BES.comitAntwoord = async (vraag, { client, user }) => {
-    const tekst = vraag.toLowerCase();
-    if (tekst.includes('hard')) {
+    const tekst = vraag.toLowerCase().trim();
+    if (lijktOp(tekst, /hard ?mode/)) {
       return { tekst: 'Hard mode is een moeilijker niveau met toepassings- en casusvragen. Je kiest het op de vakpagina bij de stap Niveau. Bij vakken waar nog geen Hard-vragen zijn, zie je die stap niet. Je voortgang op Hard telt apart.', knoppen: [] };
     }
-    if (/tijd|klok/.test(tekst)) {
+    if (lijktOp(tekst, /tijdklok/, /met tijd oefenen/, /werkt de klok/)) {
       return { tekst: 'Op de vakpagina kies je bij de stap Tijd voor Met tijd en stel je 45 seconden tot 2 minuten per vraag in. Tijdens het oefenen telt de klok af. Bij nul stopt de ronde en tellen onbeantwoorde vragen als fout. Op het eindscherm zie je hoe lang je erover deed.', knoppen: [] };
     }
     try {
-      if (tekst.includes('week')) return await week(client, user);
-      if (/oefenen|zwak|slecht|verbeter/.test(tekst)) return await oefenen(client, user);
+      if (lijktOp(tekst, /hoe ging mijn week/, /mijn week/, /deze week (ge)?oefend/)) return await week(client, user);
+      if (lijktOp(tekst, /waar moet ik (nog )?op oefenen/, /wat moet ik (nog )?oefenen/, /zwakste/, /mijn zwakke/)) return await oefenen(client, user);
     } catch {
       return { tekst: 'Ik kon je voortgang nu niet ophalen. Probeer het zo opnieuw.', knoppen: [] };
     }
-    if (/wachtwoord|profiel|naam|e-mail/.test(tekst)) {
+    if (lijktOp(tekst, /wachtwoord/, /e-?mail(adres)? (wijzig|verander|aanpas)/, /naam (wijzig|verander|aanpas)/, /profielfoto/)) {
       return { tekst: 'Je naam, e-mailadres en wachtwoord pas je aan op Profiel, via de knop Bewerken.', knoppen: [{ label: 'Naar Profiel →', href: 'profiel.html' }] };
     }
-    if (/wissen|verwijderen/.test(tekst)) {
+    if (lijktOp(tekst, /account (wissen|verwijderen)/, /(wis|verwijder) (ik )?mijn account/)) {
       return { tekst: 'Je account wis je via Profiel, onderaan bij Account wissen. Je ziet eerst precies wat er verdwijnt.', knoppen: [{ label: 'Naar Account wissen →', href: 'account-wissen.html' }] };
     }
-    if (/deliberatie|tweede zit|herexamen|inschrijven/.test(tekst)) {
+    if (lijktOp(tekst, /deliberatie/, /tweede zit/, /herexamen/, /herinschrijving/, /inschrijven voor/)) {
       return { tekst: 'Daar staat veel over in Examen-info.', knoppen: [{ label: 'Naar Examen-info →', href: 'examen-info.html' }] };
     }
     return null;
