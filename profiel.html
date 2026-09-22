@@ -42,11 +42,24 @@
   <script src="assets/inzichten.js?v=40" defer></script>
   <style>
     .profiel-wrap { max-width: 640px; }
-    .profiel-kop { display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: start; gap: 20px; }
-    .profiel-kop h1 { margin: 0; overflow-wrap: anywhere; }
-    .profiel-extra { min-height: 24px; }
+    /* Bovenaan alleen foto, naam en e-mail met één knop Bewerken; de velden komen pas na die klik. */
+    .profiel-kaart { display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; align-items: center; gap: 20px; padding: clamp(22px, 5vw, 32px); }
+    .profiel-kaart h1 { margin: 0; font-size: clamp(1.4rem, 4vw, 1.75rem); overflow-wrap: anywhere; }
+    .profiel-mail { margin: 4px 0 0; overflow: hidden; color: var(--ink-soft); font-size: .9375rem; text-overflow: ellipsis; white-space: nowrap; }
+    .profiel-extra { min-height: 0; }
     .profiel-avatar-groot { width: 96px; height: 96px; font-size: 2rem; }
-    .profiel-form { display: grid; gap: 28px; padding: clamp(22px, 5vw, 36px); }
+    .profiel-bewerken.knop-secundair { width: auto; min-width: 0; margin: 0; padding: 10px 20px; }
+    .profiel-onderaan { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line); }
+    .profiel-onderaan .knop-secundair { width: auto; min-width: 0; margin: 0; padding: 10px 20px; }
+    .profiel-wissen-link { padding: 10px 0; border: 0; background: none; color: var(--ink-soft); font: inherit; font-size: .875rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+    :where(html.has-hover) .profiel-wissen-link:hover { color: var(--fout); }
+    #studiekalender { margin-top: 20px; }
+    @media (max-width: 560px) {
+      .profiel-kaart { grid-template-columns: 72px minmax(0, 1fr); }
+      .profiel-avatar-groot { width: 72px; height: 72px; font-size: 1.5rem; }
+      .profiel-bewerken.knop-secundair { grid-column: 1 / -1; width: 100%; }
+    }
+    .profiel-form { display: grid; gap: 28px; margin-top: 16px; padding: clamp(22px, 5vw, 36px); }
     .profiel-veld { display: grid; gap: 10px; }
     .profiel-veld label, .profiel-veld > .profiel-label { font-size: .9375rem; font-weight: 600; }
     .profiel-veld .auth-input { width: 100%; max-width: none; }
@@ -56,10 +69,11 @@
     .profiel-opgeslagen { display: inline-flex; align-items: center; gap: 10px; color: var(--teal-tekst); font-size: .9375rem; opacity: 1; transition: opacity 200ms var(--ease); }
     .profiel-opgeslagen.is-fading { opacity: 0; }
     .profiel-opgeslagen .vinkje { width: 40px; height: 40px; margin: 0; }
-    .profiel-uitloggen { padding-top: 12px; }
+    .profiel-form-knoppen { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+    .profiel-form-knoppen .knop, .profiel-form-knoppen .knop-secundair { width: auto; min-width: 0; margin: 0; }
     .profiel-email-status { overflow-wrap: anywhere; }
     .profiel-email-status:empty { display: none; }
-    #voortgang-kort { margin-top: 40px; }
+    #voortgang-kort { margin-top: 36px; }
     #voortgang-kort h2 { margin: 0 0 16px; font-size: 1.25rem; }
     .inz-kaart + .inz-kaart { margin-top: 14px; }
     .inz-leeg { margin: 0; color: var(--ink-soft); font-size: .9375rem; line-height: 1.6; }
@@ -83,7 +97,7 @@
     .inz-sessie-score { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
     @media (max-width: 520px) { .inz-sessie { grid-template-columns: 56px minmax(0, 1fr) auto; } .inz-sessie-modus { display: none; } }
     @media (prefers-reduced-motion: reduce) { .inz-balk i { transition: none; } }
-    .profiel-wissen { margin-top: 40px; }
+    .profiel-wissen { margin-top: 24px; }
     .profiel-wissen h2 { margin: 0 0 16px; font-size: 1.25rem; }
     .profiel-wissen .kaart p { margin: 0 0 16px; color: var(--ink-soft); font-size: .9375rem; line-height: 1.6; }
     .profiel-wissen .kaart p strong { color: var(--ink); }
@@ -123,13 +137,14 @@
   <main id="inhoud" class="pagina" aria-labelledby="profiel-titel">
     <div class="wrap profiel-wrap">
       <a class="terug tekstlink" href="hub.html" data-terug="hub.html" data-terug-tekst="Terug">← Terug</a>
-      <header class="pagina-kop profiel-kop">
+      <header class="kaart profiel-kaart" id="profiel-kaart">
         <span class="profiel-avatar profiel-avatar-groot" id="profiel-avatar" aria-hidden="true"></span>
         <div>
           <h1 id="profiel-titel">Profiel</h1>
-          <p class="pagina-sub">Jouw profiel</p>
+          <p class="profiel-mail" id="profiel-mail"></p>
           <div class="profiel-extra"></div>
         </div>
+        <button class="knop-secundair profiel-bewerken" id="profiel-bewerken" type="button" aria-expanded="false" aria-controls="profiel-form" hidden>Bewerken</button>
       </header>
 
       <div class="kaart profiel-form" id="profiel-bevestiging" role="status" hidden>
@@ -187,8 +202,9 @@
         </div>
 
         <p class="auth-error" id="profiel-fout" role="alert" hidden></p>
-        <div class="profiel-opslaan">
+        <div class="profiel-opslaan profiel-form-knoppen">
           <button class="knop" id="profiel-opslaan" type="submit">Opslaan →</button>
+          <button class="knop-secundair" id="profiel-annuleren" type="button">Annuleren</button>
           <span class="profiel-opgeslagen" id="profiel-opgeslagen" role="status" hidden>
             <svg class="vinkje" viewBox="0 0 64 64" width="40" height="40" aria-hidden="true">
               <circle cx="32" cy="32" r="30" fill="none" stroke="var(--teal)" stroke-width="2"></circle>
@@ -197,15 +213,23 @@
             <span>Opgeslagen.</span>
           </span>
         </div>
-        <div class="profiel-uitloggen" data-uitloggen-groep>
-          <button class="knop-secundair" id="profiel-uitloggen" type="button" data-account-uitloggen>Uitloggen</button>
-        </div>
       </form>
+
+      <section id="studiekalender" class="sectie studiekalender" aria-labelledby="kalender-kop">
+        <h2 id="kalender-kop">Jouw studiekalender</h2>
+        <div data-kalender></div>
+        <p data-kalender-status class="form-hint"></p>
+      </section>
 
       <section id="voortgang-kort" class="sectie" aria-labelledby="voortgang-kop">
         <h2 id="voortgang-kop">Jouw voortgang</h2>
         <div data-inzichten hidden></div>
       </section>
+
+      <div class="profiel-onderaan" id="profiel-onderaan" data-uitloggen-groep hidden>
+        <button class="knop-secundair" id="profiel-uitloggen" type="button" data-account-uitloggen>Uitloggen</button>
+        <button class="tekstlink profiel-wissen-link" id="wissen-openen" type="button" aria-expanded="false" aria-controls="account-wissen">Account wissen</button>
+      </div>
 
       <section class="sectie profiel-wissen" id="account-wissen" aria-labelledby="wissen-kop" hidden>
         <h2 id="wissen-kop">Account wissen</h2>
@@ -223,12 +247,6 @@
             <p class="auth-help" id="wissen-status" role="status" aria-live="polite" hidden>Je account is gewist. Tot ziens.</p>
           </div>
         </div>
-      </section>
-
-      <section id="studiekalender" class="sectie studiekalender" aria-labelledby="kalender-kop">
-        <h2 id="kalender-kop">Jouw studiekalender</h2>
-        <div data-kalender></div>
-        <p data-kalender-status class="form-hint"></p>
       </section>
     </div>
   </main>
@@ -256,6 +274,10 @@
       const emailStatus = document.getElementById('email-status');
       const confirmation = document.getElementById('profiel-bevestiging');
       const logout = document.getElementById('profiel-uitloggen');
+      const editButton = document.getElementById('profiel-bewerken');
+      const cancelEdit = document.getElementById('profiel-annuleren');
+      const mailLine = document.getElementById('profiel-mail');
+      const bottomRow = document.getElementById('profiel-onderaan');
       const password = document.getElementById('profiel-wachtwoord');
       const submit = document.getElementById('profiel-opslaan');
       const choose = document.getElementById('foto-kiezen');
@@ -267,6 +289,7 @@
       const toggle = document.getElementById('wachtwoord-tonen');
       let user = null;
       let busy = false;
+      let editing = false;
       let nameChanged = false;
       let emailChanged = false;
       let refreshingEmail = false;
@@ -311,7 +334,12 @@
           email.value = '';
           emailStatus.textContent = '';
           remove.hidden = true;
+          editing = false;
           form.hidden = true;
+          mailLine.textContent = '';
+          editButton.hidden = true;
+          editButton.setAttribute('aria-expanded', 'false');
+          bottomRow.hidden = true;
           document.getElementById('account-wissen').hidden = true;
           if (auth.emailBevestiging.teruggekeerd) {
             confirmation.hidden = false;
@@ -344,12 +372,50 @@
         confirmation.hidden = true;
         if (auth.emailBevestiging.fout && !confirmationHandled) showError(error, 'Deze bevestigingslink is ongeldig of verlopen. Controleer je adres en kies Opslaan om de wijziging opnieuw aan te vragen.', email);
         remove.hidden = !current.user_metadata?.foto;
-        form.hidden = false;
-        document.getElementById('account-wissen').hidden = false;
+        mailLine.textContent = current.email || '';
+        mailLine.title = current.email || '';
+        editButton.hidden = false;
+        editButton.setAttribute('aria-expanded', String(editing));
+        form.hidden = !editing;
+        bottomRow.hidden = false;
       };
+
+      // Bewerken opent de velden; Annuleren sluit ze en zet alles terug zoals het opgeslagen staat.
+      const setEditing = value => {
+        editing = value;
+        form.hidden = !value;
+        editButton.setAttribute('aria-expanded', String(value));
+        editButton.textContent = value ? 'Sluiten' : 'Bewerken';
+      };
+      editButton.addEventListener('click', () => {
+        if (editing) { setEditing(false); editButton.focus({ preventScroll: true }); return; }
+        setEditing(true);
+        const first = form.querySelector('input:not([type="file"])');
+        if (first) first.focus({ preventScroll: true });
+      });
+      cancelEdit.addEventListener('click', () => {
+        if (busy) return;
+        nameChanged = false;
+        emailChanged = false;
+        password.value = '';
+        error.hidden = true;
+        photoError.hidden = true;
+        hideSuccess();
+        if (user) render(user, false);
+        setEditing(false);
+        editButton.focus({ preventScroll: true });
+      });
 
       // Account wissen: eerst WISSEN typen, dan de functie account_verwijderen in Supabase.
       (() => {
+        const opener = document.getElementById('wissen-openen');
+        const section = document.getElementById('account-wissen');
+        opener.addEventListener('click', () => {
+          const open = opener.getAttribute('aria-expanded') === 'true';
+          opener.setAttribute('aria-expanded', String(!open));
+          section.hidden = open;
+          if (!open) section.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+        });
         const start = document.getElementById('wissen-start');
         const box = document.getElementById('wissen-bevestiging');
         const input = document.getElementById('wissen-invoer');
@@ -397,7 +463,7 @@
       const setBusy = value => {
         busy = value;
         form.setAttribute('aria-busy', String(value));
-        [choose, remove, fileInput, ...nameFields, email, password, toggle, submit, logout].forEach(control => { control.disabled = value; });
+        [choose, remove, fileInput, ...nameFields, email, password, toggle, submit, logout, cancelEdit].forEach(control => { control.disabled = value; });
       };
 
       const hideSuccess = () => {
@@ -409,6 +475,7 @@
 
       const saved = () => {
         hideSuccess();
+        document.getElementById('profiel-kaart').append(success);
         success.lastElementChild.textContent = user?.new_email ? 'Profiel opgeslagen. Bevestig je e-mailwijziging nog.' : 'Opgeslagen.';
         success.hidden = false;
         successTimer = window.setTimeout(() => {
@@ -599,6 +666,7 @@
           toggle.textContent = 'Toon';
           toggle.setAttribute('aria-pressed', 'false');
           render(updated);
+          setEditing(false);
           saved();
         } catch (caught) {
           failure = caught;
