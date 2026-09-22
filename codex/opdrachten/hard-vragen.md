@@ -16,6 +16,6 @@ Hard mode werkt nu alleen bij `inlped` (14 vragen). Geef de andere vakken elk ee
 
 ## Klaar als
 - Dit geeft `10 true` voor elk vak van de batch:
-  `node -e "global.window={};require('./vak/<id>/data.js');const d=window.BES_VAK;console.log(d.hardVragen.length, d.hardVragen.every(q=>q.h&&q.v&&q.o&&q.u&&(Array.isArray(q.a)?q.a.every(i=>q.o[i]!==undefined):q.o[q.a]!==undefined)))"`
+  `node -e "global.window={};require('./vak/<id>/data.js');const d=window.BES_VAK;console.log(d.hardVragen.length, d.hardVragen.every(q=>q.h&&q.q&&q.o&&q.u&&(Array.isArray(q.a)?q.a.every(i=>q.o[i]!==undefined):q.o[q.a]!==undefined)))"`
 - De vakpagina toont Hard als kiesbaar en start een Hard-training met minstens 8 vragen.
 - De PR-beschrijving bevat per vak de 10 vragen in het kort (alleen de vraagzin), zodat Berat ze kan nakijken.
