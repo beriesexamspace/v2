@@ -248,6 +248,16 @@
     });
   }
 
+  // Met de muis over een dag: alleen de regel eronder tonen. De dag wordt pas gekozen bij klikken of met het toetsenbord.
+  function previewDay(key) {
+    if (details) details.textContent = description(key, totals());
+  }
+
+  function previewOff() {
+    if (!details) return;
+    details.textContent = activeDay ? description(activeDay, totals()) : 'Kies een dag om je bezoeken en leertijd te zien.';
+  }
+
   function buildCalendar() {
     if (!mount) return;
     mount.classList.add('studiekalender');
@@ -329,7 +339,8 @@
       button.setAttribute('aria-label', description(key, days));
       button.setAttribute('aria-pressed', String(activeDay === key));
       if (key === dayKey(today)) button.setAttribute('aria-current', 'date');
-      button.addEventListener('pointerenter', () => showDay(key));
+      button.addEventListener('pointerenter', () => previewDay(key));
+      button.addEventListener('pointerleave', previewOff);
       button.addEventListener('focus', () => showDay(key));
       button.addEventListener('click', () => showDay(key));
       grid.append(button);
