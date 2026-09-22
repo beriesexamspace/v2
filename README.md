@@ -66,7 +66,7 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 42), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 43), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.
@@ -188,6 +188,8 @@ Zolang de tabel ontbreekt, toont de pagina de rode regel "Feedback is nog niet i
 26 vragen sinds 15-09-2026, plus sinds 21-09-2026 de categorie "Volgend jaar" met vijf vragen over herinschrijving en studievoortgang (OER art. 60 §4, 88 §1 tot §3, 59 §3; bron: het geverifieerde rapport in Backup-D-schijf/Bestanden/Notities/examen-info-vub-geverifieerd.md). Zoekvak en categorieën bestonden al. Onderaan een kaart "Mijn vraag staat er niet bij →" naar feedback.html; de lege zoekstaat verwijst ook naar Feedback in plaats van de WhatsApp-groep. Nooit iets uit het rapportdeel "Nog te bevestigen" publiceren.
 
 ## Inzichten (Free)
+
+Sinds 22-09-2026 opent `voortgang.html` met het weekoverzicht: een zelfgetekende SVG-grafiek van de laatste zeven kalenderdagen (blauw gemaakt, teal goed), de tegels sessies, vragen en score van deze week met het verschil in procentpunten tegenover de zeven dagen daarvoor, daarna Verbeterpunten (de drie laagste hoofdstukken met minstens drie vragen, met een knop naar `vak/<id>/?hoofdstuk=<h>` die meteen een training start) en Gaat goed (chips vanaf 80 procent). Op Profiel heet de link Weekoverzicht.
 
 `voortgang.html` groepeert de vakken per jaar (1ste, 2de, 3de bachelor) en toont alleen vakken die geoefend zijn; de lijst "Nog niet geoefend" is op 22-09-2026 weggehaald.
 

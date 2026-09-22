@@ -131,6 +131,7 @@
     let session = null;
     let screen = 'keuzes';
     let currentTab = 'paneel-oefenen';
+    let chapterFromUrl = new URL(window.location.href).searchParams.get('hoofdstuk');
     let lastRun = null;
     let loggedSyncError = false;
     let lastSyncSent = 0;
@@ -383,6 +384,17 @@
       renderSimulation();
       updateStart();
       banks.forEach(bank => loadRemote(bank.get(owner), authGeneration));
+      // Vanaf het weekoverzicht: ?hoofdstuk=<id> begint meteen een training van dat hoofdstuk.
+      if (owner && chapterFromUrl && data.hoofdstukken.some(chapter => chapter.id === chapterFromUrl)) {
+        const questions = data.vragen.filter(question => question.h === chapterFromUrl);
+        chapterFromUrl = null;
+        setLevel('normaal');
+        setMode('training');
+        start(questions, 'training', 'normaal', 0);
+        const url = new URL(window.location.href);
+        url.searchParams.delete('hoofdstuk');
+        window.history.replaceState(window.history.state, '', url);
+      }
     }
 
     function setLevel(value) {
