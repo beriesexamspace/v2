@@ -135,7 +135,7 @@
       return wolk;
     };
 
-    const verstuurVraag = vraag => {
+    const verstuurVraag = async vraag => {
       const inhoud = vraag.trim();
       if (!inhoud || bezig) return;
       bezig = true;
@@ -156,15 +156,45 @@
       werkKnopBij();
       invoer.focus({ preventScroll: true });
       naarLaatsteBericht();
-      window.setTimeout(() => {
-        wolk.classList.remove('comit-denkt');
-        puntjes.remove();
-        wolk.firstChild.textContent = 'Comit: ';
-        wolk.append(document.createTextNode('Hier kan ik nog niet op antwoorden. Binnenkort wel.'));
-        bezig = false;
-        werkKnopBij();
-        naarLaatsteBericht();
-      }, 900);
+      const minimumDenktijd = new Promise(resolve => window.setTimeout(resolve, 600));
+      let antwoord = null;
+      try {
+        antwoord = await BES.comitAntwoord(inhoud, { client: BES.auth.client, user });
+      } catch {}
+      if (antwoord == null && typeof BES.comitVrij === 'function') {
+        try {
+          antwoord = await BES.comitVrij(inhoud, { client: BES.auth.client, user });
+        } catch { antwoord = null; }
+      }
+      if (!antwoord || typeof antwoord.tekst !== 'string') {
+        antwoord = {
+          tekst: 'Dat kan ik nog niet. Wil je het als feedback sturen?',
+          knoppen: [{ label: 'Stuur als feedback →', href: 'feedback.html' }]
+        };
+      }
+      await minimumDenktijd;
+      wolk.classList.remove('comit-denkt');
+      puntjes.remove();
+      wolk.firstChild.textContent = 'Comit: ';
+      wolk.append(document.createTextNode(antwoord.tekst));
+      const knoppen = document.createElement('span');
+      knoppen.className = 'comit-antwoord-knoppen';
+      for (const knop of Array.isArray(antwoord.knoppen) ? antwoord.knoppen : []) {
+        if (!knop || typeof knop.label !== 'string' || typeof knop.href !== 'string' || !knop.href.trim()) continue;
+        try {
+          const url = new URL(knop.href, window.location.href);
+          if (!['http:', 'https:'].includes(url.protocol) || url.origin !== window.location.origin) continue;
+        } catch { continue; }
+        const link = document.createElement('a');
+        link.className = 'knop-secundair comit-antwoord-knop';
+        link.href = knop.href;
+        link.textContent = knop.label;
+        knoppen.append(link);
+      }
+      if (knoppen.childElementCount) wolk.append(knoppen);
+      bezig = false;
+      werkKnopBij();
+      naarLaatsteBericht();
     };
 
     formulier.addEventListener('submit', event => {
