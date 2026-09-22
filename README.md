@@ -147,6 +147,8 @@ Zolang de bucket ontbreekt, meldt de profielpagina "Foto's zijn nog niet ingesch
 
 ## Privacy, account wissen en beheer
 
+Sinds 22-09-2026 is account wissen een eigen pagina, `account-wissen.html` (achter de deur, `noindex`), in drie stappen: wat er verdwijnt (ook: een betaald abonnement stopt en de lopende maand wordt niet terugbetaald), waarom je weggaat, en de bevestiging. Het vakje "typ WISSEN" is weg; Profiel linkt onderaan naar deze pagina. De reden gaat als losse rij naar `public.vertrek_redenen` (SQL in `supabase/vertrek-redenen.sql`), zonder gebruikers-id: iedereen mag insturen, alleen beheerders lezen. Het wissen zelf gebruikt nog steeds `account_verwijderen()`.
+
 - `privacy.html` beschrijft in gewone taal wat er bewaard wordt. De link en het contactadres berie007yldrm@gmail.com staan op Over mij (bij de sociale links) en het adres ook op de feedbackpagina; het aanmeldformulier heeft een regel over privacy onder de knop. In de voettekst staan ze bewust niet (Berat, 20-09-2026).
 - Account wissen: onderaan `profiel.html` (alleen ingelogd zichtbaar). Eerst WISSEN typen, dan roept de pagina `rpc('account_verwijderen')` aan. Die functie (security definer) wist de avatar in de bucket, de rijen in voortgang, feedback en studieactiviteit en de rij in auth.users. Daarna signOut en terug naar de startpagina.
 - Beheer: `beheer.html` roept `studie_totalen()` en `studie_dagcijfers(30)` aan. Beide geven alleen rijen terug als de ingelogde gebruiker in de tabel `beheerders` staat (gevuld via de SQL-editor, nooit een e-mailadres in de code). Een dag telt zodra iemand minstens 60 seconden leertijd of één bezoek had.

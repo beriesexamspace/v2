@@ -55,6 +55,7 @@
     .wissen-reden input { width: 18px; height: 18px; flex: 0 0 auto; accent-color: var(--accent); }
     .wissen-reden:has(input:checked) { border-color: var(--accent); background: var(--accent-zacht); }
     .wissen-reden:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .wissen-toelichting-kop { margin-top: 24px; font-weight: 600; }
     .wissen-toelichting { width: 100%; min-height: 96px; margin-top: 4px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); color: var(--ink); font: inherit; font-size: .9375rem; resize: vertical; }
     .wissen-toelichting:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     .wissen-knoppen { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 28px; }
@@ -62,7 +63,10 @@
     .knop-gevaar-vol { background: var(--fout); border-color: var(--fout); box-shadow: none; }
     .knop-gevaar-vol:disabled { opacity: .45; cursor: default; }
     :where(html.has-hover) .knop-gevaar-vol:not(:disabled):hover { background: var(--fout); box-shadow: none; }
-    .wissen-terug { color: var(--ink-soft); }
+    button.wissen-terug { padding: 10px 0; border: 0; background: none; font: inherit; font-size: .9375rem; cursor: pointer; }
+    .wissen-terug { color: var(--ink-soft); text-decoration: underline; text-underline-offset: 3px; }
+    :where(html.has-hover) .wissen-terug:hover { color: var(--ink); }
+    html[data-theme="dark"] .knop-gevaar-vol { color: var(--bg); }
     .wissen-fout { margin-top: 16px; }
     .wissen-klaar { display: grid; gap: 16px; justify-items: start; }
     @media (max-width: 480px) { .wissen-knoppen .knop, .wissen-knoppen .knop-secundair { width: 100%; } }
@@ -128,7 +132,7 @@
           <label class="wissen-reden"><input type="radio" name="reden" value="werkt-niet"><span>Er werkt iets niet goed</span></label>
           <label class="wissen-reden"><input type="radio" name="reden" value="anders"><span>Een andere reden</span></label>
         </fieldset>
-        <p><label for="wissen-toelichting">Wil je er iets bij zeggen? (optioneel)</label></p>
+        <p class="wissen-toelichting-kop"><label for="wissen-toelichting">Wil je er iets bij zeggen? (optioneel)</label></p>
         <textarea class="wissen-toelichting" id="wissen-toelichting" maxlength="500" placeholder="Bijvoorbeeld: wat had beter gekund?"></textarea>
         <div class="wissen-knoppen">
           <button class="knop-secundair" type="button" data-volgende="3">Verder →</button>
