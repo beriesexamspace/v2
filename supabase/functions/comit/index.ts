@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
     body: JSON.stringify(snel ? { ...inhoud, generationConfig: { ...inhoud.generationConfig, thinkingConfig: { thinkingBudget: 0 } } } : inhoud),
   });
 
-  let laatsteStatus = 0;
+  const pogingen: { model: string; status: number; melding?: string }[] = [];
   for (const model of MODELLEN) {
     let r = await vraagModel(model, true);
     if (r.status === 400) r = await vraagModel(model, false);
@@ -77,13 +77,19 @@ Deno.serve(async (req) => {
       await new Promise((klaar) => setTimeout(klaar, 900));
       r = await vraagModel(model, true);
     }
-    laatsteStatus = r.status;
-    if ([404, 429, 500, 503].includes(r.status)) continue;
-    if (!r.ok) break;
+    if (!r.ok) {
+      let melding = '';
+      try { melding = String((await r.json())?.error?.message ?? '').slice(0, 160); } catch {}
+      pogingen.push({ model, status: r.status, melding });
+      if ([404, 429, 500, 503].includes(r.status)) continue;
+      break;
+    }
     const data = await r.json();
     const tekst = (data?.candidates?.[0]?.content?.parts ?? []).map((deel: { text?: string }) => deel.text ?? '').join('').trim();
-    if (!tekst) break;
+    if (!tekst) { pogingen.push({ model, status: r.status, melding: 'leeg antwoord' }); break; }
     return antwoord({ tekst: tekst.replace(/\s*[\u2014\u2013]\s*/g, ', ').replace(/\*\*?/g, '').replace(/\bgratis\b/gi, 'zonder kosten'), model });
   }
-  return antwoord({ fout: 'ai', status: laatsteStatus }, 502);
+  await beheer.rpc('comit_terug', { p_user: user.id });
+  console.error('comit: geen antwoord', JSON.stringify(pogingen));
+  return antwoord({ fout: 'ai', pogingen }, 502);
 });

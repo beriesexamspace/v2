@@ -35,3 +35,15 @@ revoke all on function public.comit_tel(uuid, integer) from public, anon, authen
 grant execute on function public.comit_tel(uuid, integer) to service_role;
 
 commit;
+
+-- Aanvulling 23-09-2026: lukt het antwoord niet (Gemini te druk), dan telt die vraag niet mee.
+create or replace function public.comit_terug(p_user uuid)
+returns void
+language sql security definer set search_path = ''
+as $$
+  update public.comit_gebruik set aantal = greatest(aantal - 1, 0)
+  where user_id = p_user and dag = (now() at time zone 'Europe/Brussels')::date;
+$$;
+
+revoke all on function public.comit_terug(uuid) from public, anon, authenticated;
+grant execute on function public.comit_terug(uuid) to service_role;
