@@ -66,7 +66,7 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 49), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 50), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.
@@ -80,6 +80,8 @@ In `assets/updates.js` mogen korte belangrijke stukjes in `tekst` tussen `**dubb
 Hover volgt de werkelijk gebruikte invoer via `html.has-hover`: muisbewegingen schakelen de effecten in, aanraken schakelt ze uit. Dit werkt ook in ingebouwde browsers die geen hovermogelijkheid melden. Knoppen bewegen maximaal 2 px met een kleine vergroting; bij verminderde beweging blijven alleen kleur en schaduw veranderen.
 
 ## De deur: inloggen verplicht
+
+Sinds 23-09-2026 staat de nieuwe site dicht tot de lancering. `openDeur` in `auth.js` vraagt na het inloggen `heeft_toegang()` op (SQL in `supabase/toegang.sql`, uitgevoerd): alleen beheerders en accounts in de tabel `toegang` komen binnen, alle anderen gaan naar `gesloten.html` ("nog niet open", met knop naar de WhatsApp-groep en Uitloggen). `aanmelden.html` toont een melding in plaats van het formulier zolang `site_open()` onwaar is, en aanmelden van nieuwe accounts staat in Supabase uit. Openen bij de lancering: in de SQL-editor `update public.site_instellingen set waarde = true where sleutel = 'open';` en in Supabase bij Authentication het aanmelden weer aanzetten. Iemand eerder binnenlaten: zijn gebruikers-id in `public.toegang` zetten.
 
 Sinds 20-09-2026 zijn de hub, het welkomstscherm, de jaarpagina's, alle vakpagina's, de tools (reken, examen-info, leren), feedback, profiel en beheer alleen voor ingelogde accounts. Elke pagina laadt `assets/deur.js` in de head (zonder defer): zonder Supabase-sessie in localStorage (sleutel `sb-…-auth-token`) gaat de bezoeker meteen naar `inloggen.html?terug=<pad>`; met sessie krijgt `<html>` de klasse `deur-check` (pagina onzichtbaar, maximaal 4 seconden) tot `auth.js` het account bevestigt (`openDeur`), anders alsnog naar inloggen. Na het inloggen stuurt `auth.terugNa` terug naar de pagina van herkomst (alleen eigen relatieve paden). Openbaar blijven: startpagina, aanmelden, inloggen, wachtwoord, privacy, Over mij, WhatsApp-pagina en 404.
 

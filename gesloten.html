@@ -7,12 +7,12 @@
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Berie's Exam Space">
-  <meta property="og:title" content="Pagina niet gevonden | Berie's Exam Space">
+  <meta property="og:title" content="Nog niet open | Berie's Exam Space">
   <meta property="og:description" content="Oefenvragen, theorie en examensimulaties voor psychologiestudenten aan de VUB.">
   <meta property="og:image" content="https://beriesexamspace.com/v2/assets/deel.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:url" content="https://beriesexamspace.com/v2/404.html">
+  <meta property="og:url" content="https://beriesexamspace.com/v2/gesloten.html">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#FFFFFF">
@@ -25,13 +25,16 @@
       document.querySelector('meta[name="theme-color"]').content = donker ? '#0B0B0C' : '#FFFFFF';
     })();
   </script>
-  <title>Pagina niet gevonden | Berie's Exam Space</title>
+  <title>Nog niet open | Berie's Exam Space</title>
   <!-- Deze pagina kan op elke diepte verschijnen, daarom absolute paden. Bij de lancering op het hoofddomein: /v2/ vervangen door /. -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/v2/assets/style.css?v=50">
   <script src="/v2/assets/app.js?v=50" defer></script>
+  <script src="/v2/assets/config.js?v=50" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
+  <script src="/v2/assets/auth.js?v=50" defer></script>
   <style>
     .niet-gevonden { display: flex; flex: 1 0 auto; align-items: center; justify-content: center; width: 100%; box-sizing: border-box; padding: 88px 16px 48px; }
     .niet-gevonden-kaart { width: 100%; max-width: 36rem; min-width: 0; box-sizing: border-box; padding: clamp(28px, 6vw, 48px) clamp(20px, 5vw, 44px); text-align: center; }
@@ -52,17 +55,16 @@
 </head>
 <body>
   <a class="skip-link" href="#inhoud">Ga naar inhoud</a>
-  <main id="inhoud" class="niet-gevonden" aria-labelledby="niet-gevonden-titel">
+  <main id="inhoud" class="niet-gevonden" aria-labelledby="gesloten-titel">
     <div class="kaart niet-gevonden-kaart">
       <div class="niet-gevonden-b" aria-hidden="true">B</div>
-      <p class="code">Fout 404</p>
-      <h1 id="niet-gevonden-titel">Deze pagina bestaat niet.</h1>
-      <p>De link klopt niet meer, of de pagina is verhuisd. Alle vakken en tools vind je op de hub.</p>
-      <div class="niet-gevonden-knoppen">
-        <a class="knop" href="/v2/hub.html">Naar de hub →</a>
-        <a class="knop-secundair" id="vorige" href="/v2/index.html">Startpagina</a>
+      <p class="code">Bijna klaar</p>
+      <h1 id="gesloten-titel">De nieuwe Berie's Exam Space is nog niet open.</h1>
+      <p>We leggen de laatste hand aan de site. In de WhatsApp-groep hoor je als eerste wanneer het zover is.</p>
+      <div class="niet-gevonden-knoppen" data-uitloggen-groep>
+        <a class="knop" href="/v2/whatsapp.html">Naar de WhatsApp-groep →</a>
+        <a class="knop-secundair" href="/v2/index.html" data-account-uitloggen>Uitloggen</a>
       </div>
-      <p class="niet-gevonden-tip">Klopt dit niet? Laat het weten via <a href="/v2/feedback.html">Feedback</a>.</p>
     </div>
   </main>
 
@@ -74,16 +76,5 @@
     </div>
   </footer>
 
-  <script>
-    // Kwam de bezoeker van een eigen pagina, dan wordt de tweede knop "Vorige pagina".
-    (() => {
-      const vorige = document.getElementById('vorige');
-      let vanEigenSite = false;
-      try { vanEigenSite = Boolean(document.referrer) && new URL(document.referrer).origin === window.location.origin && window.history.length > 1; } catch {}
-      if (!vanEigenSite) return;
-      vorige.textContent = '← Vorige pagina';
-      vorige.addEventListener('click', event => { event.preventDefault(); window.history.back(); });
-    })();
-  </script>
 </body>
 </html>

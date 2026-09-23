@@ -397,10 +397,17 @@
   if (!auth.beschikbaar) console.info('Accounts zijn nog niet ingeschakeld; de client is niet aangemaakt.');
 
   // De deur (assets/deur.js): zodra de sessie bekend is, pagina tonen of naar inloggen sturen.
-  const openDeur = () => {
+  // Zolang de site niet open is, mag alleen een account met toegang binnen (heeft_toegang in Supabase, zie supabase/toegang.sql).
+  const openDeur = async () => {
     if (!window.BES_DEUR) return;
-    if (currentUser) document.documentElement.classList.remove('deur-check');
-    else window.BES_DEUR.naarInloggen();
+    if (!currentUser) { window.BES_DEUR.naarInloggen(); return; }
+    let toegang = false;
+    try {
+      const { data, error } = await client.rpc('heeft_toegang');
+      toegang = !error && data === true;
+    } catch {}
+    if (toegang) document.documentElement.classList.remove('deur-check');
+    else window.location.replace(window.BES_DEUR.prefix + 'gesloten.html');
   };
   auth.gereed.then(openDeur, openDeur);
 

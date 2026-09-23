@@ -29,13 +29,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=49">
-  <script src="assets/app.js?v=49" defer></script>
-  <script src="assets/config.js?v=49" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=50">
+  <script src="assets/app.js?v=50" defer></script>
+  <script src="assets/config.js?v=50" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=49" defer></script>
-  <script src="assets/activiteit.js?v=49" defer></script>
+  <script src="assets/auth.js?v=50" defer></script>
+  <script src="assets/activiteit.js?v=50" defer></script>
   <style>
+    .aanmelden-dicht-tekst { max-width: 34rem; margin: 16px auto 28px; color: var(--ink-soft); font-size: 1.0625rem; line-height: 1.6; text-wrap: pretty; }
     #name-step { display: grid; gap: 18px; }
     #name-step[hidden] { display: none; }
     #name-step .auth-input { width: 100%; }
@@ -68,6 +69,11 @@
     <main id="inhoud" class="hero" aria-labelledby="signup-title">
       <a class="terug auth-back tekstlink" id="signup-back" href="index.html" data-terug="index.html" data-terug-tekst="Terug">← Terug</a>
       <div class="hero-stage auth-stage">
+        <div class="hero-content" id="aanmelden-dicht" hidden>
+          <h1>Nog even geduld.</h1>
+          <p class="aanmelden-dicht-tekst">De nieuwe Berie's Exam Space is nog niet open. In de WhatsApp-groep hoor je als eerste wanneer je een account kan maken.</p>
+          <a class="knop" href="whatsapp.html">Naar de WhatsApp-groep →</a>
+        </div>
         <div class="hero-content" id="signup-content">
           <p class="eyebrow" id="signup-step">Stap 1 van 3</p>
           <svg class="vinkje" id="signup-check" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true" hidden>
@@ -359,6 +365,21 @@
         }
       });
     });
+</script>
+<script>
+  // Voor de lancering: is de site nog dicht (site_open in Supabase), dan geen nieuwe accounts maar een melding.
+  document.addEventListener('DOMContentLoaded', async () => {
+    const auth = window.BES && window.BES.auth;
+    if (!auth) return;
+    try { await auth.gereed; } catch {}
+    if (!auth.client) return;
+    try {
+      const { data, error } = await auth.client.rpc('site_open');
+      if (error || data !== false) return;
+      document.getElementById('signup-content').hidden = true;
+      document.getElementById('aanmelden-dicht').hidden = false;
+    } catch {}
+  });
 </script>
 </body>
 </html>
