@@ -60,6 +60,15 @@
     .ab-plan-kop { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
     .ab-plan-naam { margin: 0; font-size: clamp(2rem, 3vw, 2.5rem); font-weight: 700; line-height: 1.1; letter-spacing: -.02em; }
     .ab-prijs { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 6px; margin: 8px 0 0; }
+    .ab-prijs-blok { margin: 8px 0 0; }
+    @media (min-width: 900px) {
+      .ab-prijs-blok { min-height: 4.25rem; }
+    }
+    .ab-prijs-blok .ab-prijs { margin: 0; }
+    .ab-oud { color: var(--ink-soft); font-size: 1.0625rem; font-weight: 500; line-height: 1.3; text-decoration-thickness: 2px; }
+    .ab-bedrag.is-actie { color: var(--teal-tekst); }
+    .ab-daarna { margin: 2px 0 0; color: var(--ink-soft); font-size: .8125rem; line-height: 1.5; }
+    .ab-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
     .ab-bedrag { font-size: 1.25rem; font-weight: 600; line-height: 1.3; font-variant-numeric: tabular-nums; }
     .ab-periode { color: var(--ink-soft); font-size: .9375rem; line-height: 1.3; }
     .ab-plan-sub { margin: 8px 0 0; color: var(--ink-soft); font-size: .9375rem; line-height: 1.5; }
@@ -136,7 +145,9 @@
           <div class="ab-plan-kop">
             <h2 class="ab-plan-naam" id="plan-free">Free</h2>
           </div>
-          <p class="ab-prijs"><span class="ab-bedrag">0 euro</span></p>
+          <div class="ab-prijs-blok">
+            <p class="ab-prijs"><span class="ab-bedrag">0 euro</span></p>
+          </div>
           <p class="ab-plan-sub">Alles om te oefenen voor je examens.</p>
           <ul class="ab-lijst">
             <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Alle vragen van alle 34 vakken</span></li>
@@ -157,7 +168,10 @@
             <h2 class="ab-plan-naam" id="plan-plus">Plus</h2>
             <span class="label">Aanrader</span>
           </div>
-          <p class="ab-prijs"><span class="ab-bedrag">2,99 euro</span><span class="ab-periode">per maand</span></p>
+          <div class="ab-prijs-blok">
+            <p class="ab-prijs"><s class="ab-oud"><span class="ab-sr">Normaal </span>2,99 euro</s><span class="ab-bedrag is-actie">0 euro</span></p>
+            <p class="ab-daarna">De eerste maand, daarna 2,99 euro per maand.</p>
+          </div>
           <p class="ab-plan-sub">Extra hulp om klaar te zijn voor je examen.</p>
           <p class="ab-lijst-kop">Alles van Free, plus:</p>
           <ul class="ab-lijst">
@@ -168,7 +182,7 @@
             <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Meer vragen per dag aan Comit <span class="label gedimd">Komt nog</span></span></li>
           </ul>
           <div class="ab-plan-voet">
-            <button class="knop" type="button" disabled aria-disabled="true">Plus nemen</button>
+            <button class="knop" type="button" disabled aria-disabled="true">Probeer 1 maand</button>
           </div>
         </section>
 
@@ -177,7 +191,9 @@
             <h2 class="ab-plan-naam" id="plan-pro">Pro</h2>
             <span class="label gedimd">Nog bezig</span>
           </div>
-          <p class="ab-prijs"><span class="ab-bedrag">9,99 euro</span><span class="ab-periode">per maand</span></p>
+          <div class="ab-prijs-blok">
+            <p class="ab-prijs"><span class="ab-bedrag">9,99 euro</span><span class="ab-periode">per maand</span></p>
+          </div>
           <p class="ab-plan-sub">Comit wordt je persoonlijke examencoach.</p>
           <p class="ab-lijst-kop">Alles van Plus, plus:</p>
           <ul class="ab-lijst">
@@ -198,6 +214,7 @@
         <div class="kaart ab-weten">
           <ul class="ab-weten-lijst">
             <li><span>Prijzen in euro, inclusief btw.</span></li>
+            <li><span>De eerste maand Plus kost 0 euro. Zeg je niet op, dan betaal je daarna 2,99 euro per maand.</span></li>
             <li><span>Je betaalt per maand. De eerste keer met Bancontact, iDEAL of kaart, daarna gaat het elke maand vanzelf.</span></li>
             <li><span>Opzeggen kan altijd, met één knop op je profiel. Je houdt je plan tot het einde van de maand die je al betaalde.</span></li>
             <li><span>Vragen? Stuur ze via de <a href="feedback.html">feedbackpagina</a>.</span></li>
