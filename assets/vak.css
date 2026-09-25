@@ -133,6 +133,10 @@
 .vak-pagina[data-niveaus] .niveau-keuze:disabled { opacity: .5; cursor: default; }
 .vak-pagina[data-niveaus] .niveau-keuze.komt-binnenkort { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; padding-top: 6px; padding-bottom: 6px; line-height: 1.2; }
 .vak-pagina[data-niveaus] .niveau-keuze.komt-binnenkort::after { content: 'Komt binnenkort'; font-size: .6875rem; font-weight: 500; color: var(--ink-soft); }
+/* Hard mode en Met tijd zonder Plus: klein label onder de knop, klikken toont een melding met link naar Abonnement. */
+.vak-pagina .niveau-keuze.met-plus { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; padding-top: 6px; padding-bottom: 6px; line-height: 1.2; }
+.vak-pagina .niveau-keuze.met-plus::after { content: 'Met Plus'; font-size: .6875rem; font-weight: 500; color: var(--ink-soft); }
+.vak-pagina .plus-slot a { color: var(--accent); font-weight: 500; }
 :where(html.has-hover) .vak-pagina[data-niveaus] .niveau-keuze:not(:disabled):hover { color: var(--ink); background: var(--card); }
 :where(html.has-hover) .vak-pagina[data-niveaus] .niveau-keuze:not(:disabled):hover:not(:active) { transform: scale(1.025); }
 .vak-pagina[data-niveaus] .niveau-keuze:not(:disabled):active { transform: scale(.98); }

@@ -46,7 +46,7 @@ assets/intro.css      stijl van de stap-voor-stap-intro (welkomstscherm en Hoe w
 assets/intro.js       bouwt de stappen: BES.stappen(element, { soorten, kopniveau, overslaan, lus, laatsteTekst, bijKlaar })
 assets/icoon-*.png    beginscherm-iconen (180 Apple, 192 en 512 manifest); assets/deel.png is het deelvoorbeeld (1200x630) voor WhatsApp en co
 assets/activiteit.js  persoonlijke dagtotalen, bezoeksessies en studiekalender
-assets/plan.js        BES.plan(): Free, Plus of Pro van het account via mijn_abonnement(); BES.heeftPlan("plus"), BES.planNaam, BES.planDatum; laden na auth.js
+assets/plan.js        BES.plan(): Free, Plus of Pro van het account via mijn_abonnement(); BES.heeftPlan("plus"), BES.planNaam, BES.planDatum; laden na auth.js; Hard mode en Met tijd op de vakpagina (vak.js, label Met Plus) en het weekoverzicht met verbeterpunten op voortgang.html zijn alleen voor Plus en Pro
 supabase/abonnementen.sql tabellen abonnementen en proefmaanden plus mijn_abonnement(), start_proef(plan) en zeg_op() (uitgevoerd 25-09-2026); proefmaand van 1 maand zonder betaalgegevens, elke proef één keer per account
 assets/inzichten.js   Jouw voortgang op Profiel: balk per vak en laatste sessies (tabellen voortgang en sessies)
 supabase/sessies.sql  tabel sessies: één rij per afgeronde ronde
@@ -69,7 +69,7 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 51), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 52), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.

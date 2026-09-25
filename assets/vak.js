@@ -125,6 +125,8 @@
     let counts = countsFor(level);
     const chapterNames = Object.fromEntries(data.hoofdstukken.map(chapter => [chapter.id, chapter.naam]));
     let selected = selections.get(level);
+    // Hard mode en oefenen met tijd horen bij Plus (assets/plan.js). Tot het plan bekend is, staan ze op slot.
+    let plusOk = false;
     let context = null;
     let authGeneration = 0;
     let mode = 'training';
@@ -170,12 +172,36 @@
       revealStep(showLevelStep ? 'niveau' : 'tijd');
     }
 
+    // Melding onder de keuze als iemand zonder Plus Hard mode of Met tijd kiest, met een link naar Abonnement.
+    function toonPlusSlot(stap) {
+      const plek = byId(stap === 'niveau' ? 'niveau-uitleg' : 'tijd-keuzes');
+      if (!plek) return;
+      let melding = byId('plus-slot-' + stap);
+      if (!melding) {
+        melding = create('p', 'vak-hint plus-slot');
+        melding.id = 'plus-slot-' + stap;
+        melding.setAttribute('role', 'status');
+        plek.after(melding);
+      }
+      const link = create('a', '', 'Probeer Plus een maand');
+      link.href = '../../abonnement.html';
+      melding.replaceChildren(stap === 'niveau' ? 'Hard mode zit in Plus. ' : 'Oefenen met tijd zit in Plus. ', link, '.');
+    }
+
+    function markeerPlus() {
+      byId('niveau-keuzes')?.querySelector('[data-niveau="hard"]')?.classList.toggle('met-plus', !plusOk && data.hardVragen.length > 0);
+      byId('tijd-keuzes')?.querySelector('[data-tijd="met"]')?.classList.toggle('met-plus', !plusOk);
+      if (plusOk) { byId('plus-slot-niveau')?.remove(); byId('plus-slot-tijd')?.remove(); }
+    }
+
     function chooseLevel(value) {
+      if (value === 'hard' && !plusOk) { toonPlusSlot('niveau'); return; }
       setLevel(value);
       revealStep('tijd');
     }
 
     function setTime(value, reveal = false) {
+      if (value === 'met' && !plusOk) { toonPlusSlot('tijd'); return; }
       timed = value === 'met';
       byId('tijd-keuzes').querySelectorAll('[data-tijd]').forEach(button => {
         const active = (button.dataset.tijd === 'met') === timed;
@@ -929,6 +955,8 @@
       });
       setLevel('normaal');
     }
+    markeerPlus();
+    if (BES.plan) BES.plan().then((p) => { plusOk = p.plan === 'plus' || p.plan === 'pro'; markeerPlus(); });
     const timeButtons = [...byId('tijd-keuzes').querySelectorAll('[data-tijd]')];
     timeButtons.forEach(button => button.addEventListener('click', () => setTime(button.dataset.tijd, true)));
     byId('tijd-keuzes').addEventListener('keydown', event => {
