@@ -54,7 +54,13 @@
     }
     .ab-plan:nth-child(2) { animation-delay: 80ms; }
     .ab-plan:nth-child(3) { animation-delay: 160ms; }
-    .ab-plan.is-plus { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), var(--shadow-soft); }
+    .ab-plan { transition: border-color 200ms var(--ease), box-shadow 200ms var(--ease); }
+    /* Blauwe rand volgt de muis: de kaart onder de muis is gekozen; zonder muis erop blijft Plus gekozen. */
+    .ab-plan.is-plus,
+    :where(html.has-hover) .ab-plan:hover,
+    .ab-plan:focus-within { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), var(--shadow-soft); }
+    :where(html.has-hover) .ab-plannen:has(.ab-plan:hover) .ab-plan.is-plus:not(:hover),
+    .ab-plannen:has(.ab-plan:focus-within) .ab-plan.is-plus:not(:focus-within) { border-color: var(--line); box-shadow: var(--shadow-soft); }
     .ab-plan-kop { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 28px; }
     .ab-plan-naam { margin: 0; font-size: 1.25rem; font-weight: 600; line-height: 1.25; letter-spacing: -.01em; }
     .ab-prijs { display: grid; align-content: start; margin: 18px 0 0; }
