@@ -24,6 +24,7 @@ const EZELSBRUG = [
   'Je krijgt een paar oefenvragen met het juiste antwoord uit dat hoofdstuk.',
   'Maak drie korte ezelsbruggetjes (een zin, een beeld of een woordgrap) die helpen de kern van die begrippen te onthouden.',
   'Zet elk ezelsbruggetje op een eigen regel, zonder nummers of opmaak, en blijf bij de inhoud van de vragen.',
+  'Schrijf geen inleiding en geen afsluiter: alleen de drie ezelsbruggetjes.',
 ].join(' ');
 
 const kop = (origin: string | null) => ({
