@@ -64,6 +64,14 @@
     .abo-sub { margin: 6px 0 0; color: var(--ink-soft); font-size: .9375rem; line-height: 1.5; }
     .abo-kaart .knop-secundair { width: auto; min-width: 0; margin: 0; padding: 10px 20px; }
     .abo-naam .label { margin-left: 8px; vertical-align: 3px; }
+    /* Knop Beheer abonnement: rustig bij Free, in de kleur van het plan bij Plus (teal) en Pro (zwart met goud). */
+    .abo-kaart .abo-knop { gap: 8px; font-weight: 600; }
+    .abo-knop-pijl { transition: transform 180ms var(--ease); }
+    :where(html.has-hover) .abo-knop:hover .abo-knop-pijl { transform: translateX(3px); }
+    .abo-kaart .abo-knop[data-plan="plus"] { border-color: #3fb9b2; background: #3fb9b2; color: #0d1117; box-shadow: 0 8px 20px rgba(63,185,178,.25); }
+    :where(html.has-hover) .abo-kaart .abo-knop[data-plan="plus"]:hover { border-color: #36a8a1; background: #36a8a1; }
+    .abo-kaart .abo-knop[data-plan="pro"] { border-color: rgba(212,175,55,.6); background: radial-gradient(120% 140% at 100% 0%, rgba(212,175,55,.22), transparent 60%), #0b0a08; color: #e6c872; box-shadow: 0 8px 20px rgba(0,0,0,.25); }
+    :where(html.has-hover) .abo-kaart .abo-knop[data-plan="pro"]:hover { border-color: #d4af37; background: radial-gradient(120% 140% at 100% 0%, rgba(212,175,55,.3), transparent 60%), #0b0a08; }
     .abo-knoppen { display: flex; flex-direction: column; align-items: center; gap: 2px; }
     .abo-opzeggen { min-height: 44px; padding: 10px 0; border: 0; background: none; color: var(--ink-soft); font: inherit; font-size: .875rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
     :where(html.has-hover) .abo-opzeggen:hover { color: var(--fout); }
@@ -234,7 +242,7 @@
             <p class="abo-melding" data-abo-melding role="status" aria-live="polite"></p>
           </div>
           <div class="abo-knoppen">
-            <a class="knop-secundair" href="abonnement.html">Beheer abonnement</a>
+            <a class="knop-secundair abo-knop" href="abonnement.html" data-abo-knop>Beheer abonnement<span class="abo-knop-pijl" aria-hidden="true">→</span></a>
             <button class="abo-opzeggen" type="button" data-abo-opzeggen hidden>Opzeggen</button>
           </div>
           <div class="abo-zeker" data-abo-zeker hidden>
@@ -677,6 +685,7 @@
         const naam = BES.planNaam(p.plan);
         const datum = p.geldig_tot ? BES.planDatum(p.geldig_tot) : '';
         $('plan').textContent = naam;
+        $('knop').dataset.plan = p.plan;
         const status = $('status');
         status.hidden = p.plan === 'free' || !p.status;
         status.textContent = p.status === 'opgezegd' ? 'Opgezegd' : p.status === 'proef' ? 'Proefmaand' : '';
