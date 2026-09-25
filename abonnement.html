@@ -50,16 +50,13 @@
       display: flex;
       flex-direction: column;
       padding: clamp(24px, 3vw, 32px);
-      animation: rise 600ms var(--ease) both;
+      animation: rise 600ms var(--ease) backwards;
     }
     .ab-plan:nth-child(2) { animation-delay: 80ms; }
     .ab-plan:nth-child(3) { animation-delay: 160ms; }
-    .ab-plan { cursor: pointer; transition: border-color 200ms var(--ease), box-shadow 200ms var(--ease); }
-    /* Blauw = gekozen kaart (klik). De muis laat zien welke je kiest; weg met de muis, dan is de gekozen kaart weer blauw. */
-    .ab-plan.is-gekozen,
-    :where(html.has-hover) .ab-plan:hover { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), var(--shadow-soft); }
-    :where(html.has-hover) .ab-plannen:has(.ab-plan:hover) .ab-plan.is-gekozen:not(:hover) { border-color: var(--line); box-shadow: var(--shadow-soft); }
-    .ab-plan:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+    .ab-plan { transition: transform 200ms var(--ease), border-color 200ms var(--ease), box-shadow 200ms var(--ease); }
+    /* Geen kaart staat standaard blauw. Alleen de kaart onder de muis wordt blauw en komt iets naar voren. */
+    :where(html.has-hover) .ab-plan:hover { transform: translateY(-6px); border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), var(--shadow-card-hover); }
     .ab-plan-kop { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 28px; }
     .ab-plan-naam { margin: 0; font-size: 1.25rem; font-weight: 600; line-height: 1.25; letter-spacing: -.01em; }
     .ab-prijs { display: grid; align-content: start; margin: 18px 0 0; }
@@ -78,8 +75,6 @@
     .ab-plan-voet { display: grid; margin-top: auto; padding-top: 28px; }
     .ab-plan .knop, .ab-plan .knop-secundair { width: 100%; min-width: 0; max-width: none; margin-inline: 0; }
     .ab-plan .knop-secundair:disabled { opacity: .6; cursor: default; transform: none; }
-    /* Een klik op een uitgeschakelde knop gaat door naar de kaart, zodat ook dan de kaart gekozen wordt. */
-    .ab-plan :is(.knop, .knop-secundair):disabled { pointer-events: none; }
     .ab-sectie { margin-top: 56px; max-width: 760px; }
     .ab-weten { padding: clamp(22px, 5vw, 32px); }
     .ab-weten-lijst { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; font-size: .9375rem; line-height: 1.6; }
@@ -119,8 +114,8 @@
         <p class="pagina-sub">Met Free oefen je alle vakken. Plus en Pro geven je extra hulp richting je examen.</p>
       </header>
 
-      <div class="ab-plannen" role="radiogroup" aria-labelledby="ab-titel">
-        <section class="kaart ab-plan" role="radio" aria-checked="false" tabindex="-1" aria-labelledby="plan-free">
+      <div class="ab-plannen">
+        <section class="kaart ab-plan" aria-labelledby="plan-free">
           <div class="ab-plan-kop">
             <h2 class="ab-plan-naam" id="plan-free">Free</h2>
           </div>
@@ -140,7 +135,7 @@
           </div>
         </section>
 
-        <section class="kaart ab-plan is-gekozen" role="radio" aria-checked="true" tabindex="0" aria-labelledby="plan-plus">
+        <section class="kaart ab-plan" aria-labelledby="plan-plus">
           <div class="ab-plan-kop">
             <h2 class="ab-plan-naam" id="plan-plus">Plus</h2>
             <span class="label">Aanrader</span>
@@ -160,7 +155,7 @@
           </div>
         </section>
 
-        <section class="kaart ab-plan" role="radio" aria-checked="false" tabindex="-1" aria-labelledby="plan-pro">
+        <section class="kaart ab-plan" aria-labelledby="plan-pro">
           <div class="ab-plan-kop">
             <h2 class="ab-plan-naam" id="plan-pro">Pro</h2>
             <span class="label gedimd">Nog bezig</span>
@@ -194,33 +189,6 @@
       </section>
     </div>
   </main>
-
-  <script>
-    // Kies je plan: klik (of pijltjes en spatie) op een kaart en die blijft blauw. Plus is standaard gekozen.
-    (() => {
-      const kaarten = [...document.querySelectorAll('.ab-plan')];
-      const kies = (kaart, focus) => {
-        kaarten.forEach((k) => {
-          const aan = k === kaart;
-          k.classList.toggle('is-gekozen', aan);
-          k.setAttribute('aria-checked', String(aan));
-          k.tabIndex = aan ? 0 : -1;
-        });
-        if (focus) kaart.focus();
-      };
-      kaarten.forEach((kaart, i) => {
-        kaart.addEventListener('click', () => kies(kaart));
-        kaart.addEventListener('keydown', (e) => {
-          if (e.target !== kaart) return;
-          if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); kies(kaart); return; }
-          const stap = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
-          if (!stap) return;
-          e.preventDefault();
-          kies(kaarten[(i + stap + kaarten.length) % kaarten.length], true);
-        });
-      });
-    })();
-  </script>
 
   <footer class="site-footer">
     <p class="footer-brand">Berie's Exam Space</p>
