@@ -37,6 +37,7 @@
   <script src="assets/config.js?v=51" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
   <script src="assets/auth.js?v=51" defer></script>
+  <script src="assets/plan.js?v=51" defer></script>
   <script src="assets/activiteit.js?v=51" defer></script>
   <script src="assets/vakken.js?v=51"></script>
   <script src="assets/inzichten.js?v=51" defer></script>
@@ -62,12 +63,22 @@
     .abo-naam { margin: 2px 0 0; font-size: 1.375rem; font-weight: 700; line-height: 1.2; }
     .abo-sub { margin: 6px 0 0; color: var(--ink-soft); font-size: .9375rem; line-height: 1.5; }
     .abo-kaart .knop-secundair { width: auto; min-width: 0; margin: 0; padding: 10px 20px; }
+    .abo-naam .label { margin-left: 8px; vertical-align: 3px; }
+    .abo-knoppen { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .abo-opzeggen { min-height: 44px; padding: 10px 0; border: 0; background: none; color: var(--ink-soft); font: inherit; font-size: .875rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+    :where(html.has-hover) .abo-opzeggen:hover { color: var(--fout); }
+    .abo-zeker { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; padding-top: 16px; border-top: 1px solid var(--line); }
+    .abo-zeker p { flex: 1 1 260px; margin: 0; font-size: .9375rem; line-height: 1.5; }
+    .abo-zeker .tekstlink { min-height: 44px; padding: 10px 0; border: 0; background: none; cursor: pointer; }
+    .abo-melding { margin: 10px 0 0; color: var(--teal-tekst); font-size: .9375rem; font-weight: 500; }
+    .abo-melding:empty { display: none; }
     @media (max-width: 560px) {
       .profiel-kaart { grid-template-columns: 72px minmax(0, 1fr); }
       .profiel-avatar-groot { width: 72px; height: 72px; font-size: 1.5rem; }
       .profiel-bewerken.knop-secundair { grid-column: 1 / -1; width: 100%; }
       .abo-kaart { grid-template-columns: minmax(0, 1fr); }
       .abo-kaart .knop-secundair { width: 100%; max-width: none; }
+      .abo-knoppen { align-items: stretch; }
     }
     .profiel-form { display: grid; gap: 28px; margin-top: 16px; padding: clamp(22px, 5vw, 36px); }
     .profiel-veld { display: grid; gap: 10px; }
@@ -218,10 +229,19 @@
         <div class="kaart abo-kaart">
           <div>
             <p class="abo-label">Je plan</p>
-            <p class="abo-naam" data-abo-plan>Free</p>
-            <p class="abo-sub">Alle vragen van alle vakken. Met Plus krijg je er Hard mode, de tijdklok en je weekoverzicht bij.</p>
+            <p class="abo-naam"><span data-abo-plan>Free</span><span class="label" data-abo-status hidden></span></p>
+            <p class="abo-sub" data-abo-sub>Alle vragen van alle vakken. Met Plus krijg je er Hard mode, de tijdklok en je weekoverzicht bij.</p>
+            <p class="abo-melding" data-abo-melding role="status" aria-live="polite"></p>
           </div>
-          <a class="knop-secundair" href="abonnement.html">Beheer abonnement</a>
+          <div class="abo-knoppen">
+            <a class="knop-secundair" href="abonnement.html">Beheer abonnement</a>
+            <button class="abo-opzeggen" type="button" data-abo-opzeggen hidden>Opzeggen</button>
+          </div>
+          <div class="abo-zeker" data-abo-zeker hidden>
+            <p data-abo-zeker-tekst>Weet je het zeker?</p>
+            <button class="knop-secundair" type="button" data-abo-ja>Ja, opzeggen</button>
+            <button class="tekstlink" type="button" data-abo-nee>Nee, toch niet</button>
+          </div>
         </div>
       </section>
 
@@ -638,6 +658,70 @@
         if (authRevision === initialAuthRevision) render(null);
       });
     });
+  </script>
+  <script>
+    // Jouw abonnement: plan en einddatum uit Supabase (BES.plan, assets/plan.js), opzeggen via zeg_op (supabase/abonnementen.sql).
+    (() => {
+      const BES = window.BES || {};
+      const blok = document.getElementById('abonnement');
+      if (!blok || !BES.plan) return;
+      const $ = (naam) => blok.querySelector('[data-abo-' + naam + ']');
+      const inhoud = {
+        free: 'Alle vragen van alle vakken. Met Plus krijg je er Hard mode, de tijdklok en je weekoverzicht bij.',
+        plus: 'Hard mode, de tijdklok, je weekoverzicht en je foutenlijst.',
+        pro: 'Alles van Plus, met Comit als persoonlijke examencoach.',
+      };
+
+      const toon = (p) => {
+        const naam = BES.planNaam(p.plan);
+        const datum = p.geldig_tot ? BES.planDatum(p.geldig_tot) : '';
+        $('plan').textContent = naam;
+        const status = $('status');
+        status.hidden = p.plan === 'free' || !p.status;
+        status.textContent = p.status === 'opgezegd' ? 'Opgezegd' : p.status === 'proef' ? 'Proefmaand' : '';
+        status.classList.toggle('gedimd', p.status === 'opgezegd');
+        let tijd = '';
+        if (p.plan !== 'free' && datum) {
+          if (p.status === 'opgezegd') tijd = ' Je houdt ' + naam + ' tot ' + datum + '. Daarna ga je terug naar Free.';
+          else if (p.status === 'proef') tijd = ' Je proefmaand loopt tot ' + datum + '.';
+          else tijd = ' Loopt tot ' + datum + '.';
+        }
+        $('sub').textContent = inhoud[p.plan] + tijd;
+        $('opzeggen').hidden = p.plan === 'free' || p.status === 'opgezegd';
+        $('zeker').hidden = true;
+      };
+
+      let huidig = null;
+      $('opzeggen').addEventListener('click', () => {
+        if (!huidig) return;
+        $('zeker-tekst').textContent = 'Weet je het zeker? Je houdt ' + BES.planNaam(huidig.plan) + ' tot ' + BES.planDatum(huidig.geldig_tot) + ', daarna ga je terug naar Free.';
+        $('zeker').hidden = false;
+        $('ja').focus();
+      });
+      $('nee').addEventListener('click', () => { $('zeker').hidden = true; $('opzeggen').focus(); });
+      $('ja').addEventListener('click', async () => {
+        const knop = $('ja');
+        knop.disabled = true;
+        try {
+          const { data, error } = await BES.auth.client.rpc('zeg_op');
+          if (error || !data || !data.ok) throw error || new Error('niet gelukt');
+          huidig = await BES.plan(true);
+          toon(huidig);
+          $('melding').textContent = 'Opgezegd. Je betaalt niets meer.';
+        } catch {
+          $('melding').textContent = 'Opzeggen lukte niet. Probeer het zo opnieuw.';
+        }
+        knop.disabled = false;
+      });
+
+      BES.plan().then((p) => {
+        huidig = p;
+        toon(p);
+        let proef = '';
+        try { proef = new URLSearchParams(window.location.search).get('proef') || ''; } catch {}
+        if (p.status === 'proef' && proef === p.plan) $('melding').textContent = 'Je proefmaand van ' + BES.planNaam(p.plan) + ' is gestart.';
+      });
+    })();
   </script>
 </body>
 </html>

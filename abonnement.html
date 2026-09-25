@@ -35,6 +35,7 @@
   <script src="assets/config.js?v=51" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
   <script src="assets/auth.js?v=51" defer></script>
+  <script src="assets/plan.js?v=51" defer></script>
   <script src="assets/activiteit.js?v=51" defer></script>
   <style>
     .ab-plannen {
@@ -109,6 +110,12 @@
       -webkit-background-clip: text; background-clip: text; color: transparent;
     }
     .ab-plan.is-pro .label.gedimd { color: #e6c872; }
+    .ab-plan.is-pro .knop { color: #0b0a08; }
+    .ab-plan.is-pro .label { background: rgba(212,175,55,.14); color: #e6c872; }
+    /* Knop van je huidige plan (of een gebruikte proefmaand): rustig, niet vaag. */
+    .ab-plan .knop.is-huidig:disabled { opacity: 1; background: var(--surface); color: var(--ink-soft); box-shadow: none; }
+    .ab-melding { max-width: 560px; margin: 20px 0 0; color: var(--ink); font-size: .9375rem; line-height: 1.5; }
+    .ab-melding:empty { display: none; }
   </style>
 </head>
 <body data-nav="vast">
@@ -142,7 +149,7 @@
       </header>
 
       <div class="ab-plannen">
-        <section class="kaart ab-plan" aria-labelledby="plan-free">
+        <section class="kaart ab-plan" data-plan="free" aria-labelledby="plan-free">
           <div class="ab-plan-kop">
             <h2 class="ab-plan-naam" id="plan-free">Free</h2>
           </div>
@@ -156,7 +163,7 @@
             <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Uitleg bij elke vraag</span></li>
             <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Je voortgang per vak en hoofdstuk, op elk toestel</span></li>
             <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Je studiekalender</span></li>
-            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Comit, je studiemaatje <span class="label gedimd">Komt nog</span></span></li>
+            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Comit, je studiemaatje</span></li>
             <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Leren leren, Reken je punten en Examen-info</span></li>
           </ul>
           <div class="ab-plan-voet">
@@ -164,7 +171,7 @@
           </div>
         </section>
 
-        <section class="kaart ab-plan is-plus" aria-labelledby="plan-plus">
+        <section class="kaart ab-plan is-plus" data-plan="plus" aria-labelledby="plan-plus">
           <div class="ab-plan-kop">
             <h2 class="ab-plan-naam" id="plan-plus">Plus</h2>
             <span class="label">Aanrader</span>
@@ -179,18 +186,17 @@
             <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Hard mode: moeilijke toepassingsvragen op examenniveau</span></li>
             <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Simulatie met tijdklok, zoals op de examendag</span></li>
             <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Weekoverzicht met grafiek en verbeterpunten</span></li>
-            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Foutenlijst: al je fouten op één plek <span class="label gedimd">Binnenkort</span></span></li>
-            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Meer vragen per dag aan Comit <span class="label gedimd">Komt nog</span></span></li>
+            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Foutenlijst: al je fouten op één plek</span></li>
+            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Meer vragen per dag aan Comit</span></li>
           </ul>
           <div class="ab-plan-voet">
-            <button class="knop" type="button" disabled aria-disabled="true">Probeer 1 maand</button>
+            <button class="knop" type="button" data-proef="plus">Probeer 1 maand</button>
           </div>
         </section>
 
-        <section class="kaart ab-plan is-pro" aria-labelledby="plan-pro">
+        <section class="kaart ab-plan is-pro" data-plan="pro" aria-labelledby="plan-pro">
           <div class="ab-plan-kop">
             <h2 class="ab-plan-naam" id="plan-pro">Pro</h2>
-            <span class="label gedimd">Nog bezig</span>
           </div>
           <div class="ab-prijs-blok">
             <p class="ab-prijs"><s class="ab-oud"><span class="ab-sr">Normaal </span>9,99 euro</s><span class="ab-bedrag is-actie">0 euro</span></p>
@@ -202,29 +208,94 @@
             <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Een persoonlijk plan tot je examen</span></li>
             <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Ezelsbruggetjes voor je zwakke hoofdstukken</span></li>
             <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Na elke simulatie zien of je vooruitgaat</span></li>
-            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Elke week een berichtje met je plan</span></li>
+            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Elke week een overzicht met verbeterpunten</span></li>
             <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>De meeste vragen per dag aan Comit</span></li>
           </ul>
           <div class="ab-plan-voet">
-            <button class="knop-secundair" type="button" disabled aria-disabled="true">Nog bezig</button>
+            <button class="knop" type="button" data-proef="pro">Probeer 1 maand</button>
           </div>
         </section>
       </div>
+      <p class="ab-melding" id="ab-melding" role="status" aria-live="polite"></p>
 
       <section class="ab-sectie" aria-labelledby="weten-kop">
         <h2 class="sectie-kop" id="weten-kop">Goed om te weten</h2>
         <div class="kaart ab-weten">
           <ul class="ab-weten-lijst">
             <li><span>Prijzen in euro, inclusief btw.</span></li>
-            <li><span>De eerste maand van Plus en Pro is gratis. Zeg je niet op, dan betaal je daarna het gewone bedrag per maand.</span></li>
-            <li><span>Je betaalt per maand. De eerste keer met Bancontact, iDEAL of kaart, daarna gaat het elke maand vanzelf.</span></li>
-            <li><span>Opzeggen kan altijd, met één knop op je profiel. Je houdt je plan tot het einde van de maand die je al betaalde.</span></li>
+            <li><span>De eerste maand van Plus en Pro is gratis. Je proefmaand start meteen, zonder betaalgegevens. Elke proefmaand kan je één keer gebruiken.</span></li>
+            <li><span>Na je proefmaand ga je vanzelf terug naar Free. Wil je verder, dan betaal je per maand met Bancontact, iDEAL of kaart.</span></li>
+            <li><span>Opzeggen kan altijd, met één knop op je profiel. Je houdt je plan tot het einde van je proefmaand of van de maand die je al betaalde.</span></li>
             <li><span>Vragen? Stuur ze via de <a href="feedback.html">feedbackpagina</a>.</span></li>
           </ul>
         </div>
       </section>
     </div>
   </main>
+
+  <script>
+    // Knoppen Probeer 1 maand: proefmaand starten via start_proef (supabase/abonnementen.sql), daarna naar je profiel.
+    // De knoppen tonen ook je huidige stand: je plan, Plus zit in Pro, of je proefmaand is al gebruikt.
+    (() => {
+      const BES = window.BES || {};
+      const melding = document.getElementById('ab-melding');
+      const knoppen = [...document.querySelectorAll('[data-proef]')];
+
+      const zetStand = (p) => {
+        document.querySelectorAll('.ab-jouw').forEach((label) => label.remove());
+        document.querySelectorAll('.ab-plan-kop .label').forEach((label) => { label.hidden = false; });
+        const kaart = p.ingelogd && document.querySelector('.ab-plan[data-plan="' + p.plan + '"]');
+        if (kaart) {
+          const kop = kaart.querySelector('.ab-plan-kop');
+          kop.querySelectorAll('.label').forEach((label) => { label.hidden = true; });
+          const label = document.createElement('span');
+          label.className = 'label ab-jouw';
+          label.textContent = 'Jouw plan';
+          kop.append(label);
+        }
+        knoppen.forEach((knop) => {
+          const plan = knop.dataset.proef;
+          let tekst = 'Probeer 1 maand';
+          let uit = false;
+          if (p.plan === plan) { tekst = 'Je hebt ' + BES.planNaam(plan); uit = true; }
+          else if (p.plan === 'pro' && plan === 'plus') { tekst = 'Zit in je Pro'; uit = true; }
+          else if (p['proef_' + plan]) { tekst = 'Proefmaand gebruikt'; uit = true; }
+          knop.textContent = tekst;
+          knop.disabled = uit;
+          knop.classList.toggle('is-huidig', uit);
+        });
+      };
+
+      knoppen.forEach((knop) => knop.addEventListener('click', async () => {
+        const plan = knop.dataset.proef;
+        const auth = BES.auth;
+        const gebruiker = auth ? await auth.gebruiker().catch(() => null) : null;
+        if (!gebruiker || !auth.client) { window.location.href = 'inloggen.html?terug=abonnement.html'; return; }
+        const oud = knop.textContent;
+        knop.disabled = true;
+        knop.textContent = 'Even geduld';
+        melding.textContent = '';
+        try {
+          const { data, error } = await auth.client.rpc('start_proef', { p_plan: plan });
+          if (error) throw error;
+          if (data && data.ok) { window.location.href = 'profiel.html?proef=' + plan + '#abonnement'; return; }
+          const naam = BES.planNaam(plan);
+          melding.textContent = ({
+            al_actief: 'Je hebt ' + naam + ' al.',
+            al_hoger: 'Je hebt Pro al, en daar zit alles van Plus in.',
+            al_gebruikt: 'Je hebt je proefmaand van ' + naam + ' al gebruikt.',
+          })[data && data.reden] || 'Dat lukte niet. Probeer het zo opnieuw.';
+          zetStand(await BES.plan(true));
+        } catch {
+          knop.disabled = false;
+          knop.textContent = oud;
+          melding.textContent = 'Dat lukte niet. Probeer het zo opnieuw.';
+        }
+      }));
+
+      if (BES.plan) BES.plan().then(zetStand);
+    })();
+  </script>
 
   <footer class="site-footer">
     <p class="footer-brand">Berie's Exam Space</p>

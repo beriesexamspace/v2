@@ -28,7 +28,7 @@ feedback.html         feedback sturen (fout in een vraag, idee, iets anders) naa
 leren.html            leren leren: slim studeren, concentratie en hulplijnen; gelinkt vanaf de hub (Tools) en boven elk tabblad Studie-hacks
 voortgang.html        Jouw voortgang: per vak en per hoofdstuk wat je kent (tabel voortgang, hoofdstuknamen uit vak/<id>/data.js, laagste score bovenaan); staat sinds 21-09 niet meer op de hub (Berat: later bij Profiel of later), alleen via de URL bereikbaar
 privacy.html          wat we bewaren, waar, cookies, rechten en contact; gelinkt in elke voettekst en onder het aanmeldformulier
-abonnement.html       Free, Plus (2,99 euro per maand) en Pro (9,99 euro per maand, nog bezig): drie kaarten plus "Goed om te weten"; openbaar (geen deur) zodat Mollie hem kan keuren; nog nergens gelinkt, betaalknop staat uit; geen kaart staat standaard blauw, alleen de kaart onder de muis wordt blauw en komt iets naar voren
+abonnement.html       Free, Plus (2,99 euro per maand) en Pro (9,99 euro per maand, nog bezig): drie kaarten plus "Goed om te weten"; openbaar (geen deur) zodat Mollie hem kan keuren; nog nergens gelinkt, betaalknop staat uit; geen kaart staat standaard blauw, alleen de kaart onder de muis wordt blauw en komt iets naar voren; Probeer 1 maand start de proefmaand (start_proef) en stuurt naar profiel.html#abonnement, de knoppen tonen je huidige plan; Profiel toont plan, einddatum en Opzeggen (zeg_op)
 beheer.html           alleen voor de beheerder: hoeveel accounts per dag oefenden (aantallen, geen namen)
 404.html              nette foutpagina van GitHub Pages; gebruikt absolute paden /v2/ (bij de lancering aanpassen)
 manifest.webmanifest  naam, kleuren en iconen voor "Zet op beginscherm" (Android); Safari gebruikt de apple-touch-icon
@@ -46,6 +46,8 @@ assets/intro.css      stijl van de stap-voor-stap-intro (welkomstscherm en Hoe w
 assets/intro.js       bouwt de stappen: BES.stappen(element, { soorten, kopniveau, overslaan, lus, laatsteTekst, bijKlaar })
 assets/icoon-*.png    beginscherm-iconen (180 Apple, 192 en 512 manifest); assets/deel.png is het deelvoorbeeld (1200x630) voor WhatsApp en co
 assets/activiteit.js  persoonlijke dagtotalen, bezoeksessies en studiekalender
+assets/plan.js        BES.plan(): Free, Plus of Pro van het account via mijn_abonnement(); BES.heeftPlan("plus"), BES.planNaam, BES.planDatum; laden na auth.js
+supabase/abonnementen.sql tabellen abonnementen en proefmaanden plus mijn_abonnement(), start_proef(plan) en zeg_op() (uitgevoerd 25-09-2026); proefmaand van 1 maand zonder betaalgegevens, elke proef één keer per account
 assets/inzichten.js   Jouw voortgang op Profiel: balk per vak en laatste sessies (tabellen voortgang en sessies)
 supabase/sessies.sql  tabel sessies: één rij per afgeronde ronde
 assets/kalender.css   aanvullende stijl voor de studiekalender
