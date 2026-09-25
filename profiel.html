@@ -661,7 +661,8 @@
   </script>
   <script>
     // Jouw abonnement: plan en einddatum uit Supabase (BES.plan, assets/plan.js), opzeggen via zeg_op (supabase/abonnementen.sql).
-    (() => {
+    // Na DOMContentLoaded, want plan.js wordt met defer geladen en staat pas dan klaar.
+    document.addEventListener("DOMContentLoaded", () => {
       const BES = window.BES || {};
       const blok = document.getElementById('abonnement');
       if (!blok || !BES.plan) return;
@@ -721,7 +722,7 @@
         try { proef = new URLSearchParams(window.location.search).get('proef') || ''; } catch {}
         if (p.status === 'proef' && proef === p.plan) $('melding').textContent = 'Je proefmaand van ' + BES.planNaam(p.plan) + ' is gestart.';
       });
-    })();
+    });
   </script>
 </body>
 </html>

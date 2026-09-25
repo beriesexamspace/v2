@@ -236,7 +236,8 @@
   <script>
     // Knoppen Probeer 1 maand: proefmaand starten via start_proef (supabase/abonnementen.sql), daarna naar je profiel.
     // De knoppen tonen ook je huidige stand: je plan, Plus zit in Pro, of je proefmaand is al gebruikt.
-    (() => {
+    // Na DOMContentLoaded, want plan.js wordt met defer geladen en staat pas dan klaar.
+    document.addEventListener('DOMContentLoaded', () => {
       const BES = window.BES || {};
       const melding = document.getElementById('ab-melding');
       const knoppen = [...document.querySelectorAll('[data-proef]')];
@@ -294,7 +295,7 @@
       }));
 
       if (BES.plan) BES.plan().then(zetStand);
-    })();
+    });
   </script>
 
   <footer class="site-footer">
