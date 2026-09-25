@@ -108,3 +108,21 @@ grant execute on function public.zeg_op() to authenticated;
 -- select count(*) from public.abonnementen;
 -- Een proefmaand van één account terugzetten (alleen voor testen):
 -- delete from public.proefmaanden where user_id = '<id>'; delete from public.abonnementen where user_id = '<id>';
+
+-- Voor de Edge Function comit (service_role): het plan van een student, voor het maximum aantal vragen per dag
+-- en om ezelsbruggetjes alleen aan Pro te geven. Uitgevoerd op 26-09-2026.
+create or replace function public.plan_van(p_user uuid)
+returns text
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select coalesce((
+    select plan from public.abonnementen
+    where user_id = p_user
+      and greatest(coalesce(proef_tot, '-infinity'::timestamptz), coalesce(betaald_tot, '-infinity'::timestamptz)) > now()
+  ), 'free');
+$$;
+revoke all on function public.plan_van(uuid) from public, anon, authenticated;
+grant execute on function public.plan_van(uuid) to service_role;
