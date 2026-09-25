@@ -863,6 +863,7 @@
         });
       }
       renderComit(answers, correct);
+      toonVooruitgang(good, answers.length, session);
       bewaarSessie(good, answers.length);
       bewaarFouten(answers, correct);
       showScreen('einde');
@@ -872,6 +873,39 @@
     }
 
     // Eén rij per afgeronde ronde in de tabel sessies (voor de inzichten op Profiel). Alleen de score, geen antwoorden.
+    // Pro: na een simulatie de vergelijking met je vorige simulatie van dit vak en niveau (tabel sessies).
+    async function toonVooruitgang(goed, totaal, sessie) {
+      let regel = byId('pro-vooruitgang');
+      if (!regel) {
+        regel = create('p', 'vak-hint pro-vooruitgang');
+        regel.id = 'pro-vooruitgang';
+        byId('score-tekst').after(regel);
+      }
+      regel.hidden = true;
+      const client = BES.auth?.client;
+      const owner = context.owner;
+      if (!sessie || sessie.mode !== 'simulatie' || !owner || !client || !BES.plan || !totaal) return;
+      const plan = await BES.plan();
+      if (plan.plan !== 'pro') return;
+      const { data: rijen } = await client.from('sessies').select('goed,totaal')
+        .eq('user_id', owner).eq('vak', data.id).eq('niveau', sessie.level || 'normaal').eq('modus', 'simulatie')
+        .lt('gemaakt_op', new Date(sessie.startedAt).toISOString()).order('gemaakt_op', { ascending: false }).limit(1);
+      const nu = Math.round(goed / totaal * 100);
+      const vorige = rijen && rijen[0];
+      if (!vorige || !vorige.totaal) {
+        regel.textContent = `Je eerste simulatie hier: ${nu}%. Na je volgende simulatie zie je of je vooruitgaat.`;
+      } else {
+        const toen = Math.round(vorige.goed / vorige.totaal * 100);
+        const verschil = nu - toen;
+        regel.textContent = verschil > 0
+          ? `Vooruitgang: ${nu}% tegenover ${toen}% bij je vorige simulatie, ${verschil} punten beter.`
+          : verschil < 0
+            ? `${nu}% tegenover ${toen}% bij je vorige simulatie. Doe je zwakste hoofdstukken nog eens in Training.`
+            : `Even goed als je vorige simulatie: ${nu}%.`;
+      }
+      regel.hidden = false;
+    }
+
     function bewaarSessie(goed, totaal) {
       const owner = context.owner;
       const client = BES.auth?.client;

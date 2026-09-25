@@ -26,6 +26,7 @@ jaar-3ba.html         vakken 3de bachelor
 whatsapp.html         uitleg, link en QR-code (assets/whatsapp-qr.svg, gemaakt met `npx qrcode`) naar de WhatsApp-groep
 feedback.html         feedback sturen (fout in een vraag, idee, iets anders) naar de tabel feedback
 leren.html            leren leren: slim studeren, concentratie en hulplijnen; gelinkt vanaf de hub (Tools) en boven elk tabblad Studie-hacks
+examenplan.html       Jouw examenplan (Pro): examendata per vak (tabel examendata), plan voor de komende zeven dagen (twee hoofdstukken per dag, eerst nieuw en dan laagste score, de dag voor een examen een simulatie), weekcijfers en drie verbeterpunten met Ezelsbruggetjes van Comit (soort ezelsbrug); zonder Pro een uitlegkaart; gelinkt vanaf de hub
 fouten.html           Foutenlijst (Plus en Pro): open fouten per vak uit de tabel fouten, met knop naar vak/<id>/?fouten=1; zonder Plus een uitlegkaart; gelinkt vanaf de hub (Tools)
 voortgang.html        Jouw voortgang: per vak en per hoofdstuk wat je kent (tabel voortgang, hoofdstuknamen uit vak/<id>/data.js, laagste score bovenaan); staat sinds 21-09 niet meer op de hub (Berat: later bij Profiel of later), alleen via de URL bereikbaar
 privacy.html          wat we bewaren, waar, cookies, rechten en contact; gelinkt in elke voettekst en onder het aanmeldformulier
@@ -48,6 +49,7 @@ assets/intro.js       bouwt de stappen: BES.stappen(element, { soorten, kopnivea
 assets/icoon-*.png    beginscherm-iconen (180 Apple, 192 en 512 manifest); assets/deel.png is het deelvoorbeeld (1200x630) voor WhatsApp en co
 assets/activiteit.js  persoonlijke dagtotalen, bezoeksessies en studiekalender
 assets/plan.js        BES.plan(): Free, Plus of Pro van het account via mijn_abonnement(); BES.heeftPlan("plus"), BES.planNaam, BES.planDatum; laden na auth.js; Hard mode en Met tijd op de vakpagina (vak.js, label Met Plus) en het weekoverzicht met verbeterpunten op voortgang.html zijn alleen voor Plus en Pro
+supabase/examendata.sql tabel examendata (vak, datum), lezen en wissen eigen rijen, opslaan alleen met Pro via de policy (uitgevoerd 26-09-2026); vak.js toont met Pro na elke simulatie de vergelijking met je vorige simulatie (tabel sessies)
 supabase/fouten.sql   tabel fouten (sleutel = hash van de vraagtekst met n: of h:) en fouten_bijwerken(vak, fout, goed), alleen met Plus of Pro (uitgevoerd 26-09-2026); vak.js bewaart na elke ronde de foute en goede antwoorden en toont bovenaan de keuzes "Oefen je fouten"
 supabase/abonnementen.sql tabellen abonnementen en proefmaanden plus mijn_abonnement(), start_proef(plan) en zeg_op() (uitgevoerd 25-09-2026); proefmaand van 1 maand zonder betaalgegevens, elke proef één keer per account
 assets/inzichten.js   Jouw voortgang op Profiel: balk per vak en laatste sessies (tabellen voortgang en sessies)
@@ -71,7 +73,7 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 53), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 54), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.

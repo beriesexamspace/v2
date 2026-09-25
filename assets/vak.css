@@ -207,3 +207,4 @@ html.is-examen .thema-knop.is-los { display: none; }
   .vak-pagina .fouten-blok { flex-direction: column; align-items: stretch; }
   .vak-pagina .fouten-blok .knop-secundair { width: 100%; max-width: none; }
 }
+.vak-pagina .pro-vooruitgang { margin-top: 12px; color: var(--ink); font-weight: 500; }
