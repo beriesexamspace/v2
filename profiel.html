@@ -54,10 +54,20 @@
     .profiel-wissen-link { padding: 10px 0; border: 0; background: none; color: var(--ink-soft); font: inherit; font-size: .875rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
     :where(html.has-hover) .profiel-wissen-link:hover { color: var(--fout); }
     #studiekalender { margin-top: 20px; }
+    /* Jouw abonnement: tussen profielkaart en studiekalender. Nu heeft iedereen Free; het plan komt later uit Supabase. */
+    #abonnement { margin-top: 20px; }
+    #abonnement + #studiekalender { margin-top: 40px; }
+    .abo-kaart { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 20px; padding: clamp(22px, 5vw, 32px); }
+    .abo-label { margin: 0; color: var(--ink-soft); font-size: .875rem; font-weight: 500; }
+    .abo-naam { margin: 2px 0 0; font-size: 1.375rem; font-weight: 700; line-height: 1.2; }
+    .abo-sub { margin: 6px 0 0; color: var(--ink-soft); font-size: .9375rem; line-height: 1.5; }
+    .abo-kaart .knop-secundair { width: auto; min-width: 0; margin: 0; padding: 10px 20px; }
     @media (max-width: 560px) {
       .profiel-kaart { grid-template-columns: 72px minmax(0, 1fr); }
       .profiel-avatar-groot { width: 72px; height: 72px; font-size: 1.5rem; }
       .profiel-bewerken.knop-secundair { grid-column: 1 / -1; width: 100%; }
+      .abo-kaart { grid-template-columns: minmax(0, 1fr); }
+      .abo-kaart .knop-secundair { width: 100%; max-width: none; }
     }
     .profiel-form { display: grid; gap: 28px; margin-top: 16px; padding: clamp(22px, 5vw, 36px); }
     .profiel-veld { display: grid; gap: 10px; }
@@ -202,6 +212,18 @@
           </span>
         </div>
       </form>
+
+      <section id="abonnement" class="sectie" aria-labelledby="abonnement-kop">
+        <h2 id="abonnement-kop">Jouw abonnement</h2>
+        <div class="kaart abo-kaart">
+          <div>
+            <p class="abo-label">Je plan</p>
+            <p class="abo-naam" data-abo-plan>Free</p>
+            <p class="abo-sub">Alle vragen van alle vakken. Met Plus krijg je er Hard mode, de tijdklok en je weekoverzicht bij.</p>
+          </div>
+          <a class="knop-secundair" href="abonnement.html">Beheer abonnement</a>
+        </div>
+      </section>
 
       <section id="studiekalender" class="sectie studiekalender" aria-labelledby="kalender-kop">
         <h2 id="kalender-kop">Jouw studiekalender</h2>
