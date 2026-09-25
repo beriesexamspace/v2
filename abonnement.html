@@ -82,6 +82,26 @@
     .ab-weten-lijst li::before { content: '·'; color: var(--accent); font-weight: 700; }
     .ab-weten-lijst a { color: var(--accent); font-weight: 500; text-decoration: none; overflow-wrap: anywhere; }
     :where(html.has-hover) .ab-weten-lijst a:hover { text-decoration: underline; }
+    /* Plus in de oude kleuren van Berie's (donker, teal) en Pro in zwart en goud, in licht en donker thema hetzelfde.
+       De kaarten zetten hun eigen tokens, zodat tekst, vinkjes, labels, knop en de rand bij de muis vanzelf meekleuren. */
+    .ab-plan.is-plus {
+      --card: #161c24; --line: #262e39; --ink: #e7ecf1; --ink-soft: #9aa6b2; --surface: rgba(255,255,255,.07);
+      --accent: #3fb9b2; --teal-tekst: #7fd6d0; --teal-zacht: #15302e; --shadow-primary-color: rgba(63,185,178,.25);
+      background: radial-gradient(120% 70% at 100% 0%, rgba(63,185,178,.18), transparent 60%), var(--card);
+      color: var(--ink);
+    }
+    .ab-plan.is-plus .knop { color: #0d1117; }
+    .ab-plan.is-pro {
+      --card: #0b0a08; --line: rgba(212,175,55,.34); --ink: #f4efe3; --ink-soft: #b3a88f; --surface: rgba(212,175,55,.12);
+      --accent: #d4af37; --teal-tekst: #d4af37;
+      background: radial-gradient(120% 70% at 100% 0%, rgba(212,175,55,.16), transparent 60%), var(--card);
+      color: var(--ink);
+    }
+    .ab-plan.is-pro :is(.ab-plan-naam, .ab-bedrag) {
+      background: linear-gradient(135deg, #f7e7a1 0%, #d4af37 45%, #a8801f 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .ab-plan.is-pro .label.gedimd { color: #e6c872; }
   </style>
 </head>
 <body data-nav="vast">
@@ -135,7 +155,7 @@
           </div>
         </section>
 
-        <section class="kaart ab-plan" aria-labelledby="plan-plus">
+        <section class="kaart ab-plan is-plus" aria-labelledby="plan-plus">
           <div class="ab-plan-kop">
             <h2 class="ab-plan-naam" id="plan-plus">Plus</h2>
             <span class="label">Aanrader</span>
@@ -155,7 +175,7 @@
           </div>
         </section>
 
-        <section class="kaart ab-plan" aria-labelledby="plan-pro">
+        <section class="kaart ab-plan is-pro" aria-labelledby="plan-pro">
           <div class="ab-plan-kop">
             <h2 class="ab-plan-naam" id="plan-pro">Pro</h2>
             <span class="label gedimd">Nog bezig</span>
