@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="assets/deur.js?v=55"></script>
+  <script src="assets/deur.js?v=56"></script>
   <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta name="robots" content="noindex">
@@ -21,14 +21,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=55">
-  <script src="assets/app.js?v=55" defer></script>
-  <script src="assets/vakken.js?v=55"></script>
-  <script src="assets/config.js?v=55" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=56">
+  <script src="assets/app.js?v=56" defer></script>
+  <script src="assets/vakken.js?v=56"></script>
+  <script src="assets/config.js?v=56" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=55" defer></script>
-  <script src="assets/plan.js?v=55" defer></script>
-  <script src="assets/activiteit.js?v=55" defer></script>
+  <script src="assets/auth.js?v=56" defer></script>
+  <script src="assets/plan.js?v=56" defer></script>
+  <script src="assets/activiteit.js?v=56" defer></script>
   <style>
     .vg-wrap { max-width: 860px; }
     .vg-status { margin: 0 0 16px; color: var(--ink-soft); }
@@ -58,6 +58,7 @@
     .vg-plus h2 { margin: 0 0 6px; font-size: 1.125rem; }
     .vg-plus p { margin: 0; color: var(--ink-soft); font-size: .9375rem; line-height: 1.5; }
     .vg-plus .knop-secundair { width: auto; min-width: 0; margin: 0; padding: 10px 20px; }
+    .vg-regel a { display: inline-flex; align-items: center; min-height: 44px; }
     .vg-verbeter-lijst { display: grid; gap: 12px; }
     .vg-verbeter-kaart { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px; }
     .vg-verbeter-kaart h3 { margin: 4px 0 8px; font-size: 1rem; }
@@ -203,7 +204,7 @@
       const laadVak = id => new Promise(resolve => {
         if (gegevens[id]) { resolve(gegevens[id]); return; }
         const script = document.createElement('script');
-        script.src = `vak/${id}/data.js?v=55`;
+        script.src = `vak/${id}/data.js?v=56`;
         script.onload = () => { gegevens[id] = window.BES_VAK && window.BES_VAK.id === id ? window.BES_VAK : null; resolve(gegevens[id]); };
         script.onerror = () => resolve(null);
         document.head.append(script);

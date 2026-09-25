@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="assets/deur.js?v=55"></script>
+  <script src="assets/deur.js?v=56"></script>
   <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta property="og:type" content="website">
@@ -31,16 +31,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=55">
-  <link rel="stylesheet" href="assets/kalender.css?v=55">
-  <script src="assets/app.js?v=55" defer></script>
-  <script src="assets/config.js?v=55" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=56">
+  <link rel="stylesheet" href="assets/kalender.css?v=56">
+  <script src="assets/app.js?v=56" defer></script>
+  <script src="assets/config.js?v=56" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=55" defer></script>
-  <script src="assets/plan.js?v=55" defer></script>
-  <script src="assets/activiteit.js?v=55" defer></script>
-  <script src="assets/vakken.js?v=55"></script>
-  <script src="assets/inzichten.js?v=55" defer></script>
+  <script src="assets/auth.js?v=56" defer></script>
+  <script src="assets/plan.js?v=56" defer></script>
+  <script src="assets/activiteit.js?v=56" defer></script>
+  <script src="assets/vakken.js?v=56"></script>
+  <script src="assets/inzichten.js?v=56" defer></script>
   <style>
     .profiel-wrap { max-width: 640px; }
     /* Bovenaan alleen foto, naam en e-mail met één knop Bewerken; de velden komen pas na die klik. */
@@ -52,7 +52,7 @@
     .profiel-bewerken.knop-secundair { width: auto; min-width: 0; margin: 0; padding: 10px 20px; }
     .profiel-onderaan { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line); }
     .profiel-onderaan .knop-secundair { width: auto; min-width: 0; margin: 0; padding: 10px 20px; }
-    .profiel-wissen-link { padding: 10px 0; border: 0; background: none; color: var(--ink-soft); font: inherit; font-size: .875rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+    .profiel-wissen-link { min-height: 44px; padding: 10px 0; border: 0; background: none; color: var(--ink-soft); font: inherit; font-size: .875rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
     :where(html.has-hover) .profiel-wissen-link:hover { color: var(--fout); }
     #studiekalender { margin-top: 20px; }
     /* Jouw abonnement: tussen profielkaart en studiekalender. Nu heeft iedereen Free; het plan komt later uit Supabase. */
@@ -101,7 +101,7 @@
     .inz-vakken { display: grid; gap: 16px; margin: 0; padding: 0; list-style: none; }
     .inz-vak { display: grid; gap: 6px; }
     .inz-vak-kop { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-    .inz-naam { color: var(--ink); font-size: .9375rem; font-weight: 600; text-decoration: none; }
+    .inz-naam { display: inline-flex; align-items: center; min-height: 44px; color: var(--ink); font-size: .9375rem; font-weight: 600; text-decoration: none; }
     :where(html.has-hover) .inz-naam:hover { text-decoration: underline; }
     .inz-procent { font-weight: 700; font-variant-numeric: tabular-nums; }
     .inz-procent.is-goed, .inz-sessie-score.is-goed { color: var(--teal-tekst); }

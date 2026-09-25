@@ -32,3 +32,8 @@ html.has-hover .kalender-dag:hover, html.has-hover .kalender-maandknop:not(:disa
   .kalender-dag, .kalender-maandknop { transition: none; }
   html.has-hover .kalender-dag:hover, html.has-hover .kalender-maandknop:not(:disabled):hover, .kalender-dag:active, .kalender-maandknop:not(:disabled):active { transform: none; }
 }
+
+/* Telefoon: dagen minstens 44 pixels hoog, zodat ze goed aan te tikken zijn. */
+@media (max-width: 480px) {
+  .kalender-dag { aspect-ratio: auto; min-height: 44px; }
+}
