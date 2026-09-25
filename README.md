@@ -16,7 +16,7 @@ index.html            startpagina (de deur)
 aanmelden.html        account maken, één vraag per stap
 inloggen.html         inloggen en herstelmail aanvragen
 wachtwoord.html       wachtwoord instellen via een herstel-link
-nieuw.html            highlights-carrousel na iedere nieuwe login, vóór de hub
+nieuw.html            highlights-carrousel na iedere nieuwe login, vóór de hub; daarna stelt Comit zich één keer per toestel voor in een laag over bijna het hele scherm (localStorage bes_comit_voorgesteld), met Praat met Comit of Later
 hub.html              jaren + tools
 over-mij.html         kennismaking, sociale links en het ontstaan van de site
 profiel.html          naam, e-mailadres, profielfoto, wachtwoord en studiekalender
@@ -38,7 +38,7 @@ vak/voorbeeld/        vak-template (index.html + data.js)
 assets/style.css      gedeelde stijl
 assets/app.js         gedeelde logica (nav, fade, terugknop, naam)
 assets/config.js      publieke Supabase-instellingen
-assets/auth.js        gedeelde sessie- en accountlogica
+assets/auth.js        gedeelde sessie- en accountlogica; de knop Profiel in de nav klapt een menu uit (Profiel, Abonnement, Weekoverzicht, Foutenlijst, Examenplan, Uitloggen), met je naam en plan bovenaan; dicht met Escape of een klik ernaast
 assets/deur.js        de deur: pagina alleen voor ingelogde accounts (in de head laden)
 assets/vak.css        aanvullende stijl van de vakpagina
 assets/vak.js         logica van de vakpagina
@@ -73,7 +73,7 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 54), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 55), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.

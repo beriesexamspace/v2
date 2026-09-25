@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="assets/deur.js?v=54"></script>
+  <script src="assets/deur.js?v=55"></script>
   <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta property="og:type" content="website">
@@ -30,15 +30,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=54">
-  <link rel="stylesheet" href="assets/intro.css?v=54">
-  <script src="assets/app.js?v=54"></script>
-  <script src="assets/updates.js?v=54"></script>
-  <script src="assets/intro.js?v=54"></script>
-  <script src="assets/config.js?v=54" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=55">
+  <link rel="stylesheet" href="assets/intro.css?v=55">
+  <script src="assets/app.js?v=55"></script>
+  <script src="assets/updates.js?v=55"></script>
+  <script src="assets/intro.js?v=55"></script>
+  <script src="assets/config.js?v=55" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=54" defer></script>
-  <script src="assets/activiteit.js?v=54" defer></script>
+  <script src="assets/auth.js?v=55" defer></script>
+  <script src="assets/activiteit.js?v=55" defer></script>
+  <script src="assets/comit.js?v=55" defer></script>
   <style>
     /* Alles in één scherm: kop, de stap, en de knoppen, zonder scrollen. */
     html, body { height: 100%; overflow: hidden; }
@@ -54,6 +55,19 @@
       .nieuw-pagina { padding-top: 22px; }
       .nieuw-pagina .pagina-kop { margin-bottom: 8px; padding-right: 56px; }
       .nieuw-intro { padding: 0 16px; }
+    }
+    /* Comit stelt zich voor: een laag die bijna het hele scherm bedekt, één keer per toestel na de slideshow. */
+    .comit-voorstel { position: fixed; z-index: 50; inset: 0; display: grid; place-items: center; padding: 16px; background: rgb(0 0 0 / 45%); animation: appear 220ms var(--ease) both; }
+    .comit-voorstel-kaart { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; width: min(100%, 1060px); height: min(100%, 720px); padding: clamp(28px, 6vw, 64px); border: 1px solid var(--line); border-radius: 28px; background: var(--card); box-shadow: var(--shadow-card-hover); text-align: center; overflow: auto; }
+    .comit-voorstel-logo { display: grid; place-items: center; width: 112px; height: 112px; border-radius: 32px; background: var(--accent-zacht); animation: comit-in 700ms var(--ease) both; }
+    .comit-voorstel-logo svg { width: 64px; height: 64px; }
+    .comit-voorstel .eyebrow { margin: 0; }
+    .comit-voorstel h2 { margin: 0; font-size: clamp(2rem, 5vw, 3.25rem); line-height: 1.08; text-wrap: balance; animation: rise 600ms var(--ease) 120ms both; }
+    .comit-voorstel p.comit-voorstel-tekst { max-width: 34rem; margin: 0; color: var(--ink-soft); font-size: clamp(1rem, 1.6vw, 1.1875rem); line-height: 1.55; animation: rise 600ms var(--ease) 200ms both; }
+    .comit-voorstel-knoppen { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 8px; animation: rise 600ms var(--ease) 280ms both; }
+    @keyframes comit-in { from { opacity: 0; transform: scale(.7) rotate(-8deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
+    @media (max-width: 767px) {
+      .comit-voorstel-knoppen { flex-direction: column; width: 100%; max-width: 320px; }
     }
     /* Te weinig hoogte (bijvoorbeeld een telefoon in de breedte): dan mag de pagina gewoon scrollen. */
     @media (max-height: 560px) {
@@ -101,7 +115,57 @@
           await Promise.race([auth.gereed, new Promise(resolve => window.setTimeout(resolve, 1500))]);
           if (await auth.gebruiker()) await auth.profielBijwerken({ versieGezien: versie });
         } catch {}
+        if (await comitVoorstellen()) return;
         window.location.assign('hub.html' + window.location.hash);
+      };
+
+      // Na de slideshow stelt Comit zich één keer per toestel voor. Kiezen: praten met Comit of later (naar de hub).
+      const comitVoorstellen = async () => {
+        let gezien = false;
+        try { gezien = window.localStorage.getItem('bes_comit_voorgesteld') === '1'; } catch {}
+        if (gezien || typeof window.BES.comitLogo !== 'function') return false;
+        try { window.localStorage.setItem('bes_comit_voorgesteld', '1'); } catch {}
+        const laag = document.createElement('div');
+        laag.className = 'comit-voorstel';
+        laag.setAttribute('role', 'dialog');
+        laag.setAttribute('aria-modal', 'true');
+        laag.setAttribute('aria-labelledby', 'comit-voorstel-kop');
+        const kaart = document.createElement('div');
+        kaart.className = 'comit-voorstel-kaart';
+        const logo = document.createElement('div');
+        logo.className = 'comit-voorstel-logo';
+        logo.append(window.BES.comitLogo(64));
+        const eyebrow = document.createElement('p');
+        eyebrow.className = 'eyebrow';
+        eyebrow.textContent = 'Nieuw op Berie\'s Exam Space';
+        const kop = document.createElement('h2');
+        kop.id = 'comit-voorstel-kop';
+        kop.textContent = 'Hallo, ik ben Comit.';
+        const tekst = document.createElement('p');
+        tekst.className = 'comit-voorstel-tekst';
+        tekst.textContent = 'Je studiemaatje. Vraag me wat je nog moet oefenen, hoe je week ging, of leg me een begrip voor dat je niet snapt.';
+        const knoppen = document.createElement('div');
+        knoppen.className = 'comit-voorstel-knoppen';
+        const praat = document.createElement('a');
+        praat.className = 'knop';
+        praat.href = 'comit.html';
+        praat.textContent = 'Praat met Comit →';
+        const later = document.createElement('a');
+        later.className = 'knop-secundair';
+        later.href = 'hub.html' + window.location.hash;
+        later.textContent = 'Later';
+        knoppen.append(praat, later);
+        kaart.append(logo, eyebrow, kop, tekst, knoppen);
+        laag.append(kaart);
+        laag.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape') { window.location.assign(later.href); return; }
+          if (event.key !== 'Tab') return;
+          if (event.shiftKey && document.activeElement === praat) { event.preventDefault(); later.focus(); }
+          else if (!event.shiftKey && document.activeElement === later) { event.preventDefault(); praat.focus(); }
+        });
+        document.body.append(laag);
+        praat.focus();
+        return true;
       };
       window.BES.stappen(document.getElementById('intro'), {
         kopniveau: 'h2',

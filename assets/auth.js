@@ -113,8 +113,81 @@
     element.replaceChildren(image);
   }
 
+  // Profielmenu in de nav: een knop die een lijstje uitklapt (Profiel, Abonnement, Weekoverzicht, Foutenlijst, Examenplan, Uitloggen).
+  function zetProfielMenu(menu, open) {
+    const knop = menu.querySelector('.profiel-knop');
+    const lijst = menu.querySelector('.profiel-menu-lijst');
+    if (!knop || !lijst) return;
+    knop.setAttribute('aria-expanded', String(open));
+    lijst.hidden = !open;
+    menu.classList.toggle('is-open', open);
+  }
+
+  function maakProfielMenu(index) {
+    const menu = document.createElement('div');
+    menu.className = 'profiel-menu';
+    const lijstId = 'profiel-menu-' + index;
+    const knop = document.createElement('button');
+    knop.type = 'button';
+    knop.className = 'profiel-knop';
+    knop.setAttribute('aria-expanded', 'false');
+    knop.setAttribute('aria-controls', lijstId);
+    const avatar = document.createElement('span');
+    avatar.className = 'profiel-avatar';
+    fillAvatar(avatar, currentUser);
+    const pijl = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    pijl.setAttribute('class', 'profiel-pijl');
+    pijl.setAttribute('viewBox', '0 0 24 24');
+    pijl.setAttribute('aria-hidden', 'true');
+    const lijn = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    lijn.setAttribute('d', 'm7 10 5 5 5-5');
+    pijl.append(lijn);
+    knop.append(avatar, document.createTextNode('Profiel'), pijl);
+
+    const lijst = document.createElement('div');
+    lijst.className = 'profiel-menu-lijst';
+    lijst.id = lijstId;
+    lijst.hidden = true;
+    const kop = document.createElement('p');
+    kop.className = 'profiel-menu-kop';
+    const naam = document.createElement('strong');
+    const gegevens = nameDetails(currentUser);
+    naam.textContent = gegevens.aanspreeknaam || gegevens.volledig || 'Jouw account';
+    const plan = document.createElement('span');
+    plan.className = 'profiel-menu-plan';
+    plan.hidden = true;
+    kop.append(naam, plan);
+    lijst.append(kop);
+    const pagina = window.location.pathname.split('/').pop() || 'index.html';
+    [['Profiel', 'profiel.html'], ['Abonnement', 'abonnement.html'], ['Weekoverzicht', 'voortgang.html'], ['Foutenlijst', 'fouten.html'], ['Examenplan', 'examenplan.html']].forEach(([tekst, pad]) => {
+      const link = document.createElement('a');
+      link.href = pagePrefix + pad;
+      link.textContent = tekst;
+      if (pagina === pad) link.setAttribute('aria-current', 'page');
+      lijst.append(link);
+    });
+    const uitloggen = document.createElement('button');
+    uitloggen.type = 'button';
+    uitloggen.className = 'profiel-menu-uitloggen';
+    uitloggen.setAttribute('data-account-uitloggen', '');
+    uitloggen.textContent = 'Uitloggen';
+    lijst.append(document.createElement('hr'), uitloggen);
+
+    knop.addEventListener('click', () => zetProfielMenu(menu, knop.getAttribute('aria-expanded') !== 'true'));
+    menu.addEventListener('focusout', event => { if (event.relatedTarget && !menu.contains(event.relatedTarget)) zetProfielMenu(menu, false); });
+    menu.append(knop, lijst);
+    if (typeof BES.plan === 'function') {
+      BES.plan().then(gegeven => {
+        plan.textContent = BES.planNaam(gegeven.plan);
+        plan.dataset.plan = gegeven.plan;
+        plan.hidden = false;
+      }).catch(() => {});
+    }
+    return menu;
+  }
+
   function renderAccount() {
-    document.querySelectorAll('nav.navigation, nav.nav-vol').forEach(navigation => {
+    document.querySelectorAll('nav.navigation, nav.nav-vol').forEach((navigation, index) => {
       let controls = navigation.querySelector('.account-controls');
       if (!controls) {
         const original = navigation.querySelector('.login-button');
@@ -133,14 +206,7 @@
         controls.append(login);
         return;
       }
-      const profile = document.createElement('a');
-      profile.className = 'profiel-knop';
-      profile.href = pagePrefix + 'profiel.html';
-      const avatar = document.createElement('span');
-      avatar.className = 'profiel-avatar';
-      fillAvatar(avatar, currentUser);
-      profile.append(avatar, document.createTextNode('Profiel'));
-      controls.append(profile);
+      controls.append(maakProfielMenu(index));
     });
     document.querySelectorAll('[data-account-opties]').forEach(element => { element.hidden = Boolean(currentUser); });
     document.querySelectorAll('[data-account-sessie]').forEach(element => {
@@ -413,6 +479,14 @@
 
   const initializeView = () => {
     renderAccount();
+    // Profielmenu dicht bij een klik ernaast of met Escape.
+    document.addEventListener('click', event => {
+      document.querySelectorAll('.profiel-menu.is-open').forEach(menu => { if (!menu.contains(event.target)) zetProfielMenu(menu, false); });
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key !== 'Escape') return;
+      document.querySelectorAll('.profiel-menu.is-open').forEach(menu => { zetProfielMenu(menu, false); menu.querySelector('.profiel-knop')?.focus(); });
+    });
     document.addEventListener('click', async event => {
       const link = event.target.closest?.('[data-account-uitloggen]');
       if (!link || !currentUser) return;
