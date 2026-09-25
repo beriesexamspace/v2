@@ -197,3 +197,13 @@ html.is-oefenen .vak-pagina .pagina-kop, html.is-oefenen .vak-pagina #vak-terug,
 html.is-examen .site-header { display: none; }
 html.is-examen .pagina { padding-top: 40px; }
 html.is-examen .thema-knop.is-los { display: none; }
+
+/* Foutenlijst (Plus en Pro): bovenaan de keuzes, met een knop om alleen je fouten te oefenen. */
+.vak-pagina .fouten-blok { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 0 28px; padding: 20px 24px; }
+.vak-pagina .fouten-blok .kaart-titel, .vak-pagina .fouten-blok .kaart-sub { margin: 0; }
+.vak-pagina .fouten-blok .kaart-sub { margin-top: 4px; }
+.vak-pagina .fouten-blok .knop-secundair { flex-shrink: 0; width: auto; min-width: 0; margin: 0; padding: 10px 20px; }
+@media (max-width: 560px) {
+  .vak-pagina .fouten-blok { flex-direction: column; align-items: stretch; }
+  .vak-pagina .fouten-blok .knop-secundair { width: 100%; max-width: none; }
+}

@@ -127,6 +127,9 @@
     let selected = selections.get(level);
     // Hard mode en oefenen met tijd horen bij Plus (assets/plan.js). Tot het plan bekend is, staan ze op slot.
     let plusOk = false;
+    // Foutenlijst (Plus en Pro, supabase/fouten.sql): open fouten van dit vak, als sleutels. ?fouten=1 begint meteen met oefenen.
+    let openFouten = new Set();
+    let foutenUitUrl = new URLSearchParams(window.location.search).get('fouten') === '1';
     let context = null;
     let authGeneration = 0;
     let mode = 'training';
@@ -192,6 +195,80 @@
       byId('niveau-keuzes')?.querySelector('[data-niveau="hard"]')?.classList.toggle('met-plus', !plusOk && data.hardVragen.length > 0);
       byId('tijd-keuzes')?.querySelector('[data-tijd="met"]')?.classList.toggle('met-plus', !plusOk);
       if (plusOk) { byId('plus-slot-niveau')?.remove(); byId('plus-slot-tijd')?.remove(); }
+    }
+
+    // Korte vaste sleutel per vraag: hash van de vraagtekst, met h: voor Hard mode en n: voor Normaal.
+    function vraagSleutel(question) {
+      let hash = 0x811c9dc5;
+      for (const teken of question.q) { hash ^= teken.codePointAt(0); hash = Math.imul(hash, 0x01000193) >>> 0; }
+      return (String(question.id).startsWith('hard:') ? 'h:' : 'n:') + hash.toString(16).padStart(8, '0');
+    }
+
+    const foutVragen = () => questionsFor(level).filter(question => openFouten.has(vraagSleutel(question)));
+
+    function toonFoutenKnop() {
+      const vragen = plusOk ? foutVragen() : [];
+      let blok = byId('fouten-blok');
+      if (!vragen.length) { if (blok) blok.hidden = true; return; }
+      if (!blok) {
+        blok = create('div', 'kaart fouten-blok');
+        blok.id = 'fouten-blok';
+        const tekst = create('div', 'fouten-tekst');
+        tekst.append(create('p', 'kaart-titel', 'Je foutenlijst'), create('p', 'kaart-sub'));
+        const knop = create('button', 'knop-secundair', 'Oefen je fouten');
+        knop.type = 'button';
+        knop.addEventListener('click', () => {
+          const lijst = foutVragen();
+          if (!lijst.length) return;
+          setMode('training');
+          start(shuffle(lijst), 'training', level, 0);
+        });
+        blok.append(tekst, knop);
+        byId('vak-instellingen').prepend(blok);
+      }
+      blok.querySelector('.kaart-sub').textContent = `${countText(vragen.length)}${hasLevels ? ` in ${levelLabel(level)}` : ''} die je fout had en nog niet goed beantwoordde.`;
+      blok.hidden = false;
+    }
+
+    async function laadFouten() {
+      const client = BES.auth?.client;
+      const plan = BES.plan ? await BES.plan() : null;
+      plusOk = Boolean(plan && (plan.plan === 'plus' || plan.plan === 'pro'));
+      markeerPlus();
+      const owner = context?.owner;
+      if (!plusOk || !owner || !client) { openFouten = new Set(); toonFoutenKnop(); return; }
+      const { data: rijen, error } = await client.from('fouten').select('sleutel').eq('user_id', owner).eq('vak', data.id).eq('opgelost', false);
+      if (error || context?.owner !== owner) return;
+      openFouten = new Set((rijen || []).map(rij => rij.sleutel));
+      toonFoutenKnop();
+      if (foutenUitUrl && screen === 'keuzes') {
+        foutenUitUrl = false;
+        const url = new URL(window.location.href);
+        url.searchParams.delete('fouten');
+        window.history.replaceState(window.history.state, '', url);
+        if (!foutVragen().length && hasLevels && data.hardVragen.some(question => openFouten.has(vraagSleutel(question)))) setLevel(level === 'hard' ? 'normaal' : 'hard');
+        const lijst = foutVragen();
+        if (lijst.length) { setMode('training'); start(shuffle(lijst), 'training', level, 0); }
+      }
+    }
+
+    // Na een ronde: foute antwoorden op de lijst, goede eraf. Alleen met Plus of Pro; de database controleert dat ook.
+    function bewaarFouten(answers, correct) {
+      const client = BES.auth?.client;
+      if (!plusOk || !context.owner || !client) return;
+      const fout = new Map();
+      const goed = new Set();
+      answers.forEach(entry => {
+        const sleutel = vraagSleutel(entry.question);
+        if (correct(entry)) goed.add(sleutel);
+        else fout.set(sleutel, { s: sleutel, h: entry.question.h });
+      });
+      fout.forEach((_, sleutel) => goed.delete(sleutel));
+      if (!fout.size && !goed.size) return;
+      fout.forEach((_, sleutel) => openFouten.add(sleutel));
+      goed.forEach(sleutel => openFouten.delete(sleutel));
+      toonFoutenKnop();
+      client.rpc('fouten_bijwerken', { p_vak: data.id, p_fout: [...fout.values()], p_goed: [...goed] }).then(() => {}, () => {});
     }
 
     function chooseLevel(value) {
@@ -421,6 +498,7 @@
         url.searchParams.delete('hoofdstuk');
         window.history.replaceState(window.history.state, '', url);
       }
+      laadFouten();
     }
 
     function setLevel(value) {
@@ -455,6 +533,7 @@
             : 'Oefen met de bestaande vragen. Hard mode heeft een eigen vragenreeks en aparte voortgang.';
       }
       if (byId('voortgang-niveau')) byId('voortgang-niveau').textContent = `Voortgang: ${levelLabel(level)}`;
+      toonFoutenKnop();
       const simulationDescription = byId('modus-keuzes').querySelector('[data-modus="simulatie"] .kaart-sub');
       if (simulationDescription) simulationDescription.textContent = `${countText(Math.min(20, questionsFor(level).length))}, uitslag en uitleg aan het einde.`;
       renderChapters();
@@ -785,6 +864,7 @@
       }
       renderComit(answers, correct);
       bewaarSessie(good, answers.length);
+      bewaarFouten(answers, correct);
       showScreen('einde');
       byId('score-kop').focus({ preventScroll: true });
       byId('eindscherm').scrollIntoView({ block: 'start', behavior: 'instant' });
