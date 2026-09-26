@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="assets/deur.js?v=57"></script>
+  <script src="assets/deur.js?v=58"></script>
   <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta property="og:type" content="website">
@@ -31,14 +31,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=57">
-  <script src="assets/app.js?v=57"></script>
-  <script src="assets/config.js?v=57" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=58">
+  <script src="assets/app.js?v=58"></script>
+  <script src="assets/config.js?v=58" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=57" defer></script>
-  <script src="assets/plan.js?v=57" defer></script>
-  <script src="assets/activiteit.js?v=57" defer></script>
-  <script src="assets/reken.js?v=57" defer></script>
+  <script src="assets/auth.js?v=58" defer></script>
+  <script src="assets/plan.js?v=58" defer></script>
+  <script src="assets/activiteit.js?v=58" defer></script>
+  <script src="assets/reken.js?v=58" defer></script>
   <style>
 
     .reken-pagina .wrap { max-width: 808px; }
@@ -59,6 +59,9 @@
     .num { font-variant-numeric: tabular-nums; }
     .delbtn { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 50%; background: var(--card); color: var(--muted); font: 400 1.5rem/1 var(--font-family); cursor: pointer; }
     .delbtn:disabled { opacity: .4; cursor: default; }
+    .delbtn { transition: color 180ms var(--ease), background-color 180ms var(--ease), border-color 180ms var(--ease), box-shadow 180ms var(--ease), transform 180ms var(--ease), opacity 180ms var(--ease); }
+    .delbtn:not(:disabled):active { transform: scale(.97); }
+    :is(.verdict, .verdict-teken, .vt, .ric, .rdet, .rlbl, #ex1Status, #ex2Graad) { transition: color 200ms var(--ease), background-color 200ms var(--ease), border-color 200ms var(--ease); }
     .reken-pagina .addbtn { min-height: 44px; padding: 8px 22px; margin-top: 20px; font-size: .9375rem; line-height: 26px; }
     .metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin-top: 32px; padding: 24px 0; border-top: 1px solid var(--line); }
     .metric { min-width: 0; }

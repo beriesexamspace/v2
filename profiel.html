@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="assets/deur.js?v=57"></script>
+  <script src="assets/deur.js?v=58"></script>
   <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta property="og:type" content="website">
@@ -31,16 +31,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=57">
-  <link rel="stylesheet" href="assets/kalender.css?v=57">
-  <script src="assets/app.js?v=57" defer></script>
-  <script src="assets/config.js?v=57" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=58">
+  <link rel="stylesheet" href="assets/kalender.css?v=58">
+  <script src="assets/app.js?v=58" defer></script>
+  <script src="assets/config.js?v=58" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=57" defer></script>
-  <script src="assets/plan.js?v=57" defer></script>
-  <script src="assets/activiteit.js?v=57" defer></script>
-  <script src="assets/vakken.js?v=57"></script>
-  <script src="assets/inzichten.js?v=57" defer></script>
+  <script src="assets/auth.js?v=58" defer></script>
+  <script src="assets/plan.js?v=58" defer></script>
+  <script src="assets/activiteit.js?v=58" defer></script>
+  <script src="assets/vakken.js?v=58"></script>
+  <script src="assets/inzichten.js?v=58" defer></script>
   <style>
     .profiel-wrap { max-width: 640px; }
     /* Bovenaan alleen foto, naam en e-mail met één knop Bewerken; de velden komen pas na die klik. */
@@ -53,6 +53,8 @@
     .profiel-onderaan { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line); }
     .profiel-onderaan .knop-secundair { width: auto; min-width: 0; margin: 0; padding: 10px 20px; }
     .profiel-wissen-link { min-height: 44px; padding: 10px 0; border: 0; background: none; color: var(--ink-soft); font: inherit; font-size: .875rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+    .profiel-wissen-link, .abo-opzeggen { transition: color 180ms var(--ease), opacity 180ms var(--ease), transform 180ms var(--ease); }
+    .profiel-wissen-link:active, .abo-opzeggen:not(:disabled):active { transform: scale(.97); }
     :where(html.has-hover) .profiel-wissen-link:hover { color: var(--fout); }
     #studiekalender { margin-top: 20px; }
     /* Jouw abonnement: tussen profielkaart en studiekalender. Nu heeft iedereen Free; het plan komt later uit Supabase. */
@@ -67,7 +69,7 @@
     /* Knop Beheer abonnement: rustig bij Free, in de kleur van het plan bij Plus (teal) en Pro (zwart met goud). */
     .abo-kaart .abo-knop { gap: 8px; font-weight: 600; }
     .abo-knop-pijl { transition: transform 180ms var(--ease); }
-    :where(html.has-hover) .abo-knop:hover .abo-knop-pijl { transform: translateX(3px); }
+    :where(html.has-hover) .abo-knop:hover .abo-knop-pijl { transform: translateX(2px); }
     .abo-kaart .abo-knop[data-plan="plus"] { border-color: #3fb9b2; background: #3fb9b2; color: #0d1117; box-shadow: 0 8px 20px rgba(63,185,178,.25); }
     :where(html.has-hover) .abo-kaart .abo-knop[data-plan="plus"]:hover { border-color: #36a8a1; background: #36a8a1; }
     .abo-kaart .abo-knop[data-plan="pro"] { border-color: rgba(212,175,55,.6); background: radial-gradient(120% 140% at 100% 0%, rgba(212,175,55,.22), transparent 60%), #0b0a08; color: #e6c872; box-shadow: 0 8px 20px rgba(0,0,0,.25); }
@@ -76,6 +78,7 @@
     .abo-opzeggen { min-height: 44px; padding: 10px 0; border: 0; background: none; color: var(--ink-soft); font: inherit; font-size: .875rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
     :where(html.has-hover) .abo-opzeggen:hover { color: var(--fout); }
     .abo-zeker { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; padding-top: 16px; border-top: 1px solid var(--line); }
+    .abo-zeker:not([hidden]), #profiel-form:not([hidden]) { animation: menu-open 220ms var(--ease); }
     .abo-zeker p { flex: 1 1 260px; margin: 0; font-size: .9375rem; line-height: 1.5; }
     .abo-zeker .tekstlink { min-height: 44px; padding: 10px 0; border: 0; background: none; cursor: pointer; }
     .abo-melding { margin: 10px 0 0; color: var(--teal-tekst); font-size: .9375rem; font-weight: 500; }
@@ -114,7 +117,7 @@
     .inz-procent { font-weight: 700; font-variant-numeric: tabular-nums; }
     .inz-procent.is-goed, .inz-sessie-score.is-goed { color: var(--teal-tekst); }
     .inz-balk { height: 8px; border-radius: 4px; background: var(--surface); overflow: hidden; }
-    .inz-balk i { display: block; height: 100%; border-radius: inherit; background: var(--accent); transition: width 600ms var(--ease); }
+    .inz-balk i { display: block; height: 100%; border-radius: inherit; background: var(--accent); transition: width 300ms var(--ease), background-color 200ms var(--ease); }
     .inz-balk i.is-goed { background: var(--teal); }
     .inz-sub { color: var(--ink-soft); font-size: .8125rem; }
     .inz-meer { display: inline-block; margin-top: 16px; }

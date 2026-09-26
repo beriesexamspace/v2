@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="assets/deur.js?v=57"></script>
+  <script src="assets/deur.js?v=58"></script>
   <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta property="og:type" content="website">
@@ -15,7 +15,7 @@
   <meta property="og:image:height" content="630">
   <meta property="og:url" content="https://beriesexamspace.com/v2/hub.html">
   <meta name="twitter:card" content="summary_large_image">
-  <script src="assets/updates.js?v=57"></script>
+  <script src="assets/updates.js?v=58"></script>
   <script>
     // Welkomstscherm (Wat is nieuw) één keer per persoon per versie.
     // Op dit toestel al gezien: meteen door. Anders even wachten op het account (misschien al gezien op een ander toestel).
@@ -59,15 +59,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=57">
-  <link rel="stylesheet" href="assets/intro.css?v=57">
-  <script src="assets/app.js?v=57"></script>
-  <script src="assets/intro.js?v=57"></script>
-  <script src="assets/config.js?v=57" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=58">
+  <link rel="stylesheet" href="assets/intro.css?v=58">
+  <script src="assets/app.js?v=58"></script>
+  <script src="assets/intro.js?v=58"></script>
+  <script src="assets/config.js?v=58" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=57" defer></script>
-  <script src="assets/plan.js?v=57" defer></script>
-  <script src="assets/activiteit.js?v=57" defer></script>
+  <script src="assets/auth.js?v=58" defer></script>
+  <script src="assets/plan.js?v=58" defer></script>
+  <script src="assets/activiteit.js?v=58" defer></script>
   <style>
     html { scroll-behavior: smooth; }
 
@@ -116,11 +116,11 @@
     .jaar-body { flex: 1; gap: 8px; padding: 24px; background: var(--card); }
     .jaar-link { display: flex; align-items: center; gap: 8px; margin-top: 12px; color: var(--jaar); font-weight: 600; }
     .jaar-pijl { display: inline-block; transition: transform 150ms var(--ease); }
-    a.kaart.jaar[data-jaar]:not([aria-disabled="true"]):active { transform: scale(.985); transition-duration: 80ms; }
+    a.kaart.jaar[data-jaar]:not([aria-disabled="true"]):active { transform: scale(.99); transition-duration: 150ms; }
 
-    :where(html.has-hover) a.kaart.jaar[data-jaar]:not([aria-disabled="true"]):hover { transform: translateY(-4px); box-shadow: var(--jaar-schaduw-hover); }
+    :where(html.has-hover) a.kaart.jaar[data-jaar]:not([aria-disabled="true"]):hover { transform: translateY(-2px); box-shadow: var(--jaar-schaduw-hover); }
     :where(html.has-hover) a.kaart.jaar[data-jaar]:hover .jaar-pijl { transform: translateX(2px); }
-    :where(html.has-hover) a.kaart.jaar[data-jaar]:not([aria-disabled="true"]):active { transform: scale(.985); }
+    :where(html.has-hover) a.kaart.jaar[data-jaar]:not([aria-disabled="true"]):active { transform: scale(.99); }
 
     .hub-sectie { scroll-margin-top: 88px; }
     .kaart-binnenkort { cursor: default; opacity: .8; }
@@ -155,11 +155,7 @@
     .update-label-nieuw { background: var(--teal-zacht); color: var(--teal-tekst); }
     .update-label-verbeterd { background: var(--surface); color: var(--ink-soft); }
     .hub-updates-knop { margin-top: 24px; }
-    .hub-update.is-net-zichtbaar { animation: hub-update-binnen 150ms var(--ease) both; }
-    @keyframes hub-update-binnen {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .hub-update.is-net-zichtbaar { animation: menu-open 200ms var(--ease) both; }
 
     @media (max-width: 767px) {
       .hub-update { grid-template-columns: minmax(0, 1fr); gap: 6px; padding: 14px 0; }

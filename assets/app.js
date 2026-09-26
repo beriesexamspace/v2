@@ -398,6 +398,45 @@
     window.addEventListener('blur', clear);
   };
 
+  // Alleen na bediening: nieuwe rijen, teruggekeerde stappen en bijgewerkte meldingen openen.
+  // CSS kan een tekstvervanging of een opnieuw getoonde eerste stap niet zelf herkennen.
+  const setupOpeningMotion = () => {
+    const main = document.querySelector('main');
+    if (!main) return;
+    const status = '[role="status"], [role="alert"], .kalender-daginfo';
+    const opening = '#stap-1, .info-kaart, .crow';
+    const running = new Map();
+    const start = () => {
+      document.removeEventListener('click', start, true);
+      document.removeEventListener('input', start, true);
+      new MutationObserver(records => {
+        if (motion.matches) return;
+        const targets = new Set();
+        records.forEach(record => {
+          const element = record.target.nodeType === Node.ELEMENT_NODE ? record.target : record.target.parentElement;
+          if (!element) return;
+          const message = element.closest(status);
+          if (message) targets.add(message);
+          if (record.type === 'attributes' && element.matches(opening)) targets.add(element);
+          record.addedNodes.forEach(node => { if (node.nodeType === Node.ELEMENT_NODE && node.matches('.crow')) targets.add(node); });
+        });
+        targets.forEach(element => {
+          if (!element.isConnected || !element.textContent.trim() || !element.getClientRects().length || !element.animate) return;
+          running.get(element)?.cancel();
+          const shift = element.matches(opening) ? 'translateY(-4px)' : 'none';
+          const animation = element.animate([{ opacity: 0, transform: shift }, { opacity: 1, transform: 'none' }], {
+            duration: 200, easing: getComputedStyle(element).getPropertyValue('--ease').trim()
+          });
+          running.set(element, animation);
+          animation.finished.catch(() => {}).finally(() => { if (running.get(element) === animation) running.delete(element); });
+        });
+      }).observe(main, { childList: true, characterData: true, subtree: true, attributes: true, attributeFilter: ['hidden'] });
+    };
+    document.addEventListener('click', start, true);
+    document.addEventListener('input', start, true);
+    motion.addEventListener('change', () => { if (motion.matches) { running.forEach(animation => animation.cancel()); running.clear(); } });
+  };
+
   const initialize = () => {
     try {
       setupTheme();
@@ -405,6 +444,7 @@
       setupLinks();
       setupSignature();
       setupCursor();
+      setupOpeningMotion();
     } finally {
       revealPage();
     }

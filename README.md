@@ -73,7 +73,7 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 57), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 58), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.
@@ -379,3 +379,7 @@ De accountkoppeling uit de sectie "Accounts" moet ook zijn ingesteld. Totdat de 
 5. Zet voor dat bestaande vak `v2: true` in `assets/vakken.js`. `BES.vakLink` laat de jaarpagina dan naar `vak/<id>/` verwijzen. Verhoog bij deze gedeelde wijziging de versienummers in alle pagina's.
 
 Voeg het voorbeeldvak niet aan de 34 vakken toe. Het sjabloon maakt deze stap compleet; het overzetten van de echte vakinhoud is een volgende opdracht.
+
+## Animaties
+
+De knoppen, kaarten, menu's, themakeuze, vakkeuzes, meldingen en bevestigingen gebruiken dezelfde rustige bewegingen met `var(--ease)`: 150 tot 300 ms, 1 tot 2 px hover en een druk-effect van .97 voor knoppen of .99 voor kaarten. Openende lagen hergebruiken `appear` en `menu-open`. Een kleine haak in `app.js` laat pas na bediening nieuwe rekenrijen, zoekresultaten, meldingen en de terugkeer naar de eerste wisstap verschijnen. Hover werkt alleen met een muis; bij minder beweging staan animaties, overgangen en verplaatsingen uit. Bestaande pagina-introducties en voortgangsbalken blijven behouden. Cachenummer: 58.

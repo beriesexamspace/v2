@@ -125,23 +125,25 @@
   transition: border-color 150ms var(--ease), background-color 150ms var(--ease), transform 150ms var(--ease), box-shadow 150ms var(--ease);
 }
 
-:where(html.has-hover) .comit-voorstel:hover { border-color: var(--accent); background: var(--accent-zacht); transform: translateY(-2px); box-shadow: var(--shadow-soft); }
+:where(html.has-hover) .comit-voorstel:hover { border-color: var(--accent); background: var(--accent-zacht); box-shadow: var(--shadow-soft); }
+:where(html.has-hover) .comit-voorstel:hover:not(:active) { transform: translateY(-2px); }
 .comit-voorstel:focus-visible { outline-offset: 2px; }
-.comit-voorstel:active { transform: translateY(0); }
+.comit-voorstel:active { transform: scale(.99); }
 
 .comit-gesprek { display: flex; flex-direction: column; gap: 22px; width: 100%; margin-top: auto; padding-top: 24px; }
 .comit-gesprek:empty { margin-top: 0; padding-top: 0; }
 .comit-bericht { display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
-.comit-bericht-gebruiker { justify-content: flex-end; }
+.comit-bericht-gebruiker { justify-content: flex-end; animation: appear 200ms var(--ease) both; }
 .comit-bericht-logo { margin-top: 13px; }
 .comit-wolk { max-width: 82%; margin: 0; padding: 14px 18px; border-radius: 20px; color: var(--ink); font-size: .9375rem; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
 .comit-bericht-gebruiker .comit-wolk { border-bottom-right-radius: 6px; background: var(--accent-zacht); }
 .comit-bericht-assistent .comit-wolk { max-width: calc(100% - 34px); border-top-left-radius: 6px; background: var(--surface); }
+.comit-bericht-assistent .comit-wolk:not(.comit-denkt) { animation: menu-open 200ms var(--ease) both; }
 .comit-antwoord-knoppen { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; white-space: normal; }
 .comit-antwoord-knoppen .comit-antwoord-knop { flex: 0 1 auto; width: auto; min-width: 0; max-width: 100%; min-height: 44px; margin: 0; padding: 10px 14px; color: var(--accent); font-size: .875rem; line-height: 1.5; text-align: center; white-space: normal; overflow-wrap: anywhere; }
-.comit-denkt { display: flex; align-items: center; min-height: 52px; }
+.comit-denkt { display: flex; align-items: center; min-height: 52px; animation: appear 200ms var(--ease) both; }
 .comit-puntjes { display: inline-flex; align-items: center; gap: 5px; padding: 0 2px; }
-.comit-puntjes > span { width: 5px; height: 5px; border-radius: 50%; background: var(--ink-soft); animation: comit-denken 900ms var(--ease) infinite; }
+.comit-puntjes > span { width: 5px; height: 5px; border-radius: 50%; background: var(--ink-soft); animation: appear 200ms var(--ease) both; }
 .comit-puntjes > span:nth-child(2) { animation-delay: 150ms; }
 .comit-puntjes > span:nth-child(3) { animation-delay: 300ms; }
 
@@ -168,19 +170,21 @@
 .comit-invoer:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, var(--transparent)), var(--shadow-soft); }
 .comit-invoer textarea { display: block; flex: 1 1 auto; width: 100%; min-width: 0; min-height: 44px; max-height: 116px; padding: 10px 10px 10px 14px; border: 0; border-radius: 20px; outline: none; resize: none; background: var(--transparent); color: var(--ink); font: 400 1rem/24px var(--font); overflow-x: hidden; overflow-y: auto; }
 .comit-invoer textarea::placeholder { color: var(--ink-soft); opacity: 1; }
-.comit-verstuur { display: inline-flex; flex: 0 0 44px; align-items: center; justify-content: center; width: 44px; height: 44px; min-height: 44px; padding: 10px; border: 0; border-radius: 50%; background: var(--accent); color: var(--white); cursor: pointer; }
+.comit-verstuur { display: inline-flex; flex: 0 0 44px; align-items: center; justify-content: center; width: 44px; height: 44px; min-height: 44px; padding: 10px; border: 0; border-radius: 50%; background: var(--accent); color: var(--white); cursor: pointer; transition: transform 180ms var(--ease), color 180ms var(--ease), background-color 180ms var(--ease), box-shadow 180ms var(--ease); }
 .comit-verstuur svg { display: block; width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .comit-verstuur:disabled { background: var(--surface); color: var(--ink-soft); cursor: default; }
-:where(html.has-hover) .comit-verstuur:not(:disabled):hover { background: var(--accent-dark); }
+:where(html.has-hover) .comit-verstuur:not(:disabled):hover { background: var(--accent-dark); box-shadow: var(--shadow-soft); }
+:where(html.has-hover) .comit-verstuur:not(:disabled):hover:not(:active) { transform: translateY(-1px); }
+.comit-verstuur:not(:disabled):active { transform: scale(.97); }
 .comit-sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0; clip-path: inset(50%); overflow: hidden; white-space: nowrap; }
 
 .comit-pagina-body :is(.home-knop, .thema-knop) { flex-basis: 44px; width: 44px; height: 44px; }
 .comit-pagina-body :is(.menu-toggle, .profiel-knop, .login-button, .navigation-links a) { min-height: 44px; }
 .comit-pagina-body .site-footer { padding-bottom: calc(var(--comit-invoer-hoogte, 62px) + 40px); }
 
-.comit-pagina[data-opening="eerste"]::before { animation: comit-kleur 1400ms var(--ease) 300ms both; }
-.comit-pagina[data-opening="eerste"] .comit-hero-logo { animation: comit-logo 650ms var(--ease) both; }
-.comit-pagina[data-opening="eerste"] .comit-hero-logo::before { animation: comit-gloed 700ms var(--ease) 250ms both; }
+.comit-pagina[data-opening="eerste"]::before { animation: comit-kleur 300ms var(--ease) 300ms both; }
+.comit-pagina[data-opening="eerste"] .comit-hero-logo { animation: comit-logo 300ms var(--ease) both; }
+.comit-pagina[data-opening="eerste"] .comit-hero-logo::before { animation: comit-gloed 300ms var(--ease) 250ms both; }
 .comit-pagina[data-opening="eerste"] .comit-woord { animation: comit-verschijnen 250ms var(--ease) calc(650ms + var(--woord-index, 0) * 125ms) both; }
 .comit-pagina[data-opening="eerste"] .comit-hulpvraag { animation: comit-verschijnen 200ms var(--ease) 1100ms both; }
 .comit-pagina[data-opening="eerste"] .comit-kop { animation: comit-verschijnen 200ms var(--ease) 1100ms both; }
@@ -193,7 +197,6 @@
 @keyframes comit-kleur { 0% { opacity: 0; transform: translateX(-25%); } 45% { opacity: .15; } 100% { opacity: .045; transform: translateX(0); } }
 @keyframes comit-verschijnen { from { opacity: 0; } to { opacity: 1; } }
 @keyframes comit-omhoog { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes comit-denken { 0%, 70%, 100% { opacity: .45; transform: translateY(0); } 35% { opacity: 1; transform: translateY(-3px); } }
 
 @media (max-width: 600px) {
   .comit-pagina-body .comit-pagina { padding: 74px 16px max(16px, env(safe-area-inset-bottom)); }
@@ -213,5 +216,5 @@
 
 @media (prefers-reduced-motion: reduce) {
   .comit-pagina *, .comit-pagina::before, .comit-pagina *::before { animation: none !important; transition: none !important; }
-  .comit-voorstel:is(:hover, :active) { transform: none; }
+  :is(.comit-voorstel, .comit-verstuur):is(:hover, :active) { transform: none; }
 }

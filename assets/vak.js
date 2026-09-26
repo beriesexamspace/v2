@@ -36,7 +36,8 @@
     element.getAnimations?.().forEach(animation => animation.cancel());
     element.hidden = false;
     if (reducedMotion.matches || !element.animate) return;
-    const animation = element.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: 'ease-out' });
+    const easing = window.getComputedStyle(element).getPropertyValue('--ease').trim();
+    const animation = element.animate([{ opacity: 0, transform: 'translateY(-4px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 200, easing });
     fades.add(animation);
     animation.finished.catch(() => {}).finally(() => fades.delete(animation));
   }
