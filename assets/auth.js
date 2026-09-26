@@ -123,6 +123,13 @@
     menu.classList.toggle('is-open', open);
   }
 
+  // Is dit account beheerder? Eén keer per pagina gevraagd; dan komt Beheer in het profielmenu.
+  let beheerderBelofte = null;
+  const isBeheerder = () => {
+    if (!beheerderBelofte) beheerderBelofte = client && currentUser ? client.rpc('is_beheerder').then(({ data }) => data === true, () => false) : Promise.resolve(false);
+    return beheerderBelofte;
+  };
+
   function maakProfielMenu(index) {
     const menu = document.createElement('div');
     menu.className = 'profiel-menu';
@@ -165,6 +172,15 @@
       link.textContent = tekst;
       if (pagina === pad) link.setAttribute('aria-current', 'page');
       lijst.append(link);
+    });
+    isBeheerder().then(ja => {
+      if (!ja || lijst.querySelector('[data-beheer-link]')) return;
+      const link = document.createElement('a');
+      link.href = pagePrefix + 'beheer.html';
+      link.textContent = 'Beheer';
+      link.setAttribute('data-beheer-link', '');
+      if (pagina === 'beheer.html') link.setAttribute('aria-current', 'page');
+      lijst.querySelector('hr')?.before(link);
     });
     const uitloggen = document.createElement('button');
     uitloggen.type = 'button';

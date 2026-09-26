@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="assets/deur.js?v=60"></script>
+  <script src="assets/deur.js?v=61"></script>
   <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta name="robots" content="noindex">
@@ -21,12 +21,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=60">
-  <script src="assets/app.js?v=60" defer></script>
-  <script src="assets/config.js?v=60" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=61">
+  <script src="assets/app.js?v=61" defer></script>
+  <script src="assets/vakken.js?v=61"></script>
+  <script src="assets/config.js?v=61" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=60" defer></script>
-  <script src="assets/plan.js?v=60" defer></script>
+  <script src="assets/auth.js?v=61" defer></script>
+  <script src="assets/plan.js?v=61" defer></script>
   <style>
     .beheer-wrap { max-width: 760px; }
     .beheer-tegels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
@@ -43,8 +44,25 @@
     .beheer-lijst .aantal { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
     .beheer-lijst .aantal small { color: var(--ink-soft); font-weight: 400; }
     .beheer-status { margin: 0; color: var(--ink-soft); }
+    .beheer-sectie { margin-top: 40px; }
+    .beheer-sectie .sectie-kop { margin-bottom: 14px; }
+    .beheer-tegels.is-vijf { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    .beheer-cijfers { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+    .beheer-cijfer { padding: 14px 16px; }
+    .beheer-cijfer .getal { display: block; font-size: 1.375rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .beheer-cijfer .uitleg { display: block; margin-top: 2px; color: var(--ink-soft); font-size: .8125rem; }
+    .beheer-rijen { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+    .beheer-rijen li { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: .9375rem; }
+    .beheer-rijen li:last-child { border-bottom: 0; }
+    .beheer-rijen small { color: var(--ink-soft); font-size: .8125rem; }
+    .beheer-plan { padding: 2px 8px; border-radius: var(--pill); background: var(--surface); color: var(--ink-soft); font-size: .75rem; font-weight: 600; }
+    .beheer-plan[data-plan="plus"] { background: var(--teal-zacht); color: var(--teal-tekst); }
+    .beheer-plan[data-plan="pro"] { background: #0b0a08; color: #e6c872; }
+    .beheer-feedback li { display: block; }
+    .beheer-feedback p { margin: 4px 0 0; color: var(--ink); font-size: .9375rem; line-height: 1.5; overflow-wrap: anywhere; }
+    .beheer-leeg { margin: 0; color: var(--ink-soft); font-size: .9375rem; }
     @media (max-width: 600px) {
-      .beheer-tegels { grid-template-columns: minmax(0, 1fr); }
+      .beheer-tegels, .beheer-tegels.is-vijf { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .beheer-lijst li { grid-template-columns: 72px minmax(0, 1fr) 56px; }
     }
   </style>
@@ -74,22 +92,64 @@
     <div class="wrap beheer-wrap">
       <a class="terug tekstlink" href="hub.html" data-terug="hub.html" data-terug-tekst="Terug">← Terug</a>
       <header class="pagina-kop">
-        <h1 id="beheer-titel">Hoeveel mensen oefenen</h1>
-        <p class="pagina-sub">Alleen aantallen, nooit namen. Een dag telt mee zodra iemand minstens één minuut oefende.</p>
+        <h1 id="beheer-titel">Beheer</h1>
+        <p class="pagina-sub">Alleen voor jou. Alles als aantallen; e-mailadressen zie je afgeschermd.</p>
       </header>
 
       <p class="beheer-status" id="beheer-status" role="status">Even laden.</p>
 
       <div id="beheer-inhoud" hidden>
-        <div class="beheer-tegels">
+        <div class="beheer-tegels is-vijf">
           <div class="kaart beheer-tegel"><span class="getal" id="tegel-accounts">0</span><span class="uitleg">accounts</span></div>
+          <div class="kaart beheer-tegel"><span class="getal" id="tegel-nieuw">0</span><span class="uitleg">nieuw deze week</span></div>
           <div class="kaart beheer-tegel"><span class="getal" id="tegel-week">0</span><span class="uitleg">oefenden de laatste 7 dagen</span></div>
-          <div class="kaart beheer-tegel"><span class="getal" id="tegel-ooit">0</span><span class="uitleg">oefenden ooit</span></div>
+          <div class="kaart beheer-tegel"><span class="getal" id="tegel-plus">0</span><span class="uitleg">met Plus</span></div>
+          <div class="kaart beheer-tegel"><span class="getal" id="tegel-pro">0</span><span class="uitleg">met Pro</span></div>
         </div>
-        <section class="beheer-dagen" aria-labelledby="dagen-kop">
-          <h2 class="sectie-kop" id="dagen-kop">Per dag, laatste 30 dagen</h2>
+
+        <section class="beheer-sectie" aria-labelledby="abo-kop">
+          <h2 class="sectie-kop" id="abo-kop">Abonnementen</h2>
+          <div class="beheer-cijfers" id="beheer-abo"></div>
+        </section>
+
+        <section class="beheer-sectie" aria-labelledby="nieuwste-kop">
+          <h2 class="sectie-kop" id="nieuwste-kop">Nieuwste accounts</h2>
+          <div class="kaart"><ul class="beheer-rijen" id="beheer-nieuwste"></ul></div>
+        </section>
+
+        <section class="beheer-sectie" aria-labelledby="oefenen-kop">
+          <h2 class="sectie-kop" id="oefenen-kop">Oefenen</h2>
+          <div class="beheer-cijfers" id="beheer-oefenen"></div>
+          <div class="kaart" style="margin-top: 12px"><ul class="beheer-rijen" id="beheer-vakken"></ul></div>
+        </section>
+
+        <section class="beheer-sectie" aria-labelledby="comit-kop">
+          <h2 class="sectie-kop" id="comit-kop">Comit</h2>
+          <div class="beheer-cijfers" id="beheer-comit"></div>
+        </section>
+
+        <section class="beheer-sectie" aria-labelledby="feedback-kop">
+          <h2 class="sectie-kop" id="feedback-kop">Feedback</h2>
+          <div class="beheer-cijfers" id="beheer-feedback-cijfers"></div>
+          <div class="kaart" style="margin-top: 12px"><ul class="beheer-rijen beheer-feedback" id="beheer-feedback"></ul></div>
+        </section>
+
+        <section class="beheer-sectie" aria-labelledby="vertrek-kop">
+          <h2 class="sectie-kop" id="vertrek-kop">Waarom mensen hun account wisten</h2>
+          <div class="kaart"><ul class="beheer-rijen" id="beheer-vertrek"></ul></div>
+        </section>
+
+        <section class="beheer-sectie beheer-dagen" aria-labelledby="dagen-kop">
+          <h2 class="sectie-kop" id="dagen-kop">Oefenaars per dag, laatste 30 dagen</h2>
           <div class="kaart">
             <ul class="beheer-lijst" id="beheer-lijst"></ul>
+          </div>
+        </section>
+
+        <section class="beheer-sectie beheer-dagen" aria-labelledby="nieuw-kop">
+          <h2 class="sectie-kop" id="nieuw-kop">Nieuwe accounts per dag, laatste 14 dagen</h2>
+          <div class="kaart">
+            <ul class="beheer-lijst" id="beheer-nieuw-lijst"></ul>
           </div>
         </section>
       </div>
@@ -105,57 +165,122 @@
   </footer>
 
   <script>
+    // Beheer: beheer_overzicht (supabase/beheer-overzicht.sql) en de dagcijfers (supabase/account-en-beheer.sql). Alleen voor beheerders.
     document.addEventListener('DOMContentLoaded', async () => {
       const auth = window.BES.auth;
       const status = document.getElementById('beheer-status');
       const inhoud = document.getElementById('beheer-inhoud');
-      const lijst = document.getElementById('beheer-lijst');
-      const datum = new Intl.DateTimeFormat('nl-BE', { day: 'numeric', month: 'short' });
+      const $ = (id) => document.getElementById(id);
+      const el = (tag, klasse, tekst) => { const node = document.createElement(tag); if (klasse) node.className = klasse; if (tekst !== undefined) node.textContent = String(tekst); return node; };
+      const kort = new Intl.DateTimeFormat('nl-BE', { day: 'numeric', month: 'short' });
+      const lang = new Intl.DateTimeFormat('nl-BE', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+      const vakNaam = new Map((window.BES_VAKKEN || []).map((vak) => [vak.id, vak.naam]));
+      const redenen = { klaar: 'Klaar met de opleiding', 'gebruik-niet': 'Gebruikt het niet meer', 'te-weinig-vakken': 'Vakken staan er niet bij', 'werkt-niet': 'Iets werkt niet goed', anders: 'Een andere reden' };
+
+      const cijfers = (plek, lijst) => $(plek).replaceChildren(...lijst.map(([getal, uitleg]) => {
+        const tegel = el('div', 'kaart beheer-cijfer');
+        tegel.append(el('span', 'getal', getal ?? 0), el('span', 'uitleg', uitleg));
+        return tegel;
+      }));
+      const rijen = (plek, items, leeg) => $(plek).replaceChildren(...(items.length ? items : [el('li', 'beheer-leeg', leeg)]));
+      const balken = (plek, lijst, sleutel, label) => {
+        const max = Math.max(1, ...lijst.map((rij) => rij[sleutel]));
+        $(plek).replaceChildren(...lijst.map((rij) => {
+          const li = el('li');
+          const dag = el('span', 'dag', kort.format(new Date(rij.dag + 'T12:00:00')));
+          const balk = el('span', 'balk');
+          const vul = el('i');
+          vul.style.width = (rij[sleutel] / max * 100) + '%';
+          balk.append(vul);
+          li.append(dag, balk, el('span', 'aantal', rij[sleutel]));
+          li.setAttribute('aria-label', dag.textContent + ': ' + rij[sleutel] + ' ' + label);
+          return li;
+        }));
+      };
 
       const laad = async () => {
         await auth.gereed;
         const user = await auth.gebruiker();
         if (!user) { status.textContent = 'Log in om dit overzicht te zien.'; inhoud.hidden = true; return; }
         status.textContent = 'Even laden.';
-        const [totalen, dagen] = await Promise.all([
-          auth.client.rpc('studie_totalen'),
+        const [overzicht, dagen] = await Promise.all([
+          auth.client.rpc('beheer_overzicht'),
           auth.client.rpc('studie_dagcijfers', { p_dagen: 30 })
         ]);
-        if (totalen.error || dagen.error) {
-          status.textContent = 'Laden is niet gelukt. Staat de SQL uit supabase/account-en-beheer.sql al in het project?';
-          inhoud.hidden = true;
-          return;
-        }
-        const totaal = totalen.data?.[0];
-        if (!totaal) { status.textContent = 'Dit overzicht is alleen voor de beheerder.'; inhoud.hidden = true; return; }
-        document.getElementById('tegel-accounts').textContent = totaal.accounts;
-        document.getElementById('tegel-week').textContent = totaal.laatste_7_dagen;
-        document.getElementById('tegel-ooit').textContent = totaal.ooit_geoefend;
-        const rijen = dagen.data || [];
-        const max = Math.max(1, ...rijen.map(rij => rij.oefenaars));
-        lijst.replaceChildren(...rijen.map(rij => {
-          const li = document.createElement('li');
-          const dag = document.createElement('span');
-          dag.className = 'dag';
-          dag.textContent = datum.format(new Date(rij.dag + 'T12:00:00'));
-          const balk = document.createElement('span');
-          balk.className = 'balk';
-          const vul = document.createElement('i');
-          vul.style.width = (rij.oefenaars / max * 100) + '%';
-          balk.append(vul);
-          const aantal = document.createElement('span');
-          aantal.className = 'aantal';
-          aantal.textContent = rij.oefenaars;
-          li.append(dag, balk, aantal);
-          li.setAttribute('aria-label', `${dag.textContent}: ${rij.oefenaars} oefenaars, ${rij.leertijd_min} minuten`);
+        if (overzicht.error) { status.textContent = 'Laden is niet gelukt. Staat de SQL uit supabase/beheer-overzicht.sql al in het project?'; inhoud.hidden = true; return; }
+        const o = overzicht.data;
+        if (!o) { status.textContent = 'Dit overzicht is alleen voor de beheerder.'; inhoud.hidden = true; return; }
+
+        $('tegel-accounts').textContent = o.accounts.totaal;
+        $('tegel-nieuw').textContent = o.accounts.week;
+        $('tegel-week').textContent = o.accounts.actief_week;
+        $('tegel-plus').textContent = o.plannen.plus;
+        $('tegel-pro').textContent = o.plannen.pro;
+
+        cijfers('beheer-abo', [
+          [o.plannen.in_proef, 'in een proefmaand'],
+          [o.plannen.betaald, 'betalend'],
+          [o.plannen.opgezegd, 'opgezegd, loopt nog'],
+          [o.plannen.proeven_plus, 'proefmaanden Plus ooit'],
+          [o.plannen.proeven_pro, 'proefmaanden Pro ooit']
+        ]);
+
+        rijen('beheer-nieuwste', (o.accounts.nieuwste || []).map((rij) => {
+          const li = el('li');
+          const links = el('span', '', rij.email || 'onbekend');
+          const plan = el('span', 'beheer-plan', rij.plan === 'pro' ? 'Pro' : rij.plan === 'plus' ? 'Plus' : 'Free');
+          plan.dataset.plan = rij.plan;
+          links.append(' ', plan);
+          li.append(links, el('small', '', lang.format(new Date(rij.gemaakt))));
           return li;
-        }));
+        }), 'Nog geen accounts.');
+
+        cijfers('beheer-oefenen', [
+          [o.oefenen.sessies_week, 'rondes deze week'],
+          [o.oefenen.vragen_week, 'vragen deze week'],
+          [o.oefenen.score_week === null ? '-' : o.oefenen.score_week + '%', 'goed deze week'],
+          [o.oefenen.open_fouten, 'open fouten (Plus)'],
+          [o.oefenen.examens, 'examens ingevuld (Pro)']
+        ]);
+        rijen('beheer-vakken', (o.oefenen.top_vakken || []).map((rij) => {
+          const li = el('li');
+          li.append(el('span', '', vakNaam.get(rij.vak) || rij.vak), el('small', '', rij.sessies + (rij.sessies === 1 ? ' ronde' : ' rondes') + ' in 30 dagen'));
+          return li;
+        }), 'De laatste 30 dagen nog niet geoefend.');
+
+        cijfers('beheer-comit', [
+          [o.comit.vandaag, 'vragen vandaag'],
+          [o.comit.week, 'vragen deze week'],
+          [o.comit.mensen_week, 'mensen deze week']
+        ]);
+
+        cijfers('beheer-feedback-cijfers', [
+          [o.feedback.week, 'deze week'],
+          [o.feedback.totaal, 'in totaal']
+        ]);
+        const soorten = { fout: 'Fout in een vraag', idee: 'Idee', anders: 'Iets anders' };
+        rijen('beheer-feedback', (o.feedback.nieuwste || []).map((rij) => {
+          const li = el('li');
+          const kop = el('small', '', (soorten[rij.soort] || rij.soort) + (rij.vak ? ' · ' + (vakNaam.get(rij.vak) || rij.vak) : '') + ' · ' + lang.format(new Date(rij.gemaakt)));
+          li.append(kop, el('p', '', rij.tekst));
+          return li;
+        }), 'Nog geen feedback.');
+
+        rijen('beheer-vertrek', Object.entries(o.vertrek || {}).sort((a, b) => b[1] - a[1]).map(([reden, aantal]) => {
+          const li = el('li');
+          li.append(el('span', '', redenen[reden] || reden), el('small', '', aantal + ' keer'));
+          return li;
+        }), 'Nog niemand heeft zijn account gewist.');
+
+        if (!dagen.error) balken('beheer-lijst', dagen.data || [], 'oefenaars', 'oefenaars');
+        balken('beheer-nieuw-lijst', o.accounts.per_dag || [], 'nieuw', 'nieuwe accounts');
+
         status.textContent = '';
         inhoud.hidden = false;
       };
 
       window.addEventListener('bes:auth', laad);
-      laad();
+      laad().catch(() => { status.textContent = 'Laden is niet gelukt. Probeer het later opnieuw.'; });
     });
   </script>
 </body>

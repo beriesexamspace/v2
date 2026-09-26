@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="assets/deur.js?v=60"></script>
+  <script src="assets/deur.js?v=61"></script>
   <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta property="og:type" content="website">
@@ -31,16 +31,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=60">
-  <link rel="stylesheet" href="assets/kalender.css?v=60">
-  <script src="assets/app.js?v=60" defer></script>
-  <script src="assets/config.js?v=60" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=61">
+  <link rel="stylesheet" href="assets/kalender.css?v=61">
+  <script src="assets/app.js?v=61" defer></script>
+  <script src="assets/config.js?v=61" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=60" defer></script>
-  <script src="assets/plan.js?v=60" defer></script>
-  <script src="assets/activiteit.js?v=60" defer></script>
-  <script src="assets/vakken.js?v=60"></script>
-  <script src="assets/inzichten.js?v=60" defer></script>
+  <script src="assets/auth.js?v=61" defer></script>
+  <script src="assets/plan.js?v=61" defer></script>
+  <script src="assets/activiteit.js?v=61" defer></script>
+  <script src="assets/vakken.js?v=61"></script>
+  <script src="assets/inzichten.js?v=61" defer></script>
   <style>
     .profiel-wrap { max-width: 640px; }
     /* Bovenaan alleen foto, naam en e-mail met één knop Bewerken; de velden komen pas na die klik. */
@@ -68,6 +68,20 @@
     .abo-naam .label { margin-left: 8px; vertical-align: 3px; }
     /* Knop Beheer abonnement: rustig bij Free, in de kleur van het plan bij Plus (teal) en Pro (zwart met goud). */
     .abo-kaart .abo-knop { gap: 8px; font-weight: 600; }
+    /* Het hele blok in de kleur van je plan: Plus donker met teal, Pro zwart met goud (zoals de kaarten op Abonnement). */
+    .abo-kaart { transition: background 300ms var(--ease), border-color 300ms var(--ease); }
+    .abo-kaart[data-plan="plus"] {
+      --card: #161c24; --line: #262e39; --ink: #e7ecf1; --ink-soft: #9aa6b2; --surface: rgba(255,255,255,.07);
+      --accent: #3fb9b2; --teal-tekst: #7fd6d0; --teal-zacht: #15302e;
+      border-color: #3fb9b2; background: radial-gradient(120% 90% at 100% 0%, rgba(63,185,178,.2), transparent 60%), var(--card); color: var(--ink);
+    }
+    .abo-kaart[data-plan="pro"] {
+      --card: #0b0a08; --line: rgba(212,175,55,.34); --ink: #f4efe3; --ink-soft: #b3a88f; --surface: rgba(212,175,55,.12);
+      --accent: #d4af37; --teal-tekst: #e6c872; --teal-zacht: rgba(212,175,55,.14);
+      border-color: rgba(212,175,55,.5); background: radial-gradient(120% 90% at 100% 0%, rgba(212,175,55,.18), transparent 60%), var(--card); color: var(--ink);
+    }
+    .abo-kaart[data-plan="pro"] [data-abo-plan] { background: linear-gradient(135deg, #f7e7a1 0%, #d4af37 45%, #a8801f 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .abo-kaart[data-plan="pro"] .abo-knop[data-plan="pro"] { border-color: #d4af37; }
     .abo-knop-pijl { transition: transform 180ms var(--ease); }
     :where(html.has-hover) .abo-knop:hover .abo-knop-pijl { transform: translateX(2px); }
     .abo-kaart .abo-knop[data-plan="plus"] { border-color: #3fb9b2; background: #3fb9b2; color: #0d1117; box-shadow: 0 8px 20px rgba(63,185,178,.25); }
@@ -689,6 +703,7 @@
         const datum = p.geldig_tot ? BES.planDatum(p.geldig_tot) : '';
         $('plan').textContent = naam;
         $('knop').dataset.plan = p.plan;
+        blok.querySelector('.abo-kaart').dataset.plan = p.plan;
         const status = $('status');
         status.hidden = p.plan === 'free' || !p.status;
         status.textContent = p.status === 'opgezegd' ? 'Opgezegd' : p.status === 'proef' ? 'Proefmaand' : '';

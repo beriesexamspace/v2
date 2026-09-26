@@ -131,6 +131,7 @@
     // Foutenlijst (Plus en Pro, supabase/fouten.sql): open fouten van dit vak, als sleutels. ?fouten=1 begint meteen met oefenen.
     let openFouten = new Set();
     let foutenUitUrl = new URLSearchParams(window.location.search).get('fouten') === '1';
+    let voorJouPlan = 'free';
     let context = null;
     let authGeneration = 0;
     let mode = 'training';
@@ -235,7 +236,9 @@
       const client = BES.auth?.client;
       const plan = BES.plan ? await BES.plan() : null;
       plusOk = Boolean(plan && (plan.plan === 'plus' || plan.plan === 'pro'));
+      voorJouPlan = plan ? plan.plan : 'free';
       markeerPlus();
+      renderVoorJou();
       const owner = context?.owner;
       if (!plusOk || !owner || !client) { openFouten = new Set(); toonFoutenKnop(); return; }
       const { data: rijen, error } = await client.from('fouten').select('sleutel').eq('user_id', owner).eq('vak', data.id).eq('opgelost', false);
@@ -613,7 +616,7 @@
       const summary = [['Modus', modeLabel(mode)], ['Niveau', levelLabel(level)], ['Tijd', timed ? `${duration}, ${perQuestion}` : 'Zonder tijd'], ['Hoofdstukken', chapters]];
       byId('keuze-samenvatting').replaceChildren(...summary.flatMap(([label, value]) => [create('dt', '', label), create('dd', '', value)]));
       byId('keuze-aantal').textContent = `${countText(amount)}${mode === 'simulatie' ? ' · Uitslag en uitleg aan het einde.' : ' · Uitleg na ieder antwoord.'}`;
-      byId('simulatie-uitleg').textContent = `De simulatie kiest ${countText(amount)} uit alle beschikbare hoofdstukken op ${levelLabel(level)}. Je krijgt je uitslag en uitleg aan het einde.`;
+      byId('simulatie-uitleg').textContent = `De simulatie kiest ${countText(amount)} uit alle hoofdstukken, in ${levelLabel(level)}. Je uitslag en uitleg krijg je aan het einde.`;
     }
 
     function setMode(value) {
@@ -624,7 +627,10 @@
         button.tabIndex = button.dataset.modus === mode ? 0 : -1;
         button.classList.toggle('is-gekozen', button.dataset.modus === mode);
       });
-      byId('hoofdstuk-selectie').classList.toggle('is-gedimd', simulation);
+      // Simulatie: geen grijze lijst meer, maar een kleine balk dat alle hoofdstukken meedoen.
+      byId('hoofdstuk-selectie').hidden = simulation;
+      byId('hoofdstuk-acties').hidden = simulation;
+      byId('hoofdstukken-kop').textContent = simulation ? 'Alle hoofdstukken' : 'Kies je hoofdstukken';
       byId('simulatie-uitleg').hidden = !simulation;
       byId('kies-alles').disabled = simulation;
       byId('kies-niets').disabled = simulation;
@@ -765,6 +771,7 @@
       byId('vraag-balk').querySelector('span').style.width = `${(session.index + 1) / session.questions.length * 100}%`;
       if (training) {
         byId('uitleg-tekst').textContent = current.question.u;
+        toonHackBijFout(current);
         fade(byId('uitleg'));
         recordAnswer(current.question.h, correctAnswer(current));
       }
@@ -1002,8 +1009,114 @@
       });
     }
 
+    // Studie-hacks "Voor jou" (Plus): je zwakste hoofdstukken in dit vak (Normaal, minstens 3 vragen, onder 80 procent)
+    // met hun eigen hacks, of anders de eerste kernpunten uit de theorie. Pro: ezelsbruggetjes van Comit per hoofdstuk.
+    function renderVoorJou() {
+      const hacks = byId('hacks-inhoud');
+      if (!hacks) return;
+      byId('hack-voorjou')?.remove();
+      const blok = create('section', 'hack-voorjou kaart');
+      blok.id = 'hack-voorjou';
+      const kop = create('div', 'hack-voorjou-kop');
+      kop.append(create('h2', '', 'Voor jou'), create('span', 'label', 'Plus'));
+      blok.append(kop);
+      const plek = hacks.querySelector('.hacks-algemeen');
+      if (plek) plek.after(blok); else hacks.prepend(blok);
+      if (!plusOk) {
+        blok.classList.add('is-slot');
+        const tekst = create('p', 'kaart-sub', 'Met Plus zie je hier de hacks en kernpunten van je zwakste hoofdstukken in dit vak, zodat je weet waar je het meest wint. ');
+        const link = create('a', 'tekstlink', 'Probeer Plus een maand');
+        link.href = '../../abonnement.html';
+        tekst.append(link);
+        blok.append(tekst);
+        return;
+      }
+      const voortgang = banks.get('normaal')?.get(context?.owner ?? null)?.chapters || {};
+      const zwak = data.hoofdstukken
+        .map(chapter => { const rij = voortgang[chapter.id]; return rij && rij.laatstTotaal >= 3 ? { chapter, score: rij.laatstGoed / rij.laatstTotaal } : null; })
+        .filter(item => item && item.score < .8)
+        .sort((a, b) => a.score - b.score)
+        .slice(0, 3);
+      if (!zwak.length) {
+        blok.append(create('p', 'kaart-sub', 'Nog geen zwakke hoofdstukken in dit vak. Oefen eerst een paar hoofdstukken, dan zie je hier waar je het meest wint.'));
+        return;
+      }
+      blok.append(create('p', 'kaart-sub', 'Je zwakste hoofdstukken in dit vak, met wat je moet onthouden.'));
+      zwak.forEach(({ chapter, score }) => {
+        const punt = create('article', 'hack-voorjou-punt');
+        const titel = create('h3', '', chapter.naam);
+        titel.append(create('span', '', `${Math.round(score * 100)}% goed`));
+        punt.append(titel);
+        const lijst = create('ul');
+        const eigen = data.hacks.filter(item => item.h === chapter.id);
+        if (eigen.length) eigen.slice(0, 3).forEach(item => lijst.append(create('li', '', (item.kop ? item.kop.trim() + ': ' : '') + item.t)));
+        else (data.theorie.find(item => item.h === chapter.id)?.items || []).slice(0, 3).forEach(tekst => lijst.append(create('li', '', tekst)));
+        if (lijst.children.length) punt.append(lijst);
+        const knoppen = create('div', 'hack-voorjou-knoppen');
+        const oefen = create('button', 'knop-secundair', 'Oefen dit hoofdstuk');
+        oefen.type = 'button';
+        oefen.addEventListener('click', () => {
+          const vragen = data.vragen.filter(question => question.h === chapter.id);
+          if (!vragen.length) return;
+          selectTab(byId('tab-oefenen'));
+          if (level !== 'normaal') setLevel('normaal');
+          setMode('training');
+          start(vragen, 'training', 'normaal', 0);
+        });
+        const brug = create('button', 'knop-secundair', 'Ezelsbruggetjes van Comit');
+        brug.type = 'button';
+        if (voorJouPlan !== 'pro') brug.append(create('span', 'label gedimd', 'Pro'));
+        const uitkomst = create('p', 'hack-brug');
+        uitkomst.setAttribute('aria-live', 'polite');
+        brug.addEventListener('click', () => maakEzelsbrug(chapter, brug, uitkomst));
+        knoppen.append(oefen, brug);
+        punt.append(knoppen, uitkomst);
+        blok.append(punt);
+      });
+    }
+
+    async function maakEzelsbrug(chapter, knop, uitkomst) {
+      if (voorJouPlan !== 'pro') {
+        const link = create('a', 'tekstlink', 'Probeer Pro een maand');
+        link.href = '../../abonnement.html';
+        uitkomst.replaceChildren('Ezelsbruggetjes van Comit zitten in Pro. ', link);
+        return;
+      }
+      const client = BES.auth?.client;
+      if (!client) return;
+      knop.disabled = true;
+      uitkomst.textContent = 'Comit denkt even na.';
+      let achtergrond = '';
+      data.vragen.filter(question => question.h === chapter.id).slice(0, 5).forEach(question => {
+        const juist = Array.isArray(question.a) ? question.a.map(index => question.o[index]).join(', ') : question.o[question.a];
+        const stuk = `Vraag: ${question.q}\nJuiste antwoord: ${juist}\n\n`;
+        if (achtergrond.length + stuk.length <= 1500) achtergrond += stuk;
+      });
+      try {
+        const { data: antwoord, error } = await client.functions.invoke('comit', { body: { soort: 'ezelsbrug', vraag: `Ezelsbruggetjes voor het hoofdstuk ${chapter.naam} van ${data.naam}.`, context: achtergrond } });
+        uitkomst.textContent = !error && antwoord && antwoord.tekst ? antwoord.tekst : 'Comit kan nu even niet nadenken. Probeer het zo opnieuw.';
+      } catch {
+        uitkomst.textContent = 'Comit kan nu even niet nadenken. Probeer het zo opnieuw.';
+      }
+      knop.disabled = false;
+    }
+
+    // Plus: bij een fout antwoord in Training meteen de hack van dat hoofdstuk, als die bestaat.
+    function toonHackBijFout(entry) {
+      let regel = byId('uitleg-hack');
+      if (!regel) {
+        regel = create('p', 'uitleg-hack');
+        regel.id = 'uitleg-hack';
+        byId('uitleg-tekst').after(regel);
+      }
+      const hack = plusOk && !correctAnswer(entry) ? data.hacks.find(item => item.h === entry.question.h) : null;
+      regel.hidden = !hack;
+      if (hack) regel.textContent = `Hack: ${hack.kop ? hack.kop.trim() + '. ' : ''}${hack.t}`;
+    }
+
     function selectTab(tab, focus = false) {
       currentTab = tab.getAttribute('aria-controls');
+      if (currentTab === 'paneel-hacks') renderVoorJou();
       byId('vak-tabs').querySelectorAll('[role="tab"]').forEach(button => {
         const active = button === tab;
         button.setAttribute('aria-selected', String(active));

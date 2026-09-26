@@ -31,7 +31,7 @@ fouten.html           Foutenlijst (Plus en Pro): open fouten per vak uit de tabe
 voortgang.html        Jouw voortgang: per vak en per hoofdstuk wat je kent (tabel voortgang, hoofdstuknamen uit vak/<id>/data.js, laagste score bovenaan); staat sinds 21-09 niet meer op de hub (Berat: later bij Profiel of later), alleen via de URL bereikbaar
 privacy.html          wat we bewaren, waar, cookies, rechten en contact; gelinkt in elke voettekst en onder het aanmeldformulier
 abonnement.html       Free, Plus (2,99 euro per maand) en Pro (9,99 euro per maand, nog bezig): drie kaarten plus "Goed om te weten"; openbaar (geen deur) zodat Mollie hem kan keuren; nog nergens gelinkt, betaalknop staat uit; geen kaart staat standaard blauw, alleen de kaart onder de muis wordt blauw en komt iets naar voren; Probeer 1 maand start de proefmaand (start_proef) en stuurt naar profiel.html#abonnement, de knoppen tonen je huidige plan; Profiel toont plan, einddatum en Opzeggen (zeg_op)
-beheer.html           alleen voor de beheerder: hoeveel accounts per dag oefenden (aantallen, geen namen)
+beheer.html           alleen voor de beheerder (link Beheer in het profielmenu, via is_beheerder): accounts, nieuwste accounts (e-mail afgeschermd), abonnementen, oefenen, Comit, feedback, vertrekredenen en per dag; data uit beheer_overzicht() (supabase/beheer-overzicht.sql, uitgevoerd 26-09-2026) en studie_dagcijfers()
 404.html              nette foutpagina van GitHub Pages; gebruikt absolute paden /v2/ (bij de lancering aanpassen)
 manifest.webmanifest  naam, kleuren en iconen voor "Zet op beginscherm" (Android); Safari gebruikt de apple-touch-icon
 vak/voorbeeld/        vak-template (index.html + data.js)
@@ -73,7 +73,7 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 60), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 61), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.
@@ -385,3 +385,7 @@ Voeg het voorbeeldvak niet aan de 34 vakken toe. Het sjabloon maakt deze stap co
 ## Animaties
 
 De knoppen, kaarten, menu's, themakeuze, vakkeuzes, meldingen en bevestigingen gebruiken dezelfde rustige bewegingen met `var(--ease)`: 150 tot 300 ms, 1 tot 2 px hover en een druk-effect van .97 voor knoppen of .99 voor kaarten. Openende lagen hergebruiken `appear` en `menu-open`. Een kleine haak in `app.js` laat pas na bediening nieuwe rekenrijen, zoekresultaten, meldingen en de terugkeer naar de eerste wisstap verschijnen. Hover werkt alleen met een muis; bij minder beweging staan animaties, overgangen en verplaatsingen uit. Bestaande pagina-introducties en voortgangsbalken blijven behouden. Cachenummer: 58.
+
+## Studie-hacks en simulatie (26-09-2026)
+
+In de tab Studie-hacks staat bovenaan "Voor jou" (Plus): je drie zwakste hoofdstukken in dit vak (Normaal, minstens 3 vragen, onder 80 procent) met hun eigen hacks, of anders de eerste drie kernpunten uit de theorie, plus Oefen dit hoofdstuk en Ezelsbruggetjes van Comit (Pro, Edge Function comit met soort ezelsbrug). Zonder Plus een korte uitleg met link naar Abonnement. Met Plus verschijnt bij een fout antwoord in Training de hack van dat hoofdstuk onder de uitleg, als die bestaat. Bij Examensimulatie toont stap 4 geen hoofdstukkenlijst meer maar een balk "De simulatie kiest ... uit alle hoofdstukken, in Normaal/Hard mode". Op Profiel krijgt het hele blok Jouw abonnement de kleur van je plan.
