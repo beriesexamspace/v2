@@ -3,13 +3,13 @@
 ## Doel
 Alles rond de kennismaking met Comit moet vloeiend en netjes bewegen. Daarnaast moet iedereen bij de kennismaking weten dat Comit nog een demo is: je test hem mee en hij wordt vanaf nu alleen maar beter.
 
-## Context (stand 26-09-2026, cachenummer nu 60)
+## Context (stand 26-09-2026)
 - Lees eerst in `README.md` de kopjes Comit en Animaties.
 - Er zijn drie plekken waar iemand Comit leert kennen:
   1. **Hub** (`hub.html`): een eigen knop onder de drie jaren (`.hub-comit-knop`, met logo, "Praat met Comit" en een ondertitel).
   2. **Voorstelscherm na de welkomst** (`nieuw.html`, functie `comitVoorstellen`): een laag over bijna het hele scherm met logo, "Nieuw op Berie's Exam Space", "Hallo, ik ben Comit.", een zin uitleg en de knoppen "Praat met Comit →" en "Later".
   3. **Comit-pagina** (`comit.html`, `assets/comit.js`, `assets/comit.css`): de opening met `data-opening="eerste"` (eerste bezoek) of `"herhaal"`, met logo, begroeting woord voor woord, vier voorstellen en het invoerveld.
-- De chat zelf (denkglans, berichten die inglijden, antwoord woord voor woord) is net gebouwd en blijft zoals hij is.
+- De chat zelf (denkglans, berichten die inglijden, antwoord woord voor woord) is net gebouwd en blijft zoals hij is. Hetzelfde geldt voor de knop Geschiedenis in de kop en de eerdere gesprekken (`#comit-geschiedenis`).
 - `BES.comitLogo(grootte)` in `assets/comit.js` tekent het logo.
 
 ## Wat je bouwt
@@ -48,7 +48,7 @@ Alles rond de kennismaking met Comit moet vloeiend en netjes bewegen. Daarnaast 
 
 ## Bestanden
 - `nieuw.html` (stijl en de functie `comitVoorstellen`), `hub.html` (alleen de Comit-knop), `comit.html`, `assets/comit.css`, `assets/comit.js` (alleen de opening en de begroeting).
-- Cachenummer `?v=` in alle html-bestanden naar 61, en een korte alinea onder het kopje Comit in `README.md`.
+- Cachenummer `?v=` in alle html-bestanden één hoger dan het huidige nummer in `hub.html`, en een korte alinea onder het kopje Comit in `README.md`.
 - NIET aanraken: `assets/comit-ai.js`, `assets/comit-antwoorden.js`, de chat-animaties (denken, berichten, woord voor woord), `assets/auth.js`, `assets/deur.js`, `supabase/`. Geen bibliotheek.
 
 ## Klaar wanneer

@@ -146,6 +146,31 @@
 .comit-antwoord-knoppen { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; white-space: normal; }
 .comit-antwoord-knoppen.is-zichtbaar { animation: comit-verschijnen 180ms var(--ease) both; }
 .comit-antwoord-knoppen .comit-antwoord-knop { flex: 0 1 auto; width: auto; min-width: 0; max-width: 100%; min-height: 44px; margin: 0; padding: 10px 14px; color: var(--accent); font-size: .875rem; line-height: 1.5; text-align: center; white-space: normal; overflow-wrap: anywhere; }
+/* Geschiedenis: knop in de kop, eerdere gesprekken boven het lopende gesprek. */
+.comit-kop-knop { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin: -8px 0 -8px auto; padding: 0 14px; border: 1px solid var(--line); border-radius: var(--pill); background: var(--card); color: var(--ink-soft); font: 500 .875rem/1.2 var(--font); cursor: pointer; transition: border-color 150ms var(--ease), color 150ms var(--ease), background-color 150ms var(--ease), transform 150ms var(--ease); }
+.comit-kop-knop svg { display: block; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+:where(html.has-hover) .comit-kop-knop:hover, .comit-kop-knop[aria-expanded="true"] { border-color: var(--accent); background: var(--accent-zacht); color: var(--accent); }
+.comit-kop-knop:active { transform: scale(.97); }
+.comit-kop-knop:disabled { cursor: default; opacity: .6; }
+.comit-geschiedenis { display: flex; flex-direction: column; gap: 22px; width: 100%; margin-top: auto; padding-top: 8px; }
+.comit-geschiedenis:not([hidden]) { animation: comit-verschijnen 220ms var(--ease) both; }
+.comit-geschiedenis .comit-bericht { animation: none; }
+.comit-scroll:has(.comit-geschiedenis:not([hidden])) .comit-gesprek { margin-top: 0; }
+.comit-scroll:has(.comit-geschiedenis:not([hidden])) .comit-gesprek:not(:empty) { margin-top: 8px; border-top: 1px solid var(--line); }
+.comit-geschiedenis-kop { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 12px; }
+.comit-geschiedenis-kop h2 { margin: 0; color: var(--ink); font-size: 1.125rem; font-weight: 600; letter-spacing: -.02em; }
+.comit-geschiedenis-gesprek { display: flex; flex-direction: column; gap: 22px; }
+.comit-geschiedenis-datum { margin: 8px 0 0; color: var(--ink-soft); font-size: .8125rem; font-weight: 500; text-align: center; }
+.comit-geschiedenis-melding { margin: 0; color: var(--ink-soft); font-size: .9375rem; line-height: 1.55; }
+.comit-wis-knop { min-height: 44px; padding: 10px 0; border: 0; background: none; color: var(--ink-soft); font: 400 .875rem/1.4 var(--font); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; transition: color 150ms var(--ease), transform 150ms var(--ease); }
+:where(html.has-hover) .comit-wis-knop:hover { color: var(--fout); }
+.comit-wis-knop:active { transform: scale(.97); }
+.comit-wis-zeker { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 14px 18px; border-radius: 18px; background: var(--surface); }
+.comit-wis-zeker:not([hidden]) { animation: comit-omhoog 200ms var(--ease) both; }
+.comit-wis-zeker p { flex: 1 1 260px; margin: 0; color: var(--ink); font-size: .9375rem; line-height: 1.5; }
+.comit-wis-zeker .knop-secundair { width: auto; min-width: 0; max-width: none; margin: 0; padding: 10px 18px; font-size: .9375rem; }
+.comit-wis-zeker .tekstlink { min-height: 44px; padding: 10px 0; border: 0; background: none; font: inherit; font-size: .9375rem; cursor: pointer; }
+
 .comit-denkt { display: flex; align-items: center; min-height: 52px; }
 .comit-denk-tekst { color: var(--ink-soft); }
 
@@ -224,7 +249,10 @@
   .comit-hulpvraag { margin-top: 10px; font-size: 1rem; }
   .comit-voorstellen { grid-template-columns: minmax(0, 1fr); gap: 8px; margin-top: 24px; }
   .comit-voorstel { min-height: 48px; padding: 12px 16px; border-radius: 15px; }
-  .comit-gesprek { gap: 18px; padding-top: 16px; }
+  .comit-gesprek, .comit-geschiedenis, .comit-geschiedenis-gesprek { gap: 18px; }
+  .comit-gesprek { padding-top: 16px; }
+  .comit-kop-knop { padding: 0 12px; }
+  .comit-wis-zeker .knop-secundair { width: 100%; }
   .comit-wolk { padding: 12px 15px; }
   .comit-antwoord-knoppen { flex-direction: column; }
   .comit-antwoord-knoppen .comit-antwoord-knop { width: 100%; }

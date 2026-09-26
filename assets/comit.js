@@ -66,7 +66,18 @@
     const invoer = byId('comit-tekst');
     const verstuur = byId('comit-verstuur');
     const begroeting = byId('comit-begroeting');
-    const naam = BES.auth.naamGegevens(user).aanspreeknaam.trim();
+    const geschiedenisKnop = byId('comit-geschiedenis-knop');
+    const geschiedenis = byId('comit-geschiedenis');
+    const client = BES.auth.client;
+    // Elk bezoek is één gesprek; zo haalt Geschiedenis het lopende gesprek niet dubbel op.
+    const gesprekId = window.crypto?.randomUUID ? window.crypto.randomUUID() : (() => {
+      const b = window.crypto.getRandomValues(new Uint8Array(16));
+      b[6] = (b[6] & 15) | 64;
+      b[8] = (b[8] & 63) | 128;
+      const h = [...b].map(x => x.toString(16).padStart(2, '0')).join('');
+      return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+    })();
+    const naam =BES.auth.naamGegevens(user).aanspreeknaam.trim();
     const tekst = naam ? `Hallo, ${naam}.` : 'Hallo.';
     begroeting.setAttribute('aria-label', tekst);
     tekst.split(/\s+/).forEach((woord, index) => {
@@ -235,6 +246,37 @@
       frame = window.requestAnimationFrame(stap);
     });
 
+    // Alleen knoppen naar een pagina van deze site, ook als ze uit de geschiedenis komen.
+    const veiligeKnoppen = lijst => (Array.isArray(lijst) ? lijst : []).filter(knop => {
+      if (!knop || typeof knop.label !== 'string' || typeof knop.href !== 'string' || !knop.href.trim()) return false;
+      try {
+        const url = new URL(knop.href, window.location.href);
+        return ['http:', 'https:'].includes(url.protocol) && url.origin === window.location.origin;
+      } catch { return false; }
+    }).map(knop => ({ label: knop.label, href: knop.href }));
+
+    const knoppenBlok = lijst => {
+      const knoppen = document.createElement('span');
+      knoppen.className = 'comit-antwoord-knoppen';
+      lijst.forEach(knop => {
+        const link = document.createElement('a');
+        link.className = 'knop-secundair comit-antwoord-knop';
+        link.href = knop.href;
+        link.textContent = knop.label;
+        knoppen.append(link);
+      });
+      return knoppen;
+    };
+
+    // Geschiedenis: elk bericht gaat naar comit_berichten; alleen de student zelf kan het lezen of wissen.
+    const bewaar = (rol, inhoud, knoppen = []) => {
+      const tekst = String(inhoud || '').trim().slice(0, 4000);
+      if (!client || !tekst) return;
+      client.from('comit_berichten')
+        .insert({ gesprek: gesprekId, rol, tekst, knoppen: knoppen.length ? knoppen.slice(0, 8) : null })
+        .then(() => {}, () => {});
+    };
+
     const bericht = (inhoud, assistent = false) => {
       const rij = document.createElement('div');
       rij.className = `comit-bericht comit-bericht-${assistent ? 'assistent' : 'gebruiker'}`;
@@ -263,7 +305,7 @@
       if (!inhoud || bezig) return;
       bezig = true;
       openingKlaar();
-      volgGesprek = onderaan();
+      volgGesprek = true;
       invoer.value = '';
       pasInvoerAan();
       werkKnopBij();
@@ -271,6 +313,7 @@
       await verbergWelkom();
       gesprek.tabIndex = 0;
       bericht(inhoud);
+      bewaar('student', inhoud);
       const wolk = bericht('', true);
       wolk.classList.add('comit-denkt');
       const denkTekst = document.createElement('span');
@@ -315,22 +358,11 @@
       antwoordTekst.setAttribute('aria-hidden', 'true');
       wolk.append(antwoordTekst);
       wolk.setAttribute('aria-busy', 'false');
-      const knoppen = document.createElement('span');
-      knoppen.className = 'comit-antwoord-knoppen';
-      for (const knop of Array.isArray(antwoord.knoppen) ? antwoord.knoppen : []) {
-        if (!knop || typeof knop.label !== 'string' || typeof knop.href !== 'string' || !knop.href.trim()) continue;
-        try {
-          const url = new URL(knop.href, window.location.href);
-          if (!['http:', 'https:'].includes(url.protocol) || url.origin !== window.location.origin) continue;
-        } catch { continue; }
-        const link = document.createElement('a');
-        link.className = 'knop-secundair comit-antwoord-knop';
-        link.href = knop.href;
-        link.textContent = knop.label;
-        knoppen.append(link);
-      }
+      const geldig = veiligeKnoppen(antwoord.knoppen);
+      const knoppen = knoppenBlok(geldig);
       knoppen.hidden = true;
-      if (knoppen.childElementCount) wolk.append(knoppen);
+      if (geldig.length) wolk.append(knoppen);
+      bewaar('comit', antwoord.tekst, geldig);
       await toonAntwoord(antwoordTekst, antwoord.tekst);
       knoppen.hidden = false;
       knoppen.classList.add('is-zichtbaar');
@@ -338,6 +370,144 @@
       werkKnopBij();
       naarLaatsteBericht();
     };
+
+    // Geschiedenis: eerdere gesprekken (de laatste 200 berichten), per gesprek met datum, en alles wissen.
+    const datumTekst = moment => {
+      const dag = new Date(moment);
+      const vandaag = new Date();
+      const gisteren = new Date();
+      gisteren.setDate(vandaag.getDate() - 1);
+      const tijd = dag.toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' });
+      if (dag.toDateString() === vandaag.toDateString()) return `Vandaag, ${tijd}`;
+      if (dag.toDateString() === gisteren.toDateString()) return `Gisteren, ${tijd}`;
+      const datum = dag.toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long', ...(dag.getFullYear() !== vandaag.getFullYear() ? { year: 'numeric' } : {}) });
+      return `${datum.charAt(0).toUpperCase()}${datum.slice(1)}, ${tijd}`;
+    };
+
+    const maak = (tag, klasse, tekst) => {
+      const el = document.createElement(tag);
+      if (klasse) el.className = klasse;
+      if (tekst) el.textContent = tekst;
+      if (tag === 'button') el.type = 'button';
+      return el;
+    };
+
+    const vastBericht = (plek, rij) => {
+      const assistent = rij.rol === 'comit';
+      const regel = maak('div', `comit-bericht comit-bericht-${assistent ? 'assistent' : 'gebruiker'}`);
+      if (assistent) {
+        const logo = maak('span', 'comit-bericht-logo');
+        logo.append(BES.comitLogo(24));
+        regel.append(logo);
+      }
+      const wolk = maak('p', 'comit-wolk');
+      wolk.append(maak('span', 'comit-sr-only', assistent ? 'Comit: ' : 'Jij: '), document.createTextNode(rij.tekst));
+      const knoppen = assistent ? veiligeKnoppen(rij.knoppen) : [];
+      if (knoppen.length) wolk.append(knoppenBlok(knoppen));
+      regel.append(wolk);
+      plek.append(regel);
+    };
+
+    const zetKnop = open => {
+      geschiedenisKnop.setAttribute('aria-expanded', String(open));
+      geschiedenisKnop.querySelector('span').textContent = open ? 'Verberg geschiedenis' : 'Geschiedenis';
+    };
+
+    const wisBlok = kop => {
+      const wis = maak('button', 'comit-wis-knop', 'Wis alle gesprekken');
+      const zeker = maak('div', 'comit-wis-zeker');
+      zeker.hidden = true;
+      const vraag = maak('p', '', 'Alles wat je tot nu toe met Comit besprak, wordt gewist. Dit kan niet ongedaan gemaakt worden.');
+      const ja = maak('button', 'knop-secundair', 'Ja, wis alles');
+      const nee = maak('button', 'tekstlink', 'Nee, toch niet');
+      zeker.append(vraag, ja, nee);
+      wis.addEventListener('click', () => { zeker.hidden = false; wis.hidden = true; ja.focus(); });
+      nee.addEventListener('click', () => { zeker.hidden = true; wis.hidden = false; wis.focus(); });
+      ja.addEventListener('click', async () => {
+        ja.disabled = true;
+        let gelukt = false;
+        try {
+          const { error } = await client.from('comit_berichten').delete().eq('user_id', user.id);
+          gelukt = !error;
+        } catch {}
+        if (!gelukt) {
+          vraag.textContent = 'Wissen lukt nu niet. Probeer het zo opnieuw.';
+          ja.disabled = false;
+          return;
+        }
+        geschiedenis.querySelectorAll('.comit-geschiedenis-gesprek, .comit-geschiedenis-melding').forEach(el => el.remove());
+        zeker.remove();
+        wis.remove();
+        const klaar = maak('p', 'comit-geschiedenis-melding', 'Al je gesprekken met Comit zijn gewist.');
+        klaar.setAttribute('role', 'status');
+        geschiedenis.append(klaar);
+        geschiedenisKnop.focus();
+      });
+      kop.append(wis);
+      return zeker;
+    };
+
+    const toonGeschiedenis = async () => {
+      geschiedenisKnop.disabled = true;
+      openingKlaar();
+      await verbergWelkom();
+      let rijen = null;
+      try {
+        const { data, error } = await client.from('comit_berichten')
+          .select('gesprek,rol,tekst,knoppen,gemaakt')
+          .neq('gesprek', gesprekId)
+          .order('gemaakt', { ascending: false })
+          .limit(200);
+        if (!error) rijen = (data || []).reverse();
+      } catch {}
+      geschiedenisKnop.disabled = false;
+      const kop = maak('div', 'comit-geschiedenis-kop');
+      kop.append(maak('h2', '', 'Eerdere gesprekken'));
+      geschiedenis.replaceChildren(kop);
+      if (!rijen) {
+        geschiedenis.append(maak('p', 'comit-geschiedenis-melding', 'Je eerdere gesprekken laden lukt nu niet. Probeer het zo opnieuw.'));
+      } else if (!rijen.length) {
+        geschiedenis.append(maak('p', 'comit-geschiedenis-melding', 'Nog geen eerdere gesprekken. Wat je vanaf nu met Comit bespreekt, vind je hier terug.'));
+      } else {
+        geschiedenis.append(wisBlok(kop));
+        if (rijen.length === 200) geschiedenis.append(maak('p', 'comit-geschiedenis-melding', 'Je ziet de laatste 200 berichten.'));
+        let groep = null;
+        let huidig = null;
+        rijen.forEach(rij => {
+          if (rij.gesprek !== huidig) {
+            huidig = rij.gesprek;
+            groep = maak('section', 'comit-geschiedenis-gesprek');
+            groep.append(maak('h3', 'comit-geschiedenis-datum', datumTekst(rij.gemaakt)));
+            geschiedenis.append(groep);
+          }
+          vastBericht(groep, rij);
+        });
+      }
+      geschiedenis.hidden = false;
+      zetKnop(true);
+      const laatste = geschiedenis.querySelector('.comit-geschiedenis-gesprek:last-of-type') || geschiedenis;
+      scroller.scrollTop += laatste.getBoundingClientRect().top - scroller.getBoundingClientRect().top - 12;
+      laatsteScrollTop = scroller.scrollTop;
+      volgGesprek = onderaan();
+    };
+
+    if (client) {
+      geschiedenisKnop.hidden = false;
+      geschiedenisKnop.addEventListener('click', () => {
+        if (geschiedenisKnop.disabled) return;
+        if (geschiedenis.hidden) { toonGeschiedenis(); return; }
+        geschiedenis.hidden = true;
+        geschiedenis.replaceChildren();
+        zetKnop(false);
+        if (!gesprek.childElementCount) {
+          welkom.classList.remove('is-vertrekkend');
+          welkom.inert = false;
+          welkom.hidden = false;
+        }
+        laatsteScrollTop = scroller.scrollTop;
+        volgGesprek = onderaan();
+      });
+    }
 
     formulier.addEventListener('submit', event => {
       event.preventDefault();
