@@ -73,7 +73,7 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 57), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 58), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.
@@ -239,6 +239,8 @@ Sinds 20-09-2026 (nacht) staat hier de Apple-carrousel `BES.carrousel(element, {
 De sectie `hub.html#hoe-werkt-het` bestaat uit vier korte kaarten (Log in, Kies je jaar en vak, Kies hoofdstukken en oefenvorm, Zie je voortgang groeien) en daaronder een `details` "Volledige uitleg →" met tien tekststappen (Waar / Klik op / Daarna) met de exacte knopnamen van de site. Vaste regel: uitleg op de hub is tekst. Geen screenshots van de site in de site, geen nagemaakte muis, geen animaties in uitleg; maximaal vier kaarten zichtbaar, de rest ingeklapt. Verandert een knopnaam, pas dan ook de tekst hier aan.
 
 ## Comit
+
+Sinds 26-09-2026 toont de chat een glans over "Comit denkt na" en een zacht ademend logo; na drie seconden staat er "Nog even denken". Berichten schuiven kort binnen en antwoorden verschijnen woord voor woord, met behoud van regels en maximaal 1,5 seconde voor de volledige tekst. Antwoordknoppen verschijnen daarna. Schermlezers krijgen het antwoord als één volledige tekst. De chat volgt alleen zolang je onderaan blijft; omhoog scrollen onderbreekt het volgen. Bij minder beweging staan berichten en antwoorden meteen stil in beeld, ook als die voorkeur tijdens het antwoord verandert. De antwoordlogica blijft gelijk en het cachenummer is 58.
 
 `comit.html` is sinds 23-09-2026 de losse kennismakingspagina voor Comit, alleen bereikbaar met een account en nog nergens gelinkt. `assets/comit.js` levert het SVG-logo via `BES.comitLogo(grootte)`, haalt de aanspreeknaam op via de bestaande accountlogica en regelt de opening en het gesprek. De eerste opening duurt ongeveer twee seconden; `localStorage.bes_comit_gezien` onthoudt dit, waarna alleen de begroeting kort verschijnt. Bij minder beweging staat alles meteen stil. Er is nog geen AI-koppeling; berichten blijven alleen in de geopende pagina. De eigen stijl staat in `assets/comit.css`, met het invoerveld onderaan het zichtbare scherm, ook bij een kleiner toetsenbordvenster.
 
