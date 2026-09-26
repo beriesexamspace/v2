@@ -143,7 +143,10 @@ a:focus-visible, button:focus-visible {
   box-shadow: none;
   -webkit-backdrop-filter: saturate(100%) blur(0);
   backdrop-filter: saturate(100%) blur(0);
-  transition: border-color 220ms var(--ease), background-color 220ms var(--ease), box-shadow 220ms var(--ease);
+  /* De balk krimpt bij het scrollen vloeiend tot een zwevende pil (bewust ook top en breedte). */
+  transition: top 220ms var(--ease), width 220ms var(--ease), max-width 220ms var(--ease),
+    border-width 220ms var(--ease), border-radius 220ms var(--ease),
+    border-color 220ms var(--ease), background-color 220ms var(--ease), box-shadow 220ms var(--ease);
 }
 
 .navigation.is-zwevend, .nav-vol.is-zwevend {
@@ -964,8 +967,8 @@ html.page-fade.page-ready body { animation: page-in 250ms var(--ease) both; }
   stroke: var(--teal);
   stroke-width: 2;
   stroke-dasharray: 188.496;
-  stroke-dashoffset: 0;
-  animation: appear 200ms var(--ease) both;
+  stroke-dashoffset: 188.496;
+  animation: cirkel-tekenen 400ms var(--ease) both;
 }
 .vinkje path {
   stroke: var(--teal);
@@ -973,9 +976,12 @@ html.page-fade.page-ready body { animation: page-in 250ms var(--ease) both; }
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-dasharray: 37.487;
-  stroke-dashoffset: 0;
-  animation: appear 200ms var(--ease) 100ms both;
+  stroke-dashoffset: 37.487;
+  animation: vink-tekenen 350ms var(--ease) 400ms both;
 }
+/* Het vinkje bij Opgeslagen wordt getekend: eerst de cirkel, dan de haak. */
+@keyframes cirkel-tekenen { to { stroke-dashoffset: 0; } }
+@keyframes vink-tekenen { to { stroke-dashoffset: 0; } }
 
 .knop:not(:disabled):not([aria-disabled="true"]):active, .knop-secundair:not(:disabled):not([aria-disabled="true"]):active, .pill:not(:disabled):not([aria-disabled="true"]):active { transform: scale(.97); transition-duration: 150ms; }
 .kaart:where(a[href], button, [role="button"], [role="checkbox"], [role="radio"]):not(:disabled):not([aria-disabled="true"]):active { transform: scale(.99); transition-duration: 150ms; }
