@@ -1,6 +1,7 @@
--- Beheer-overzicht: één functie met alles wat de beheerder wil zien, alleen als aantallen.
--- E-mailadressen alleen afgeschermd (be***@gmail.com), feedbacktekst ingekort. Geeft null voor wie geen beheerder is.
--- Uitgevoerd in de SQL-editor van Supabase op 26-09-2026.
+-- Beheer-overzicht: één functie met alles wat de beheerder wil zien. Geeft null voor wie geen beheerder is.
+-- Per account (de laatste 500) naam, e-mailadres, plan en hoeveel er geoefend is, op vraag van Berat (26-09-2026);
+-- nooit Comit-gesprekken of antwoorden op vragen. Feedbacktekst ingekort.
+-- Uitgevoerd in de SQL-editor van Supabase op 26-09-2026 (daarna opnieuw met de accountgegevens).
 
 create or replace function public.beheer_overzicht()
 returns json
@@ -29,11 +30,31 @@ begin
       ),
       'nieuwste', (
         select coalesce(json_agg(json_build_object(
-          'email', regexp_replace(x.email, '^(.{2})[^@]*(@.*)$', '\1***\2'),
+          'email', x.email,
+          'naam', coalesce(
+            nullif(trim(concat_ws(' ', x.raw_user_meta_data->>'voornaam', x.raw_user_meta_data->>'achternaam')), ''),
+            nullif(trim(x.raw_user_meta_data->>'naam'), ''),
+            nullif(trim(x.raw_user_meta_data->>'full_name'), ''),
+            nullif(trim(x.raw_user_meta_data->>'name'), '')
+          ),
+          'bijnaam', nullif(trim(x.raw_user_meta_data->>'bijnaam'), ''),
           'gemaakt', x.created_at,
-          'plan', public.plan_van(x.id)
+          'laatst_ingelogd', x.last_sign_in_at,
+          'bevestigd', x.email_confirmed_at is not null,
+          'via', coalesce(x.raw_app_meta_data->>'provider', 'email'),
+          'plan', public.plan_van(x.id),
+          'plan_status', a.status,
+          'plan_tot', greatest(a.proef_tot, a.betaald_tot),
+          'rondes', (select count(*) from public.sessies s where s.user_id = x.id),
+          'vragen', (select coalesce(sum(s.totaal), 0) from public.sessies s where s.user_id = x.id),
+          'score', (select case when sum(s.totaal) > 0 then round(100.0 * sum(s.goed) / sum(s.totaal)) end from public.sessies s where s.user_id = x.id),
+          'laatst_geoefend', (select max(s.gemaakt_op) from public.sessies s where s.user_id = x.id),
+          'comit_vragen', (select coalesce(sum(c.aantal), 0) from public.comit_gebruik c where c.user_id = x.id),
+          'open_fouten', (select count(*) from public.fouten f where f.user_id = x.id and not f.opgelost),
+          'beheerder', exists (select 1 from public.beheerders b where b.user_id = x.id)
         ) order by x.created_at desc), '[]'::json)
-        from (select id, email, created_at from auth.users order by created_at desc limit 8) as x
+        from (select id, email, created_at, last_sign_in_at, email_confirmed_at, raw_user_meta_data, raw_app_meta_data from auth.users order by created_at desc limit 500) as x
+        left join public.abonnementen a on a.user_id = x.id
       )
     ),
     'plannen', json_build_object(
