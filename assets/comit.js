@@ -80,7 +80,11 @@
     const naam =BES.auth.naamGegevens(user).aanspreeknaam.trim();
     const tekst = naam ? `Hallo, ${naam}.` : 'Hallo.';
     begroeting.setAttribute('aria-label', tekst);
-    tekst.split(/\s+/).forEach((woord, index) => {
+    const begroetingsWoorden = tekst.split(/\s+/);
+    const begroetingEinde = 700 + Math.min(200, (begroetingsWoorden.length - 1) * 100);
+    pagina.style.setProperty('--comit-intro-vervolg', `${begroetingEinde}ms`);
+    begroeting.style.setProperty('--comit-woord-interval', `${Math.min(100, 200 / Math.max(1, begroetingsWoorden.length - 1))}ms`);
+    begroetingsWoorden.forEach((woord, index) => {
       const span = document.createElement('span');
       span.className = 'comit-woord';
       span.textContent = woord;
@@ -521,17 +525,19 @@
       }
     });
     pagina.querySelectorAll('.comit-voorstel').forEach(knop => knop.addEventListener('click', () => verstuurVraag(knop.textContent)));
+    await document.fonts?.ready;
     pagina.hidden = false;
+    pasInvoerAan();
+    document.body.style.setProperty('--comit-invoer-hoogte', `${formulier.getBoundingClientRect().height}px`);
     const logo = pagina.querySelector('.comit-hero-logo').getBoundingClientRect();
     const midden = (window.visualViewport?.offsetTop || 0) + (window.visualViewport?.height || window.innerHeight) / 2;
     pagina.style.setProperty('--comit-logo-start-y', `${midden - logo.top - logo.height / 2}px`);
     pagina.dataset.opening = minderBeweging.matches ? 'klaar' : gezien ? 'herhaal' : 'eerste';
-    pasInvoerAan();
     new ResizeObserver(() => {
       document.body.style.setProperty('--comit-invoer-hoogte', `${formulier.getBoundingClientRect().height}px`);
     }).observe(formulier);
     werkKnopBij();
-    if (!minderBeweging.matches) openingTimer = window.setTimeout(openingKlaar, gezien ? 300 : 2200);
+    if (!minderBeweging.matches) openingTimer = window.setTimeout(openingKlaar, gezien ? 300 : begroetingEinde + 900);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initialize, { once: true });

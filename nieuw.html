@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="assets/deur.js?v=62"></script>
+  <script src="assets/deur.js?v=63"></script>
   <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta property="og:type" content="website">
@@ -30,17 +30,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=62">
-  <link rel="stylesheet" href="assets/intro.css?v=62">
-  <script src="assets/app.js?v=62"></script>
-  <script src="assets/updates.js?v=62"></script>
-  <script src="assets/intro.js?v=62"></script>
-  <script src="assets/config.js?v=62" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=63">
+  <link rel="stylesheet" href="assets/intro.css?v=63">
+  <script src="assets/app.js?v=63"></script>
+  <script src="assets/updates.js?v=63"></script>
+  <script src="assets/intro.js?v=63"></script>
+  <script src="assets/config.js?v=63" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=62" defer></script>
-  <script src="assets/plan.js?v=62" defer></script>
-  <script src="assets/activiteit.js?v=62" defer></script>
-  <script src="assets/comit.js?v=62" defer></script>
+  <script src="assets/auth.js?v=63" defer></script>
+  <script src="assets/plan.js?v=63" defer></script>
+  <script src="assets/activiteit.js?v=63" defer></script>
+  <script src="assets/comit.js?v=63" defer></script>
   <style>
     /* Alles in één scherm: kop, de stap, en de knoppen, zonder scrollen. */
     html, body { height: 100%; overflow: hidden; }
@@ -58,14 +58,33 @@
       .nieuw-intro { padding: 0 16px; }
     }
     /* Comit stelt zich voor: een laag die bijna het hele scherm bedekt, één keer per toestel na de slideshow. */
-    .comit-voorstel { position: fixed; z-index: 50; inset: 0; display: grid; place-items: center; padding: 16px; background: rgb(0 0 0 / 45%); animation: appear 220ms var(--ease) both; }
-    .comit-voorstel-kaart { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; width: min(100%, 1060px); height: min(100%, 720px); padding: clamp(28px, 6vw, 64px); border: 1px solid var(--line); border-radius: 28px; background: var(--card); box-shadow: var(--shadow-card-hover); text-align: center; overflow: auto; animation: menu-open 250ms var(--ease) both; }
-    .comit-voorstel-logo { display: grid; place-items: center; width: 112px; height: 112px; border-radius: 32px; background: var(--accent-zacht); animation: appear 250ms var(--ease) both; }
+    .comit-voorstel { position: fixed; z-index: 50; inset: 0; display: grid; place-items: center; padding: 16px; opacity: 1; transition: opacity 200ms var(--ease); }
+    .comit-voorstel::before { content: ''; position: absolute; inset: 0; background: color-mix(in srgb, var(--ink) 45%, transparent); animation: comit-voorstel-fade 180ms var(--ease) both; }
+    html[data-theme="dark"] .comit-voorstel::before { background: color-mix(in srgb, var(--bg) 65%, transparent); }
+    .comit-voorstel.is-weg { opacity: 0; pointer-events: none; }
+    .comit-voorstel-kaart { position: relative; display: flex; flex-direction: column; align-items: center; gap: 18px; width: min(100%, 1060px); height: min(100%, 720px); padding: clamp(28px, 6vw, 64px); border: 1px solid var(--line); border-radius: 28px; background: var(--card); box-shadow: var(--shadow-card-hover); text-align: center; overflow: auto; animation: comit-voorstel-kaart-in 260ms var(--ease) 180ms both; }
+    .comit-voorstel-kaart > * { flex-shrink: 0; max-width: 100%; }
+    .comit-voorstel-logo { position: relative; display: grid; place-items: center; width: 112px; height: 112px; margin-top: auto; border-radius: 32px; background: var(--accent-zacht); animation: comit-voorstel-logo-in 300ms var(--ease) 440ms both; }
+    .comit-voorstel-logo::before { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: 0 0 32px 12px var(--teal-zacht); opacity: 0; pointer-events: none; animation: comit-voorstel-gloed 400ms var(--ease) 440ms both; }
     .comit-voorstel-logo svg { width: 64px; height: 64px; }
+    .comit-voorstel-labels { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; animation: comit-voorstel-rij-in 220ms var(--ease) 740ms both; }
     .comit-voorstel .eyebrow { margin: 0; }
-    .comit-voorstel h2 { margin: 0; font-size: clamp(2rem, 5vw, 3.25rem); line-height: 1.08; text-wrap: balance; animation: appear 250ms var(--ease) 50ms both; }
-    .comit-voorstel p.comit-voorstel-tekst { max-width: 34rem; margin: 0; color: var(--ink-soft); font-size: clamp(1rem, 1.6vw, 1.1875rem); line-height: 1.55; animation: appear 250ms var(--ease) 100ms both; }
-    .comit-voorstel-knoppen { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 8px; animation: appear 250ms var(--ease) 150ms both; }
+    .comit-voorstel h2 { margin: 0; font-size: clamp(2rem, 5vw, 3.25rem); line-height: 1.08; text-wrap: balance; animation: comit-voorstel-rij-in 220ms var(--ease) 830ms both; }
+    .comit-voorstel-uitleg { display: grid; gap: 10px; width: min(100%, 34rem); animation: comit-voorstel-rij-in 220ms var(--ease) 920ms both; }
+    .comit-voorstel p.comit-voorstel-tekst { margin: 0; color: var(--ink-soft); font-size: clamp(1rem, 1.6vw, 1.1875rem); line-height: 1.55; }
+    .comit-voorstel p.comit-voorstel-demo { font-size: clamp(.875rem, 1.4vw, 1rem); }
+    .comit-voorstel-demo a { color: var(--accent); text-underline-offset: 3px; }
+    .comit-voorstel-knoppen { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 8px; margin-bottom: auto; animation: comit-voorstel-rij-in 220ms var(--ease) 1010ms both; }
+    .comit-voorstel-knoppen a { min-height: 44px; }
+    @keyframes comit-voorstel-fade { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes comit-voorstel-kaart-in { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: scale(1); } }
+    @keyframes comit-voorstel-logo-in { from { opacity: 0; transform: scale(.8); } to { opacity: 1; transform: scale(1); } }
+    @keyframes comit-voorstel-gloed { 0%, 100% { opacity: 0; } 35% { opacity: 1; } }
+    @keyframes comit-voorstel-rij-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .comit-voorstel.is-stil, .comit-voorstel.is-stil::before, .comit-voorstel.is-stil *, .comit-voorstel.is-stil *::before { animation: none; transition: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .comit-voorstel, .comit-voorstel::before, .comit-voorstel *, .comit-voorstel *::before { animation: none; transition: none; }
+    }
     @media (max-width: 767px) {
       .comit-voorstel-knoppen { flex-direction: column; width: 100%; max-width: 320px; }
     }
@@ -138,12 +157,27 @@
         const eyebrow = document.createElement('p');
         eyebrow.className = 'eyebrow';
         eyebrow.textContent = 'Nieuw op Berie\'s Exam Space';
+        const labels = document.createElement('div');
+        labels.className = 'comit-voorstel-labels';
+        const demo = document.createElement('span');
+        demo.className = 'label';
+        demo.textContent = 'Demo';
+        labels.append(eyebrow, demo);
         const kop = document.createElement('h2');
         kop.id = 'comit-voorstel-kop';
         kop.textContent = 'Hallo, ik ben Comit.';
         const tekst = document.createElement('p');
         tekst.className = 'comit-voorstel-tekst';
         tekst.textContent = 'Je studiemaatje. Vraag me wat je nog moet oefenen, hoe je week ging, of leg me een begrip voor dat je niet snapt.';
+        const demoTekst = document.createElement('p');
+        demoTekst.className = 'comit-voorstel-tekst comit-voorstel-demo';
+        const feedback = document.createElement('a');
+        feedback.href = 'feedback.html';
+        feedback.textContent = 'Feedback';
+        demoTekst.append('Comit is nog een demo. Je test hem mee en hij wordt vanaf nu alleen maar beter. Klopt er iets niet? Laat het weten via ', feedback, '.');
+        const uitleg = document.createElement('div');
+        uitleg.className = 'comit-voorstel-uitleg';
+        uitleg.append(tekst, demoTekst);
         const knoppen = document.createElement('div');
         knoppen.className = 'comit-voorstel-knoppen';
         const praat = document.createElement('a');
@@ -155,16 +189,43 @@
         later.href = 'hub.html' + window.location.hash;
         later.textContent = 'Later';
         knoppen.append(praat, later);
-        kaart.append(logo, eyebrow, kop, tekst, knoppen);
+        kaart.append(logo, labels, kop, uitleg, knoppen);
         laag.append(kaart);
+        const minderBeweging = window.matchMedia('(prefers-reduced-motion: reduce)');
+        let bestemming = '';
+        let vertrekTimer;
+        const vertrek = () => {
+          window.clearTimeout(vertrekTimer);
+          minderBeweging.removeEventListener('change', bewegingGewijzigd);
+          window.location.assign(bestemming);
+        };
+        const bewegingGewijzigd = () => {
+          if (!minderBeweging.matches) return;
+          laag.classList.add('is-stil');
+          if (bestemming) vertrek();
+        };
+        const afsluiten = href => {
+          if (bestemming) return;
+          bestemming = href;
+          if (minderBeweging.matches || laag.classList.contains('is-stil')) { vertrek(); return; }
+          laag.classList.add('is-weg');
+          vertrekTimer = window.setTimeout(vertrek, 200);
+        };
+        minderBeweging.addEventListener('change', bewegingGewijzigd);
+        bewegingGewijzigd();
+        [praat, later].forEach(link => link.addEventListener('click', event => {
+          if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+          event.preventDefault();
+          afsluiten(link.href);
+        }));
         laag.addEventListener('keydown', (event) => {
-          if (event.key === 'Escape') { window.location.assign(later.href); return; }
+          if (event.key === 'Escape') { event.preventDefault(); afsluiten(later.href); return; }
           if (event.key !== 'Tab') return;
-          if (event.shiftKey && document.activeElement === praat) { event.preventDefault(); later.focus(); }
-          else if (!event.shiftKey && document.activeElement === later) { event.preventDefault(); praat.focus(); }
+          if (event.shiftKey && document.activeElement === feedback) { event.preventDefault(); later.focus(); }
+          else if (!event.shiftKey && document.activeElement === later) { event.preventDefault(); feedback.focus(); }
         });
         document.body.append(laag);
-        praat.focus();
+        praat.focus({ preventScroll: true });
         return true;
       };
       window.BES.stappen(document.getElementById('intro'), {
