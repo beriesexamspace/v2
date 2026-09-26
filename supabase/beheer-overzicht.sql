@@ -41,7 +41,7 @@ begin
           'gemaakt', x.created_at,
           'laatst_ingelogd', x.last_sign_in_at,
           'bevestigd', x.email_confirmed_at is not null,
-          'via', coalesce(x.raw_app_meta_data->>'provider', 'email'),
+          'via', coalesce(x.raw_app_meta_data->'providers', jsonb_build_array(coalesce(x.raw_app_meta_data->>'provider', 'email'))),
           'plan', public.plan_van(x.id),
           'plan_status', a.status,
           'plan_tot', greatest(a.proef_tot, a.betaald_tot),
