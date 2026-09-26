@@ -143,9 +143,7 @@ a:focus-visible, button:focus-visible {
   box-shadow: none;
   -webkit-backdrop-filter: saturate(100%) blur(0);
   backdrop-filter: saturate(100%) blur(0);
-  transition: top 220ms var(--ease), width 220ms var(--ease), max-width 220ms var(--ease),
-    border-width 220ms var(--ease), border-radius 220ms var(--ease),
-    background-color 220ms var(--ease), box-shadow 220ms var(--ease);
+  transition: border-color 220ms var(--ease), background-color 220ms var(--ease), box-shadow 220ms var(--ease);
 }
 
 .navigation.is-zwevend, .nav-vol.is-zwevend {
@@ -249,9 +247,11 @@ body[data-nav="vast"] :is(.navigation, .nav-vol) { transition: none; }
 }
 
 .thema-knop svg, .home-knop svg { display: block; width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-.thema-knop .thema-maan { display: none; }
-html[data-theme="dark"] .thema-knop .thema-zon { display: none; }
-html[data-theme="dark"] .thema-knop .thema-maan { display: block; }
+.thema-knop { display: inline-grid; place-items: center; }
+.thema-knop svg { grid-area: 1 / 1; transition: opacity 200ms var(--ease), transform 200ms var(--ease); }
+.thema-knop .thema-maan { opacity: 0; transform: rotate(-30deg) scale(.98); }
+html[data-theme="dark"] .thema-knop .thema-zon { opacity: 0; transform: rotate(30deg) scale(.98); }
+html[data-theme="dark"] .thema-knop .thema-maan { opacity: 1; transform: none; }
 .thema-knop.is-los { position: fixed; z-index: 20; top: 16px; right: 16px; }
 
 .account-controls { display: flex; flex: 0 0 auto; align-items: center; gap: 14px; }
@@ -635,11 +635,11 @@ h1 span { display: block; }
 
 @view-transition { navigation: auto; }
 
-::view-transition-old(root) { animation: page-out 250ms ease-out both; }
-::view-transition-new(root) { animation: page-in 250ms ease-out both; }
+::view-transition-old(root) { animation: page-out 250ms var(--ease) both; }
+::view-transition-new(root) { animation: page-in 250ms var(--ease) both; }
 
 html.page-fade body { opacity: 0; }
-html.page-fade.page-ready body { animation: page-in 250ms ease-out both; }
+html.page-fade.page-ready body { animation: page-in 250ms var(--ease) both; }
 
 @keyframes page-in {
   from { opacity: 0; }
@@ -664,7 +664,7 @@ html.page-fade.page-ready body { animation: page-in 250ms ease-out both; }
 :where(html.has-hover) .kaart:where(a[href], button, [role="button"], [role="checkbox"], [role="radio"]):not(:disabled):not([aria-disabled="true"]):hover { transform: translateY(-2px); box-shadow: var(--shadow-card-hover); }
 :where(html.has-hover) .knop:not(:disabled):not([aria-disabled="true"]):hover { background: var(--accent-dark); box-shadow: var(--shadow-primary-hover); }
 :where(html.has-hover) .knop-secundair:not(:disabled):not([aria-disabled="true"]):hover { background: var(--surface); border-color: var(--accent); box-shadow: var(--shadow-soft); }
-:where(html.has-hover) :is(.knop, .knop-secundair, .pill):not(:disabled):not([aria-disabled="true"]):hover:not(:active) { transform: translateY(-2px) scale(1.02); }
+:where(html.has-hover) :is(.knop, .knop-secundair, .pill):not(:disabled):not([aria-disabled="true"]):hover:not(:active) { transform: translateY(-2px); }
 :where(html.has-hover) .terug:hover,
 :where(html.has-hover) .terug.tekstlink:hover,
 :where(html.has-hover) .vak-pagina .vak-tekstknop.terug:hover { color: var(--ink); text-decoration: underline; }
@@ -676,7 +676,7 @@ html.page-fade.page-ready body { animation: page-in 250ms ease-out both; }
   text-decoration: none;
 }
 :where(html.has-hover) .navigation-links a:hover:not(:active),
-.navigation-links a:focus-visible:not(:active) { transform: scale(1.04); }
+.navigation-links a:focus-visible:not(:active) { transform: translateY(-1px); }
 :where(html.has-hover) .pill:not(:disabled):not([aria-disabled="true"]):hover { background: var(--accent-dark); }
 :where(html.has-hover) .primary-button:hover { box-shadow: var(--shadow-primary-hover); }
 :where(html.has-hover) .tekstlink:hover { text-decoration: underline; }
@@ -744,6 +744,7 @@ html.page-fade.page-ready body { animation: page-in 250ms ease-out both; }
     border-radius: 16px;
     background: var(--card);
     box-shadow: var(--shadow-soft);
+    animation: menu-open 200ms var(--ease);
   }
   .navigation.menu-open .navigation-links a, .nav-vol.menu-open .navigation-links a { display: flex; min-height: 44px; }
   .rooster-3 { grid-template-columns: minmax(0, 1fr); }
@@ -963,8 +964,8 @@ html.page-fade.page-ready body { animation: page-in 250ms ease-out both; }
   stroke: var(--teal);
   stroke-width: 2;
   stroke-dasharray: 188.496;
-  stroke-dashoffset: 188.496;
-  animation: cirkel-tekenen 400ms var(--ease) both;
+  stroke-dashoffset: 0;
+  animation: appear 200ms var(--ease) both;
 }
 .vinkje path {
   stroke: var(--teal);
@@ -972,18 +973,16 @@ html.page-fade.page-ready body { animation: page-in 250ms ease-out both; }
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-dasharray: 37.487;
-  stroke-dashoffset: 37.487;
-  animation: vink-tekenen 350ms var(--ease) 400ms both;
+  stroke-dashoffset: 0;
+  animation: appear 200ms var(--ease) 100ms both;
 }
-@keyframes cirkel-tekenen { to { stroke-dashoffset: 0; } }
-@keyframes vink-tekenen { to { stroke-dashoffset: 0; } }
 
-.knop:active, .knop-secundair:active, .pill:active { transform: scale(.97); transition-duration: 80ms; }
-.kaart:where(a[href], button, [role="button"], [role="checkbox"], [role="radio"]):not(:disabled):not([aria-disabled="true"]):active { transform: translateY(0) scale(.99); transition-duration: 80ms; }
+.knop:not(:disabled):not([aria-disabled="true"]):active, .knop-secundair:not(:disabled):not([aria-disabled="true"]):active, .pill:not(:disabled):not([aria-disabled="true"]):active { transform: scale(.97); transition-duration: 150ms; }
+.kaart:where(a[href], button, [role="button"], [role="checkbox"], [role="radio"]):not(:disabled):not([aria-disabled="true"]):active { transform: scale(.99); transition-duration: 150ms; }
 .kaart:where(a[href], button, [role="button"]):active .pijl { transform: scale(.99); }
 
 .vak-pagina :is(.vak-tab, .optie, [role="checkbox"], [role="radio"]) {
-  transition: background-color 150ms var(--ease), border-color 150ms var(--ease), transform 150ms var(--ease), box-shadow 150ms var(--ease);
+  transition: color 150ms var(--ease), background-color 150ms var(--ease), border-color 150ms var(--ease), transform 150ms var(--ease), box-shadow 150ms var(--ease);
 }
 
 :where(html.has-hover) .vak-pagina :is(.vak-tab, .optie, [role="checkbox"], [role="radio"]):not(:disabled):not([aria-disabled="true"]):not([aria-selected="true"]):not([aria-checked="true"]):not(.is-gekozen, .is-goed, .is-fout):hover {
@@ -995,14 +994,15 @@ html.page-fade.page-ready body { animation: page-in 250ms ease-out both; }
     background: var(--accent-zacht);
   }
 
-.vak-pagina :is(.vak-tab, .optie, [role="checkbox"], [role="radio"]):not(:disabled):not([aria-disabled="true"]):active { transform: scale(.98); }
+.vak-pagina .vak-tab:not(:disabled):active { transform: scale(.97); }
+.vak-pagina :is(.optie, [role="checkbox"], [role="radio"]):not(:disabled):not([aria-disabled="true"]):active { transform: scale(.99); }
 .knop:disabled, .knop[aria-disabled="true"] { opacity: .45; transform: none; box-shadow: var(--shadow-primary); cursor: default; }
 
 :where(a[href], button, summary, [role="button"], [role="tab"], [role="checkbox"], [role="radio"]) {
   transition: color 150ms var(--ease), background-color 150ms var(--ease), border-color 150ms var(--ease), box-shadow 150ms var(--ease), transform 150ms var(--ease), opacity 150ms var(--ease);
   touch-action: manipulation;
 }
-:where(a[href], button, summary, [role="button"], [role="tab"], [role="checkbox"], [role="radio"]):not(:disabled):not([aria-disabled="true"]):active { opacity: .8; }
+:where(a[href], button, summary, [role="button"], [role="tab"], [role="checkbox"], [role="radio"]):not(:disabled):not([aria-disabled="true"]):active { opacity: .8; transform: scale(.97); }
 :is(.menu-toggle, .auth-toggle, .thema-knop, .home-knop, .profiel-knop):not(:disabled):not([aria-disabled="true"]):active { transform: scale(.97); }
 :is(input, textarea, select) {
   accent-color: var(--accent);
@@ -1035,14 +1035,14 @@ summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 
 /* Getekende muisaanwijzer, overgenomen uit Helder (style.css) */
 html.ball-cursor,html.ball-cursor body,html.ball-cursor body *,html.ball-cursor dialog::backdrop{cursor:none!important}
-.cursor-dot[popover]{position:fixed;inset:auto;margin:0;padding:0;width:14px;height:14px;min-width:0;min-height:0;border:1px solid var(--cursor-border);border-radius:50%;background:var(--cursor-bg);box-shadow:0 1px 4px var(--cursor-shadow-color);transform:translate(-50%,-50%);pointer-events:none!important;user-select:none;overflow:visible;transition:width 170ms var(--motion-ease),height 170ms var(--motion-ease),background-color 170ms ease,border-color 170ms ease,box-shadow 170ms ease}
-.cursor-dot[popover].over-control{width:16px;height:16px;background:var(--cursor-hover-bg);border-color:var(--cursor-hover-border);box-shadow:0 1px 4px var(--cursor-shadow-hover-color)}
+.cursor-dot[popover]{position:fixed;inset:auto;margin:0;padding:0;width:14px;height:14px;min-width:0;min-height:0;border:1px solid var(--cursor-border);border-radius:50%;background:var(--cursor-bg);box-shadow:0 1px 4px var(--cursor-shadow-color);transform:translate(-50%,-50%);pointer-events:none!important;user-select:none;overflow:visible;transition:transform 170ms var(--ease),background-color 170ms var(--ease),border-color 170ms var(--ease),box-shadow 170ms var(--ease)}
+.cursor-dot[popover].over-control{transform:translate(-50%,-50%) scale(1.14);background:var(--cursor-hover-bg);border-color:var(--cursor-hover-border);box-shadow:0 1px 4px var(--cursor-shadow-hover-color)}
 .cursor-dot[popover].over-control::before{content:none}
-.cursor-dot[popover].is-pressed{width:12px;height:12px;background:var(--cursor-pressed-bg);border-color:var(--cursor-pressed-border);transition-duration:80ms}
-.cursor-dot[popover].is-releasing{animation:cursor-release 240ms cubic-bezier(.22,1,.36,1)}
+.cursor-dot[popover].is-pressed{transform:translate(-50%,-50%) scale(.86);background:var(--cursor-pressed-bg);border-color:var(--cursor-pressed-border);transition-duration:150ms}
+.cursor-dot[popover].is-releasing{animation:cursor-release 240ms var(--ease)}
 .cursor-dot::after{content:'';position:absolute;inset:-6px;border:1px solid var(--cursor-ring);border-radius:50%;opacity:0;pointer-events:none}
-.cursor-dot.is-releasing::after{animation:cursor-ring 280ms ease-out}
-@keyframes cursor-release{0%{transform:translate(-50%,-50%) scale(.82)}65%{transform:translate(-50%,-50%) scale(1.08)}100%{transform:translate(-50%,-50%) scale(1)}}
+.cursor-dot.is-releasing::after{animation:cursor-ring 280ms var(--ease)}
+@keyframes cursor-release{from{transform:translate(-50%,-50%) scale(.86)}to{transform:translate(-50%,-50%) scale(1)}}
 @keyframes cursor-ring{from{opacity:.55;transform:scale(.65)}to{opacity:0;transform:scale(1.5)}}
 .cursor-dot::backdrop{background:none;pointer-events:none}
 @media(prefers-reduced-motion:reduce){.cursor-dot[popover]{transition:none}}
@@ -1062,3 +1062,23 @@ html.deur-check body { visibility: hidden; }
 :where(.tekstlink)::after { content: ''; position: absolute; inset: -11px -4px; }
 :where(.vak-tekstknop)::after { content: ''; position: absolute; inset: 0 -6px; }
 :where(.carrousel-stip)::after { content: ''; position: absolute; inset: 0 -5px; }
+
+/* Gedeelde interacties: bestaande tokens en animaties, zonder extra beweging bij paginalaad. */
+.tekstlink { transition: color 180ms var(--ease), opacity 180ms var(--ease), transform 180ms var(--ease); }
+:where(a[href], button, summary, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  box-shadow: 0 0 0 3px var(--accent-zacht);
+}
+details[open] > :not(summary) { animation: menu-open 200ms var(--ease); }
+:is(.auth-error, .account-fout, .ab-melding, .abo-melding, .ep-melding, .profiel-email-status, .profiel-opgeslagen, .feedback-verstuurd):not(:empty):not([hidden]) { animation: appear 200ms var(--ease); }
+:is(.auth-success, .feedback-bedankt, #profiel-bevestiging):not([hidden]) { animation: menu-open 200ms var(--ease); }
+/* Kleine bestaande knoppen houden hun uiterlijk; het onzichtbare tikvlak vult aan tot 44 px. */
+:where(.login-button, .profiel-knop, .stap-overslaan, .stap-vorige, .delbtn, .profiel-menu-uitloggen) { position: relative; }
+:where(.login-button, .profiel-knop, .stap-overslaan, .stap-vorige, .delbtn)::after { content: ''; position: absolute; inset: -8px 0; }
+@media (prefers-reduced-motion: reduce) {
+  :is(a[href], button, summary, [role="button"], [role="tab"], [role="checkbox"], [role="radio"], .wissen-reden):is(:hover, :active, :focus-visible),
+  :is(.jaar-pijl, .abo-knop-pijl, .thema-knop svg) { transform: none !important; }
+  .cursor-dot[popover]:is(.over-control, .is-pressed, .is-releasing) { transform: translate(-50%, -50%); animation: none !important; }
+  .cursor-dot.is-releasing::after { animation: none !important; }
+}

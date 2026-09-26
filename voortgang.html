@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="assets/deur.js?v=58"></script>
+  <script src="assets/deur.js?v=59"></script>
   <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta name="robots" content="noindex">
@@ -21,14 +21,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=58">
-  <script src="assets/app.js?v=58" defer></script>
-  <script src="assets/vakken.js?v=58"></script>
-  <script src="assets/config.js?v=58" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=59">
+  <script src="assets/app.js?v=59" defer></script>
+  <script src="assets/vakken.js?v=59"></script>
+  <script src="assets/config.js?v=59" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=58" defer></script>
-  <script src="assets/plan.js?v=58" defer></script>
-  <script src="assets/activiteit.js?v=58" defer></script>
+  <script src="assets/auth.js?v=59" defer></script>
+  <script src="assets/plan.js?v=59" defer></script>
+  <script src="assets/activiteit.js?v=59" defer></script>
   <style>
     .vg-wrap { max-width: 860px; }
     .vg-status { margin: 0 0 16px; color: var(--ink-soft); }
@@ -73,7 +73,7 @@
     .vg-procent { flex: 0 0 auto; font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
     .vg-procent.is-goed { color: var(--teal-tekst); }
     .vg-balk { height: 10px; margin-top: 14px; border-radius: 5px; background: var(--surface); overflow: hidden; }
-    .vg-balk i { display: block; height: 100%; border-radius: inherit; background: var(--accent); transition: width 600ms var(--ease); }
+    .vg-balk i { display: block; height: 100%; border-radius: inherit; background: var(--accent); transition: width 300ms var(--ease), background-color 200ms var(--ease); }
     .vg-balk i.is-goed { background: var(--teal); }
     .vg-regel { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin-top: 10px; color: var(--ink-soft); font-size: .875rem; }
     .vg-regel a { color: var(--accent); font-weight: 500; text-decoration: none; }
@@ -204,7 +204,7 @@
       const laadVak = id => new Promise(resolve => {
         if (gegevens[id]) { resolve(gegevens[id]); return; }
         const script = document.createElement('script');
-        script.src = `vak/${id}/data.js?v=58`;
+        script.src = `vak/${id}/data.js?v=59`;
         script.onload = () => { gegevens[id] = window.BES_VAK && window.BES_VAK.id === id ? window.BES_VAK : null; resolve(gegevens[id]); };
         script.onerror = () => resolve(null);
         document.head.append(script);
