@@ -62,18 +62,28 @@
     .beheer-feedback p { margin: 4px 0 0; color: var(--ink); font-size: .9375rem; line-height: 1.5; overflow-wrap: anywhere; }
     .beheer-leeg { margin: 0; color: var(--ink-soft); font-size: .9375rem; }
     .beheer-verborgen { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-    .beheer-zoek { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-bottom: 12px; }
-    .beheer-zoek input { flex: 1 1 260px; min-width: 0; min-height: 44px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--input-bg); color: var(--ink); font: inherit; font-size: 1.0625rem; transition: border-color 150ms var(--ease), box-shadow 150ms var(--ease); }
+    .beheer-zoek { position: sticky; z-index: 5; top: 68px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin: 0 -4px 12px; padding: 8px 4px; background: var(--bg); }
+    .beheer-zoek-veld { position: relative; flex: 1 1 100%; display: flex; }
+    .beheer-zoek-veld svg { position: absolute; top: 50%; left: 16px; width: 20px; height: 20px; translate: 0 -50%; fill: none; stroke: var(--ink-soft); stroke-width: 2; stroke-linecap: round; pointer-events: none; }
+    .beheer-zoek input { flex: 1 1 auto; min-width: 0; min-height: 52px; padding: 12px 16px 12px 46px; border: 1px solid var(--line); border-radius: var(--pill); background: var(--input-bg); color: var(--ink); font: inherit; font-size: 1.0625rem; transition: border-color 150ms var(--ease), box-shadow 150ms var(--ease); }
     .beheer-zoek input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-zacht); }
     .beheer-zoek small { color: var(--ink-soft); font-size: .8125rem; font-variant-numeric: tabular-nums; }
-    .beheer-rijen li.beheer-account { display: block; padding: 16px 0; }
-    .beheer-account-kop { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
-    .beheer-account-naam { font-weight: 600; overflow-wrap: anywhere; }
-    .beheer-account-kop small { margin-left: auto; }
-    .beheer-account-mail { position: relative; display: inline-block; margin-top: 2px; color: var(--accent); font-size: .9375rem; overflow-wrap: anywhere; text-decoration: none; }
+    .beheer-accounts { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+    .beheer-accounts .beheer-leeg { padding: 8px 0; }
+    .beheer-geen { margin: 8px 0 0; color: var(--ink-soft); font-size: .9375rem; }
+    .beheer-account { padding: 18px 20px; }
+    .beheer-account[hidden] { display: none; }
+    .beheer-account-kop { display: flex; align-items: center; gap: 12px; }
+    .beheer-account-letter { display: grid; flex: 0 0 44px; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--surface); color: var(--ink-soft); font-size: 1.125rem; font-weight: 700; }
+    .beheer-account[data-plan="plus"] .beheer-account-letter { background: var(--teal-zacht); color: var(--teal-tekst); }
+    .beheer-account[data-plan="pro"] .beheer-account-letter { background: #0b0a08; color: #e6c872; }
+    .beheer-account-wie { display: grid; flex: 1 1 auto; gap: 2px; min-width: 0; }
+    .beheer-account-naam { font-size: 1.0625rem; font-weight: 600; line-height: 1.3; overflow-wrap: anywhere; }
+    .beheer-account-labels { display: flex; flex-wrap: wrap; align-self: flex-start; justify-content: flex-end; gap: 6px; }
+    .beheer-account-mail { position: relative; justify-self: start; margin-top: 0; color: var(--accent); font-size: .9375rem; overflow-wrap: anywhere; text-decoration: none; }
     .beheer-account-mail::after { content: ''; position: absolute; inset: -11px -4px; }
     :where(html.has-hover) .beheer-account-mail:hover { text-decoration: underline; }
-    .beheer-account-gegevens { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px 16px; margin: 12px 0 0; }
+    .beheer-account-gegevens { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px 16px; margin: 16px 0 0; padding-top: 14px; border-top: 1px solid var(--line); }
     .beheer-account-gegevens div { min-width: 0; }
     .beheer-account-gegevens dt { color: var(--ink-soft); font-size: .75rem; }
     .beheer-account-gegevens dd { margin: 2px 0 0; font-size: .875rem; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
@@ -131,12 +141,16 @@
 
         <section class="beheer-sectie" aria-labelledby="nieuwste-kop">
           <h2 class="sectie-kop" id="nieuwste-kop">Accounts, nieuwste eerst</h2>
-          <div class="beheer-zoek">
+          <div class="beheer-zoek" role="search">
             <label class="beheer-verborgen" for="beheer-zoek">Zoek een account</label>
-            <input id="beheer-zoek" type="search" placeholder="Zoek op naam of e-mail" autocomplete="off">
+            <div class="beheer-zoek-veld">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+              <input id="beheer-zoek" type="search" placeholder="Zoek op naam of e-mail" autocomplete="off" spellcheck="false">
+            </div>
             <small id="beheer-zoek-aantal" aria-live="polite"></small>
           </div>
-          <div class="kaart"><ul class="beheer-rijen" id="beheer-nieuwste"></ul></div>
+          <ul class="beheer-accounts" id="beheer-nieuwste"></ul>
+          <p class="beheer-geen" id="beheer-geen" hidden>Niemand gevonden met die naam of dat e-mailadres.</p>
         </section>
 
         <section class="beheer-sectie" aria-labelledby="oefenen-kop">
@@ -227,6 +241,7 @@
         const term = zoek.value.trim().toLowerCase();
         let zichtbaar = 0;
         accounts.forEach((li) => { li.hidden = Boolean(term) && !li.dataset.zoek.includes(term); if (!li.hidden) zichtbaar += 1; });
+        $('beheer-geen').hidden = !term || zichtbaar > 0;
         const afgekapt = totaalAccounts > accounts.length ? ' (de ' + accounts.length + ' nieuwste van ' + totaalAccounts + ')' : '';
         $('beheer-zoek-aantal').textContent = (term ? zichtbaar + ' van ' + accounts.length : accounts.length + (accounts.length === 1 ? ' account' : ' accounts')) + afgekapt;
       };
@@ -269,21 +284,28 @@
         };
         const inlogNamen = { google: 'Google', email: 'E-mail en wachtwoord' };
         accounts = (o.accounts.nieuwste || []).map((rij) => {
-          const li = el('li', 'beheer-account');
+          const li = el('li', 'kaart beheer-account');
+          li.dataset.plan = rij.plan;
           li.dataset.zoek = [rij.naam, rij.bijnaam, rij.email].filter(Boolean).join(' ').toLowerCase();
+          const naam = (rij.naam || 'Geen naam') + (rij.bijnaam ? ' (' + rij.bijnaam + ')' : '');
           const kop = el('div', 'beheer-account-kop');
-          kop.append(el('span', 'beheer-account-naam', (rij.naam || 'Geen naam') + (rij.bijnaam ? ' (' + rij.bijnaam + ')' : '')));
-          const plan = el('span', 'beheer-plan', planNaam(rij.plan));
-          plan.dataset.plan = rij.plan;
-          kop.append(plan);
-          if (rij.beheerder) kop.append(el('span', 'beheer-plan is-beheerder', 'Beheerder'));
-          kop.append(el('small', '', 'Sinds ' + kort.format(new Date(rij.gemaakt))));
-          li.append(kop);
+          const letter = el('span', 'beheer-account-letter', ((rij.naam || rij.email || '?').trim().charAt(0) || '?').toUpperCase());
+          letter.setAttribute('aria-hidden', 'true');
+          const wie = el('div', 'beheer-account-wie');
+          wie.append(el('span', 'beheer-account-naam', naam));
           if (rij.email) {
             const mail = el('a', 'beheer-account-mail', rij.email);
             mail.href = 'mailto:' + rij.email;
-            li.append(mail);
+            wie.append(mail);
           }
+          const labels = el('div', 'beheer-account-labels');
+          const plan = el('span', 'beheer-plan', planNaam(rij.plan));
+          plan.dataset.plan = rij.plan;
+          labels.append(plan);
+          const benJij = Boolean(rij.email && user.email && rij.email.toLowerCase() === user.email.toLowerCase());
+          if (benJij || rij.beheerder) labels.append(el('span', 'beheer-plan is-beheerder', benJij ? 'Jij' : 'Beheerder'));
+          kop.append(letter, wie, labels);
+          li.append(kop);
           const gegevens = el('dl', 'beheer-account-gegevens');
           [
             ['Account gemaakt', lang.format(new Date(rij.gemaakt))],
