@@ -16,6 +16,17 @@ begin
   if eigenaar is null then
     raise exception 'Niet ingelogd' using errcode = '42501';
   end if;
+  -- Boekfoto's eerst via de Storage API wissen, inclusief losse uploads en
+  -- foto's van eerder door beheer verwijderde advertenties. Een SQL DELETE
+  -- wist alleen metadata, niet het bestand in de onderliggende opslag:
+  -- https://supabase.com/docs/guides/storage/schema/design
+  -- Vereist de voorbereidende Storage-opruiming op account-wissen.html.
+  if exists (
+    select 1 from storage.objects
+    where bucket_id = 'boekfotos' and (storage.foldername(name))[1] = eigenaar::text
+  ) then
+    raise exception 'Wis eerst je boekfoto''s en probeer opnieuw.' using errcode = '23514';
+  end if;
   delete from storage.objects
     where bucket_id = 'avatars'
       and (owner = eigenaar or name = eigenaar::text || '.jpg' or name like eigenaar::text || '/%');

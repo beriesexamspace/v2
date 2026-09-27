@@ -73,7 +73,7 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 64), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 65), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.
@@ -85,6 +85,12 @@ Elke regel in `assets/updates.js` heeft `soort: 'nieuw'` of `soort: 'verbeterd'`
 In `assets/updates.js` mogen korte belangrijke stukjes in `tekst` tussen `**dubbele sterretjes**` staan. Ze verschijnen als vetgedrukte tekst op de hub en het updatescherm. De rest blijft gewone tekst; HTML wordt niet uitgevoerd. Gebruik nadruk voor de naam van een veranderd onderdeel, niet voor hele alinea's.
 
 Hover volgt de werkelijk gebruikte invoer via `html.has-hover`: muisbewegingen schakelen de effecten in, aanraken schakelt ze uit. Dit werkt ook in ingebouwde browsers die geen hovermogelijkheid melden. Knoppen bewegen maximaal 2 px met een kleine vergroting; bij verminderde beweging blijven alleen kleur en schaduw veranderen.
+
+## Verkoop je boeken
+
+`boeken.html` is bereikbaar via de hub en gebruikt voor alle ingelogde accounts de bestaande client. Studenten zoeken op titel of vak, filteren per jaar, plaatsen een boek met maximaal drie verkleinde foto's en nemen via WhatsApp contact op. Bij Mijn boeken kunnen ze de prijs wijzigen, verlengen, als verkocht markeren en hun advertentie met foto's wissen. Meldingen verschijnen met aantallen en een bevestigde wisactie in Beheer. Nummers komen uit Supabase, worden nooit lokaal opgeslagen en verdwijnen bij uitloggen uit de pagina. Sociologie bevat geen hoofdstuk h17 of bijbehorende vragen meer; h18 en h19 zijn behouden.
+
+De SQL is alleen voorbereid, niet uitgevoerd. Na het oplossen van de open punten in de PR is de volgorde: `supabase/boeken.sql`, `supabase/account-en-beheer.sql`, `supabase/beheer-overzicht.sql`. De fotokeuze is nog open: de opdracht noemt een openbare bucket, terwijl de privacytekst toegang beperkt tot ingelogde studenten. De bucket staat voorlopig privaat; de pagina gebruikt nog de voorgeschreven openbare foto-URL's. Ook accountwissen moet eerst echte boekbestanden via de Storage API opruimen; de SQL blokkeert wissen zolang die bestanden bestaan. De benodigde aanvulling in `account-wissen.html` valt buiten de toegestane bestanden en wacht op akkoord. Deze versie is daarom nog niet klaar voor ingebruikname. Beheer wist de advertentie en meldingen, maar laat de fotobestanden in de map van de verkoper tot diens accountopruiming. Cache 65.
 
 ## De deur: inloggen verplicht
 
