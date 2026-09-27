@@ -63,6 +63,7 @@
   <link rel="stylesheet" href="assets/intro.css?v=64">
   <script src="assets/app.js?v=64"></script>
   <script src="assets/intro.js?v=64"></script>
+  <script src="assets/vakken.js?v=64"></script>
   <script src="assets/config.js?v=64" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
   <script src="assets/auth.js?v=64" defer></script>
@@ -124,6 +125,9 @@
     :where(html.has-hover) a.kaart.jaar[data-jaar]:not([aria-disabled="true"]):active { transform: scale(.99); }
 
     .hub-sectie { scroll-margin-top: 88px; }
+    .hub-verder { margin-bottom: 24px; }
+    .hub-verder .kaart { min-height: 44px; padding: 20px 24px; }
+    .hub-verder-label { color: var(--accent); font-size: .8125rem; font-weight: 600; }
     .kaart-binnenkort { cursor: default; opacity: .8; }
     /* Comit: een eigen knop in het midden onder de drie jaren, met een rand in teal naar blauw. */
     .hub-comit { display: flex; justify-content: center; margin-top: 28px; }
@@ -224,7 +228,18 @@
         <p id="hub-vraag">In welk jaar zit je?</p>
       </header>
 
-      <section class="rijst" aria-label="Kies je jaar">
+      <div class="hub-verder" id="hub-verder" hidden>
+        <a class="kaart kaart-pijl" id="hub-verder-link">
+          <span class="kaart-tekst">
+            <span class="hub-verder-label">Verder oefenen</span>
+            <span class="kaart-titel" id="hub-verder-vak"></span>
+            <span class="kaart-sub" id="hub-verder-sub">Kies je oefenvorm en hoofdstukken.</span>
+          </span>
+          <span class="pijl" aria-hidden="true">→</span>
+        </a>
+      </div>
+
+      <section class="rijst hub-sectie" id="kies-je-jaar" aria-label="Kies je jaar">
         <div class="rooster-3">
           <a class="kaart jaar" href="jaar-1ba.html" data-jaar="1ba">
             <span class="jaar-band">
@@ -358,6 +373,75 @@
       };
       updateBegroeting();
       window.addEventListener('bes:auth', event => updateBegroeting(event.detail?.user));
+
+      const verder = document.getElementById('hub-verder');
+      const verderLink = document.getElementById('hub-verder-link');
+      const verderVak = document.getElementById('hub-verder-vak');
+      const verderSub = document.getElementById('hub-verder-sub');
+      const verderVakken = (bes.vakken || []).filter(vak => vak.v2 === true);
+      let verderEigenaar = null;
+      let verderGeneratie = 0;
+      let verderSessieVak = null;
+      let verderSessieOpgevraagd = false;
+      let authOntvangen = false;
+      const lokaalVerderVak = () => {
+        try {
+          const laatstGeoefend = JSON.parse(window.localStorage.getItem('bes_laatst_geoefend_' + verderEigenaar));
+          return verderVakken.find(vak => vak.id === laatstGeoefend?.vak) || null;
+        } catch { return null; }
+      };
+      const laadVerderSessie = async () => {
+        const client = bes.auth?.client;
+        if (!verderEigenaar || !client || verderSessieOpgevraagd || !verderVakken.length) return;
+        const eigenaar = verderEigenaar;
+        const generatie = verderGeneratie;
+        verderSessieOpgevraagd = true;
+        try {
+          const { data: sessies, error } = await client.from('sessies').select('vak')
+            .eq('user_id', eigenaar).in('vak', verderVakken.map(vak => vak.id))
+            .order('gemaakt_op', { ascending: false }).limit(1);
+          if (generatie !== verderGeneratie || eigenaar !== verderEigenaar) return;
+          if (!error) verderSessieVak = verderVakken.find(vak => vak.id === sessies?.[0]?.vak) || null;
+        } catch {}
+        if (generatie === verderGeneratie && eigenaar === verderEigenaar) updateVerderOefenen();
+      };
+      const updateVerderOefenen = () => {
+        verder.hidden = true;
+        verderLink.removeAttribute('href');
+        verderVak.textContent = '';
+        verderSub.textContent = '';
+        if (!verderEigenaar) return;
+        // Een net gestarte ronde op dit toestel gaat altijd voor de opgehaalde geschiedenis.
+        const vak = lokaalVerderVak() || verderSessieVak;
+        verderVak.textContent = vak ? vak.naam : 'Kies een vak';
+        verderSub.textContent = vak ? 'Kies je oefenvorm en hoofdstukken.' : 'Ga naar je jaar en kies een vak om te oefenen.';
+        verderLink.href = vak ? 'vak/' + vak.id + '/' : '#kies-je-jaar';
+        verder.hidden = false;
+        if (!vak) laadVerderSessie();
+      };
+      const verderVoorGebruiker = user => {
+        const eigenaar = typeof user?.id === 'string' && user.id ? user.id : null;
+        if (eigenaar !== verderEigenaar) {
+          verderEigenaar = eigenaar;
+          verderGeneratie += 1;
+          verderSessieVak = null;
+          verderSessieOpgevraagd = false;
+        }
+        updateVerderOefenen();
+      };
+      window.addEventListener('bes:auth', event => {
+        authOntvangen = true;
+        verderVoorGebruiker(event.detail?.uitloggen ? null : event.detail?.user);
+      });
+      document.addEventListener('DOMContentLoaded', () => {
+        Promise.resolve(bes.auth?.gebruiker?.()).then(user => {
+          if (!authOntvangen) verderVoorGebruiker(user);
+        }).catch(() => {});
+      }, { once: true });
+      window.addEventListener('storage', event => {
+        if (event.key === null || event.key === 'bes_laatst_geoefend_' + verderEigenaar) updateVerderOefenen();
+      });
+      window.addEventListener('pageshow', updateVerderOefenen);
 
       const kaarten = Array.from(document.querySelectorAll('.jaar[data-jaar]'));
       const laatst = typeof bes.jaarOphalen === 'function' ? bes.jaarOphalen() : null;

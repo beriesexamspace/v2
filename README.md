@@ -172,7 +172,11 @@ Sinds 22-09-2026 is account wissen een eigen pagina, `account-wissen.html` (acht
 
 ## Feedback
 
-De menulink "Feedback" op elke pagina opent `feedback.html`. Alleen ingelogde gebruikers kunnen sturen; het bericht gaat met naam, e-mailadres, soort (fout, idee, anders), gekozen vak en tekst naar de tabel `feedback`. Je leest de berichten in Supabase onder Table Editor. Een link naar de pagina mag `?vak=<id>` en `?vraag=<nummer>` meegeven om het vak en het vraagnummer vooraf in te vullen (bedoeld voor een latere knop per vraag).
+Sinds 27-09-2026 staat bij elke oefenvraag en bij de vragen in de simulatie-uitslag Meld een fout. De melding opent in een dialoog op dezelfde pagina; de vraag en gekozen antwoorden blijven staan. Vak, hoofdstuk, niveau, oefenvorm, bronnummer, vraagsleutel en vraagtekst gaan met het bericht naar de bestaande feedbacktabel. De tekstlimiet van 2000 tekens omvat ook die vraaggegevens. Bij een storing blijft de melding staan om opnieuw te versturen. Bij oefenen met tijd loopt de klok door, ook terwijl de melding openstaat; bij nul staat de uitslag klaar achter de dialoog.
+
+De hub toont sinds 27-09-2026 Verder oefenen voor iedere ingelogde gebruiker. De kaart opent de oefenkeuzes van je laatst geoefende vak. Het vak-id wordt bij het starten van een ronde lokaal per account bewaard (`bes_laatst_geoefend_<account-id>`). Zonder geldige lokale marker haalt de hub de recentste eigen afgeronde ronde uit de bestaande tabel `sessies` op; een pas gestarte lokale ronde krijgt voorrang. Zonder historie of bij een ophaalfout blijft de kaart zichtbaar met Kies een vak, die naar de jaarkeuze springt. Dit hervat geen onafgemaakte ronde; de uit de accountgeschiedenis opgehaalde waarde wordt niet lokaal vastgezet. Cachenummer: 63.
+
+De menulink "Feedback" op elke pagina opent `feedback.html`. Alleen ingelogde gebruikers kunnen sturen; het bericht gaat met naam, e-mailadres, soort (fout, idee, anders), gekozen vak en tekst naar de tabel `feedback`. Je leest de berichten in Supabase onder Table Editor. Een link naar de pagina mag `?vak=<id>` en `?vraag=<nummer>` meegeven om het vak en het vraagnummer vooraf in te vullen.
 
 Eenmalig in de SQL-editor uitvoeren:
 
