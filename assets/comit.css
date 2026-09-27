@@ -13,6 +13,10 @@
   background: var(--bg);
 }
 
+/* Houd de schermruimte vrij terwijl de begroeting en het lettertype laden. */
+.comit-pagina-body:has(.comit-pagina[hidden]) { visibility: hidden; }
+.comit-pagina-body .comit-pagina[hidden] { display: block !important; visibility: hidden; }
+
 .comit-pagina::before {
   content: '';
   position: absolute;
@@ -90,7 +94,14 @@
   pointer-events: none;
 }
 
+.comit-begroeting-rij { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 12px; }
+.comit-demo-label { flex-shrink: 0; }
+.comit-demo-uitleg { max-width: 34rem; margin: 12px auto 0; color: var(--ink-soft); font-size: .875rem; line-height: 1.6; overflow-wrap: anywhere; }
+.comit-demo-uitleg a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+
 .comit-begroeting {
+  min-width: 0;
+  max-width: 100%;
   margin: 0;
   font-size: 2.5rem;
   font-weight: 600;
@@ -220,15 +231,15 @@
 .comit-pagina-body :is(.menu-toggle, .profiel-knop, .login-button, .navigation-links a) { min-height: 44px; }
 .comit-pagina-body .site-footer { padding-bottom: calc(var(--comit-invoer-hoogte, 62px) + 40px); }
 
-.comit-pagina[data-opening="eerste"]::before { animation: comit-kleur 300ms var(--ease) 300ms both; }
+.comit-pagina[data-opening="eerste"]::before { animation: comit-kleur 200ms var(--ease) 300ms both; }
 .comit-pagina[data-opening="eerste"] .comit-hero-logo { animation: comit-logo 300ms var(--ease) both; }
-.comit-pagina[data-opening="eerste"] .comit-hero-logo::before { animation: comit-gloed 300ms var(--ease) 250ms both; }
-.comit-pagina[data-opening="eerste"] .comit-woord { animation: comit-verschijnen 250ms var(--ease) calc(650ms + var(--woord-index, 0) * 125ms) both; }
-.comit-pagina[data-opening="eerste"] .comit-hulpvraag { animation: comit-verschijnen 200ms var(--ease) 1100ms both; }
-.comit-pagina[data-opening="eerste"] .comit-kop { animation: comit-verschijnen 200ms var(--ease) 1100ms both; }
-.comit-pagina[data-opening="eerste"] .comit-voorstel { animation: comit-omhoog 200ms var(--ease) calc(1300ms + var(--voorstel-index, 0) * 150ms) both; }
-.comit-pagina[data-opening="eerste"] .comit-invoer { animation: comit-omhoog 200ms var(--ease) 1900ms both; }
-.comit-pagina[data-opening="herhaal"] .comit-begroeting { animation: comit-verschijnen 300ms var(--ease) both; }
+.comit-pagina[data-opening="eerste"] .comit-hero-logo::before { animation: comit-gloed 200ms var(--ease) 300ms both; }
+.comit-pagina[data-opening="eerste"] .comit-woord { animation: comit-verschijnen 200ms var(--ease) calc(500ms + var(--woord-index, 0) * var(--comit-woord-interval, 100ms)) both; }
+.comit-pagina[data-opening="eerste"] :is(.comit-demo-label, .comit-demo-uitleg) { animation: comit-omhoog 200ms var(--ease) var(--comit-intro-vervolg, 900ms) both; }
+.comit-pagina[data-opening="eerste"] :is(.comit-hulpvraag, .comit-kop) { animation: comit-verschijnen 200ms var(--ease) calc(var(--comit-intro-vervolg, 900ms) + 200ms) both; }
+.comit-pagina[data-opening="eerste"] .comit-voorstel { animation: comit-omhoog 150ms var(--ease) calc(var(--comit-intro-vervolg, 900ms) + 400ms + var(--voorstel-index, 0) * 50ms) both; }
+.comit-pagina[data-opening="eerste"] .comit-invoer { animation: comit-omhoog 200ms var(--ease) calc(var(--comit-intro-vervolg, 900ms) + 700ms) both; }
+.comit-pagina[data-opening="herhaal"] :is(.comit-begroeting-rij, .comit-demo-uitleg) { animation: comit-verschijnen 300ms var(--ease) both; }
 
 @keyframes comit-logo { 0% { opacity: 0; transform: translateY(var(--comit-logo-start-y, 0px)) scale(.28); } 35% { opacity: 1; transform: translateY(var(--comit-logo-start-y, 0px)) scale(1); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes comit-gloed { from { opacity: 0; } to { opacity: .16; } }
