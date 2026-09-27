@@ -78,7 +78,7 @@
     const tekst = naam ? `Hallo, ${naam}.` : 'Hallo.';
     begroeting.setAttribute('aria-label', tekst);
     const begroetingsWoorden = tekst.split(/\s+/);
-    const begroetingEinde = 700 + Math.min(200, (begroetingsWoorden.length - 1) * 100);
+    const begroetingEinde = 950 + Math.min(200, (begroetingsWoorden.length - 1) * 100);
     pagina.style.setProperty('--comit-intro-vervolg', `${begroetingEinde}ms`);
     begroeting.style.setProperty('--comit-woord-interval', `${Math.min(100, 200 / Math.max(1, begroetingsWoorden.length - 1))}ms`);
     begroetingsWoorden.forEach((woord, index) => {
@@ -92,9 +92,6 @@
     });
     pagina.querySelectorAll('[data-comit-logo]').forEach(plek => plek.append(BES.comitLogo(plek.dataset.comitLogo)));
 
-    let gezien = false;
-    try { gezien = window.localStorage.getItem('bes_comit_gezien') === '1'; } catch {}
-    try { window.localStorage.setItem('bes_comit_gezien', '1'); } catch {}
     let openingTimer;
     const openingKlaar = () => {
       window.clearTimeout(openingTimer);
@@ -529,12 +526,13 @@
     const logo = pagina.querySelector('.comit-hero-logo').getBoundingClientRect();
     const midden = (window.visualViewport?.offsetTop || 0) + (window.visualViewport?.height || window.innerHeight) / 2;
     pagina.style.setProperty('--comit-logo-start-y', `${midden - logo.top - logo.height / 2}px`);
-    pagina.dataset.opening = minderBeweging.matches ? 'klaar' : gezien ? 'herhaal' : 'eerste';
+    // De volledige opening speelt elke keer dat je Comit opent (op verzoek van Berat, 27-09-2026).
+    pagina.dataset.opening = minderBeweging.matches ? 'klaar' : 'eerste';
     new ResizeObserver(() => {
       document.body.style.setProperty('--comit-invoer-hoogte', `${formulier.getBoundingClientRect().height}px`);
     }).observe(formulier);
     werkKnopBij();
-    if (!minderBeweging.matches) openingTimer = window.setTimeout(openingKlaar, gezien ? 300 : begroetingEinde + 900);
+    if (!minderBeweging.matches) openingTimer = window.setTimeout(openingKlaar, begroetingEinde + 900);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initialize, { once: true });

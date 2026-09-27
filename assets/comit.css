@@ -82,6 +82,17 @@
   isolation: isolate;
 }
 
+.comit-hero-logo::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border: 2px solid var(--teal);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .comit-hero-logo::before {
   content: '';
   position: absolute;
@@ -232,17 +243,20 @@
 .comit-pagina-body .site-footer { padding-bottom: calc(var(--comit-invoer-hoogte, 62px) + 40px); }
 
 .comit-pagina[data-opening="eerste"]::before { animation: comit-kleur 200ms var(--ease) 300ms both; }
-.comit-pagina[data-opening="eerste"] .comit-hero-logo { animation: comit-logo 300ms var(--ease) both; }
-.comit-pagina[data-opening="eerste"] .comit-hero-logo::before { animation: comit-gloed 200ms var(--ease) 300ms both; }
-.comit-pagina[data-opening="eerste"] .comit-woord { animation: comit-verschijnen 200ms var(--ease) calc(500ms + var(--woord-index, 0) * var(--comit-woord-interval, 100ms)) both; }
+.comit-pagina[data-opening="eerste"] .comit-hero-logo { animation: comit-logo 800ms var(--ease) both; }
+.comit-pagina[data-opening="eerste"] .comit-hero-logo::before { animation: comit-gloed 700ms var(--ease) 300ms both; }
+.comit-pagina[data-opening="eerste"] .comit-hero-logo::after { animation: comit-ring 700ms var(--ease) 320ms both; }
+.comit-pagina[data-opening="eerste"] .comit-woord { animation: comit-verschijnen 200ms var(--ease) calc(750ms + var(--woord-index, 0) * var(--comit-woord-interval, 100ms)) both; }
 .comit-pagina[data-opening="eerste"] :is(.comit-demo-label, .comit-demo-uitleg) { animation: comit-omhoog 200ms var(--ease) var(--comit-intro-vervolg, 900ms) both; }
 .comit-pagina[data-opening="eerste"] :is(.comit-hulpvraag, .comit-kop) { animation: comit-verschijnen 200ms var(--ease) calc(var(--comit-intro-vervolg, 900ms) + 200ms) both; }
 .comit-pagina[data-opening="eerste"] .comit-voorstel { animation: comit-omhoog 150ms var(--ease) calc(var(--comit-intro-vervolg, 900ms) + 400ms + var(--voorstel-index, 0) * 50ms) both; }
 .comit-pagina[data-opening="eerste"] .comit-invoer { animation: comit-omhoog 200ms var(--ease) calc(var(--comit-intro-vervolg, 900ms) + 700ms) both; }
 .comit-pagina[data-opening="herhaal"] :is(.comit-begroeting-rij, .comit-demo-uitleg) { animation: comit-verschijnen 300ms var(--ease) both; }
 
-@keyframes comit-logo { 0% { opacity: 0; transform: translateY(var(--comit-logo-start-y, 0px)) scale(.28); } 35% { opacity: 1; transform: translateY(var(--comit-logo-start-y, 0px)) scale(1); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
-@keyframes comit-gloed { from { opacity: 0; } to { opacity: .16; } }
+/* De ster draait in het midden van het scherm binnen, groeit even aan, en schuift dan rustig naar zijn plek. */
+@keyframes comit-logo { 0% { opacity: 0; transform: translateY(var(--comit-logo-start-y, 0px)) scale(.3) rotate(-135deg); } 42% { opacity: 1; transform: translateY(var(--comit-logo-start-y, 0px)) scale(1.08) rotate(0deg); } 58% { transform: translateY(var(--comit-logo-start-y, 0px)) scale(1) rotate(0deg); } 100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); } }
+@keyframes comit-gloed { 0% { opacity: 0; } 40% { opacity: .42; } 100% { opacity: .16; } }
+@keyframes comit-ring { 0% { opacity: .55; transform: scale(.7); } 100% { opacity: 0; transform: scale(1.9); } }
 @keyframes comit-kleur { 0% { opacity: 0; transform: translateX(-25%); } 45% { opacity: .15; } 100% { opacity: .045; transform: translateX(0); } }
 @keyframes comit-verschijnen { from { opacity: 0; } to { opacity: 1; } }
 @keyframes comit-omhoog { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -271,7 +285,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .comit-pagina *, .comit-pagina::before, .comit-pagina *::before { animation: none !important; transition: none !important; }
+  .comit-pagina *, .comit-pagina::before, .comit-pagina *::before, .comit-pagina *::after { animation: none !important; transition: none !important; }
   :is(.comit-voorstel, .comit-verstuur):is(:hover, :active) { transform: none; }
   .comit-denkt .comit-denk-tekst { background: none; color: var(--ink-soft); }
 }
