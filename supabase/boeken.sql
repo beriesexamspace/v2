@@ -152,7 +152,7 @@ $$;
 revoke all on function public.beheer_boek_wissen(uuid) from public, anon;
 grant execute on function public.beheer_boek_wissen(uuid) to authenticated;
 
--- BOEKFOTOS: voorlopig privaat, in afwachting van de privacykeuze.
+-- BOEKFOTOS: privaat (besluit 27-09-2026); de pagina toont ze met tijdelijke links.
 -- Een publieke bucket omzeilt lees-RLS; wijzig dit niet zonder de privacytekst
 -- en de gekozen downloadmethode samen te controleren.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
@@ -171,61 +171,7 @@ create policy "boekfotos lezen na inloggen" on storage.objects for select to aut
 drop policy if exists "eigen boekfotos uploaden" on storage.objects;
 create policy "eigen boekfotos uploaden" on storage.objects for insert to authenticated
   with check (bucket_id = 'boekfotos' and auth.uid() is not null and (select public.heeft_toegang())
-    and name ~ ('^' || auth.uid()::text || '/[A-Za-z0-9_-]+[.]jpg on storage.objects;
-create policy "eigen boekfotos wissen" on storage.objects for delete to authenticated
-  using (bucket_id = 'boekfotos' and auth.uid() is not null
-    and (storage.foldername(name))[1] = auth.uid()::text);
-
--- Restrictieve regels begrenzen ook eventuele oudere, ruimere Storage-policies.
--- Andere buckets (zoals avatars) houden hun bestaande gedrag.
-drop policy if exists "boekfotos leesgrens" on storage.objects;
-create policy "boekfotos leesgrens" on storage.objects as restrictive for select to authenticated
-  using (bucket_id <> 'boekfotos' or (auth.uid() is not null and (
-    (storage.foldername(name))[1] = auth.uid()::text or exists (
-      select 1 from public.boeken b where name = any(b.fotos) and not b.verkocht and b.verloopt > now()
-    )
-  )));
-
--- Geen verwijzing naar public.boeken in de anon-policy: anon heeft daar geen
--- tabelrechten; zo blijft ook het lezen van bestaande avatars werken.
-drop policy if exists "boekfotos geen gasttoegang" on storage.objects;
-create policy "boekfotos geen gasttoegang" on storage.objects as restrictive for all to anon
-  using (bucket_id <> 'boekfotos') with check (bucket_id <> 'boekfotos');
-
-drop policy if exists "boekfotos uploadgrens" on storage.objects;
-create policy "boekfotos uploadgrens" on storage.objects as restrictive for insert to public
-  with check (bucket_id <> 'boekfotos' or (auth.uid() is not null
-    and name ~ ('^' || auth.uid()::text || '/[A-Za-z0-9_-]+[.]jpg$')));
-
-drop policy if exists "boekfotos wisgrens" on storage.objects;
-create policy "boekfotos wisgrens" on storage.objects as restrictive for delete to public
-  using (bucket_id <> 'boekfotos' or (auth.uid() is not null
-    and (storage.foldername(name))[1] = auth.uid()::text));
-
-drop policy if exists "boekfotos niet overschrijven" on storage.objects;
-create policy "boekfotos niet overschrijven" on storage.objects as restrictive for update to public
-  using (bucket_id <> 'boekfotos') with check (bucket_id <> 'boekfotos');
-
-commit;
-
--- Drie controlequery's voor Claude na uitvoering, zonder nummers of advertentietekst:
--- 1. RLS en anon-rechten: beide tabellen true; alle anon_* kolommen false.
--- select c.relname, c.relrowsecurity,
---   has_table_privilege('anon', c.oid, 'SELECT') as anon_lezen,
---   has_table_privilege('anon', c.oid, 'INSERT,UPDATE,DELETE') as anon_schrijven
--- from pg_class c join pg_namespace n on n.oid = c.relnamespace
--- where n.nspname = 'public' and c.relname in ('boeken', 'boek_meldingen');
--- 2. Controleer de eigenaren-/beheerregels en de restrictieve boekfotos-grenzen.
--- select schemaname, tablename, policyname, permissive, roles, cmd, qual, with_check
--- from pg_policies where (schemaname = 'public' and tablename in ('boeken', 'boek_meldingen'))
---   or (schemaname = 'storage' and tablename = 'objects' and policyname like '%boekfoto%')
--- order by schemaname, tablename, policyname;
--- 3. Bucketlimieten en beveiliging van de beheer-RPC.
--- select b.id, b.public, b.file_size_limit, b.allowed_mime_types,
---   has_function_privilege('anon', 'public.beheer_boek_wissen(uuid)', 'EXECUTE') as anon_beheer_rpc,
---   has_function_privilege('authenticated', 'public.beheer_boek_wissen(uuid)', 'EXECUTE') as account_beheer_rpc
--- from storage.buckets b where b.id = 'boekfotos';
-));
+    and name ~ ('^' || auth.uid()::text || '/[A-Za-z0-9_-]+[.]jpg$'));
 
 drop policy if exists "eigen boekfotos wissen" on storage.objects;
 create policy "eigen boekfotos wissen" on storage.objects for delete to authenticated
