@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="assets/deur.js?v=64"></script>
+  <script src="assets/deur.js?v=65"></script>
   <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta property="og:type" content="website">
@@ -30,17 +30,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=64">
-  <link rel="stylesheet" href="assets/intro.css?v=64">
-  <script src="assets/app.js?v=64"></script>
-  <script src="assets/updates.js?v=64"></script>
-  <script src="assets/intro.js?v=64"></script>
-  <script src="assets/config.js?v=64" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=65">
+  <link rel="stylesheet" href="assets/intro.css?v=65">
+  <script src="assets/app.js?v=65"></script>
+  <script src="assets/updates.js?v=65"></script>
+  <script src="assets/intro.js?v=65"></script>
+  <script src="assets/config.js?v=65" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=64" defer></script>
-  <script src="assets/plan.js?v=64" defer></script>
-  <script src="assets/activiteit.js?v=64" defer></script>
-  <script src="assets/comit.js?v=64" defer></script>
+  <script src="assets/auth.js?v=65" defer></script>
+  <script src="assets/plan.js?v=65" defer></script>
+  <script src="assets/activiteit.js?v=65" defer></script>
+  <script src="assets/comit.js?v=65" defer></script>
   <style>
     /* Alles in één scherm: kop, de stap, en de knoppen, zonder scrollen. */
     html, body { height: 100%; overflow: hidden; }
@@ -213,6 +213,15 @@
         };
         minderBeweging.addEventListener('change', bewegingGewijzigd);
         bewegingGewijzigd();
+        // Terug via de browser (bfcache): de laag weer zichtbaar en bruikbaar maken.
+        window.addEventListener('pageshow', event => {
+          if (!event.persisted || !bestemming) return;
+          window.clearTimeout(vertrekTimer);
+          bestemming = '';
+          laag.classList.remove('is-weg');
+          minderBeweging.addEventListener('change', bewegingGewijzigd);
+          praat.focus({ preventScroll: true });
+        });
         [praat, later].forEach(link => link.addEventListener('click', event => {
           if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
           event.preventDefault();

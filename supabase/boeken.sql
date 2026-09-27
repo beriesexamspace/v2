@@ -1,7 +1,7 @@
--- Verkoop je boeken. Alleen voorbereide SQL; nog niet uitgevoerd.
+-- Verkoop je boeken. Foto's privé (tijdelijke links voor ingelogden), besloten 27-09-2026.
+-- Zolang de site dicht is (toegang.sql) zien alleen accounts met toegang de boeken van anderen.
 -- Vereist de bestaande public.is_beheerder() uit account-en-beheer.sql.
 -- Uitvoervolgorde: dit bestand, account-en-beheer.sql, beheer-overzicht.sql.
--- De keuze openbaar/privaat voor boekfotos moet voor uitvoering bevestigd zijn.
 -- Storage-bestanden altijd wissen via de Storage API, nooit via DELETE op storage.objects:
 -- https://supabase.com/docs/guides/storage/schema/design
 
@@ -83,6 +83,10 @@ begin
   if new.user_id is distinct from old.user_id then
     raise exception 'De eigenaar van een boek kan niet veranderen.' using errcode = '23514';
   end if;
+  -- Verlengen kan alleen met de klok van de server: altijd precies 60 dagen vanaf nu.
+  if new.verloopt is distinct from old.verloopt then
+    new.verloopt := now() + interval '60 days';
+  end if;
   return new;
 end;
 $$;
@@ -104,11 +108,11 @@ grant insert (boek_id, user_id, reden) on public.boek_meldingen to authenticated
 
 drop policy if exists "boeken lezen na inloggen" on public.boeken;
 create policy "boeken lezen na inloggen" on public.boeken for select to authenticated
-  using (auth.uid() is not null and (user_id = auth.uid() or (not verkocht and verloopt > now())));
+  using (auth.uid() is not null and (user_id = auth.uid() or ((select public.heeft_toegang()) and not verkocht and verloopt > now())));
 
 drop policy if exists "eigen boeken toevoegen" on public.boeken;
 create policy "eigen boeken toevoegen" on public.boeken for insert to authenticated
-  with check (auth.uid() is not null and user_id = auth.uid());
+  with check (auth.uid() is not null and user_id = auth.uid() and (select public.heeft_toegang()));
 
 drop policy if exists "eigen boeken bijwerken" on public.boeken;
 create policy "eigen boeken bijwerken" on public.boeken for update to authenticated
@@ -121,7 +125,7 @@ create policy "boeken wissen door eigenaar of beheerder" on public.boeken for de
 
 drop policy if exists "boek melden na inloggen" on public.boek_meldingen;
 create policy "boek melden na inloggen" on public.boek_meldingen for insert to authenticated
-  with check (auth.uid() is not null and user_id = auth.uid() and exists (
+  with check (auth.uid() is not null and user_id = auth.uid() and (select public.heeft_toegang()) and exists (
     select 1 from public.boeken b where b.id = boek_id
   ));
 
@@ -159,15 +163,69 @@ on conflict (id) do update set public = excluded.public,
 drop policy if exists "boekfotos lezen na inloggen" on storage.objects;
 create policy "boekfotos lezen na inloggen" on storage.objects for select to authenticated
   using (bucket_id = 'boekfotos' and auth.uid() is not null and (
-    (storage.foldername(name))[1] = auth.uid()::text or exists (
+    (storage.foldername(name))[1] = auth.uid()::text or (select public.heeft_toegang()) and exists (
       select 1 from public.boeken b where name = any(b.fotos) and not b.verkocht and b.verloopt > now()
     )
   ));
 
 drop policy if exists "eigen boekfotos uploaden" on storage.objects;
 create policy "eigen boekfotos uploaden" on storage.objects for insert to authenticated
-  with check (bucket_id = 'boekfotos' and auth.uid() is not null
-    and name ~ ('^' || auth.uid()::text || '/[A-Za-z0-9_-]+[.]jpg$'));
+  with check (bucket_id = 'boekfotos' and auth.uid() is not null and (select public.heeft_toegang())
+    and name ~ ('^' || auth.uid()::text || '/[A-Za-z0-9_-]+[.]jpg on storage.objects;
+create policy "eigen boekfotos wissen" on storage.objects for delete to authenticated
+  using (bucket_id = 'boekfotos' and auth.uid() is not null
+    and (storage.foldername(name))[1] = auth.uid()::text);
+
+-- Restrictieve regels begrenzen ook eventuele oudere, ruimere Storage-policies.
+-- Andere buckets (zoals avatars) houden hun bestaande gedrag.
+drop policy if exists "boekfotos leesgrens" on storage.objects;
+create policy "boekfotos leesgrens" on storage.objects as restrictive for select to authenticated
+  using (bucket_id <> 'boekfotos' or (auth.uid() is not null and (
+    (storage.foldername(name))[1] = auth.uid()::text or exists (
+      select 1 from public.boeken b where name = any(b.fotos) and not b.verkocht and b.verloopt > now()
+    )
+  )));
+
+-- Geen verwijzing naar public.boeken in de anon-policy: anon heeft daar geen
+-- tabelrechten; zo blijft ook het lezen van bestaande avatars werken.
+drop policy if exists "boekfotos geen gasttoegang" on storage.objects;
+create policy "boekfotos geen gasttoegang" on storage.objects as restrictive for all to anon
+  using (bucket_id <> 'boekfotos') with check (bucket_id <> 'boekfotos');
+
+drop policy if exists "boekfotos uploadgrens" on storage.objects;
+create policy "boekfotos uploadgrens" on storage.objects as restrictive for insert to public
+  with check (bucket_id <> 'boekfotos' or (auth.uid() is not null
+    and name ~ ('^' || auth.uid()::text || '/[A-Za-z0-9_-]+[.]jpg$')));
+
+drop policy if exists "boekfotos wisgrens" on storage.objects;
+create policy "boekfotos wisgrens" on storage.objects as restrictive for delete to public
+  using (bucket_id <> 'boekfotos' or (auth.uid() is not null
+    and (storage.foldername(name))[1] = auth.uid()::text));
+
+drop policy if exists "boekfotos niet overschrijven" on storage.objects;
+create policy "boekfotos niet overschrijven" on storage.objects as restrictive for update to public
+  using (bucket_id <> 'boekfotos') with check (bucket_id <> 'boekfotos');
+
+commit;
+
+-- Drie controlequery's voor Claude na uitvoering, zonder nummers of advertentietekst:
+-- 1. RLS en anon-rechten: beide tabellen true; alle anon_* kolommen false.
+-- select c.relname, c.relrowsecurity,
+--   has_table_privilege('anon', c.oid, 'SELECT') as anon_lezen,
+--   has_table_privilege('anon', c.oid, 'INSERT,UPDATE,DELETE') as anon_schrijven
+-- from pg_class c join pg_namespace n on n.oid = c.relnamespace
+-- where n.nspname = 'public' and c.relname in ('boeken', 'boek_meldingen');
+-- 2. Controleer de eigenaren-/beheerregels en de restrictieve boekfotos-grenzen.
+-- select schemaname, tablename, policyname, permissive, roles, cmd, qual, with_check
+-- from pg_policies where (schemaname = 'public' and tablename in ('boeken', 'boek_meldingen'))
+--   or (schemaname = 'storage' and tablename = 'objects' and policyname like '%boekfoto%')
+-- order by schemaname, tablename, policyname;
+-- 3. Bucketlimieten en beveiliging van de beheer-RPC.
+-- select b.id, b.public, b.file_size_limit, b.allowed_mime_types,
+--   has_function_privilege('anon', 'public.beheer_boek_wissen(uuid)', 'EXECUTE') as anon_beheer_rpc,
+--   has_function_privilege('authenticated', 'public.beheer_boek_wissen(uuid)', 'EXECUTE') as account_beheer_rpc
+-- from storage.buckets b where b.id = 'boekfotos';
+));
 
 drop policy if exists "eigen boekfotos wissen" on storage.objects;
 create policy "eigen boekfotos wissen" on storage.objects for delete to authenticated

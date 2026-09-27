@@ -803,7 +803,7 @@
     function start(questions, runMode = mode, runLevel = level, runSeconds = timed ? secondsPerQuestion : 0) {
       if (!questions.length || !context.authReady || runLevel !== level) return;
       if (context.owner) {
-        try { window.localStorage.setItem(`bes_laatst_geoefend_${context.owner}`, JSON.stringify({ vak: data.id })); } catch {}
+        try { window.localStorage.setItem(`bes_laatst_geoefend_${context.owner}`, JSON.stringify({ vak: data.id, t: new Date().toISOString() })); } catch {}
       }
       stopClock();
       session = {

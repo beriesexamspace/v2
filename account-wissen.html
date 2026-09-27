@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="assets/deur.js?v=64"></script>
+  <script src="assets/deur.js?v=65"></script>
   <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta name="robots" content="noindex">
@@ -31,12 +31,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=64">
-  <script src="assets/app.js?v=64" defer></script>
-  <script src="assets/config.js?v=64" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=65">
+  <script src="assets/app.js?v=65" defer></script>
+  <script src="assets/config.js?v=65" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=64" defer></script>
-  <script src="assets/plan.js?v=64" defer></script>
+  <script src="assets/auth.js?v=65" defer></script>
+  <script src="assets/plan.js?v=65" defer></script>
   <style>
     .wissen-wrap { max-width: 640px; }
     .wissen-legenda { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0; clip-path: inset(50%); overflow: hidden; white-space: nowrap; }
@@ -116,6 +116,7 @@
           <li><div>Je studiekalender met je leertijd per dag.</div></li>
           <li><div>Je naam, je e-mailadres, je profielfoto en je instellingen.</div></li>
           <li><div>De feedback die je stuurde.</div></li>
+          <li><div>Je boeken, de foto's en je WhatsApp-nummer bij je advertenties.</div></li>
         </ul>
         <p>Heb je een betaald abonnement, dan stopt dat op hetzelfde moment. De maand die al betaald is wordt niet terugbetaald, behalve binnen de bedenktijd uit de <a href="voorwaarden.html">voorwaarden</a>. Wil je alleen stoppen met betalen, zeg dan je abonnement op en laat je account gewoon staan; je voortgang blijft dan bewaard.</p>
         <p><strong>Dit kan niet ongedaan gemaakt worden.</strong> Je kan later een nieuw account maken, maar je oude voortgang komt niet terug.</p>
@@ -182,6 +183,7 @@
       let bezig = false;
 
       const toon = nummer => {
+        if (bezig) return;
         [1, 2, 3].forEach(n => { document.getElementById('stap-' + n).hidden = n !== nummer; });
         document.getElementById('stap-klaar').hidden = true;
         stappen.hidden = false;
@@ -211,15 +213,61 @@
         } catch {}
       };
 
+      // Steeds de eerste pagina wissen, zodat ook losse uploads en oude boekfoto's verdwijnen.
+      const boekfotosWissen = async (eigenaar, controleer) => {
+        const bucket = auth.client.storage.from('boekfotos');
+        for (let ronde = 0; ronde < 100; ronde += 1) {
+          await controleer();
+          const lijst = await bucket.list(eigenaar, { limit: 100, offset: 0, sortBy: { column: 'name', order: 'asc' } });
+          await controleer();
+          if (lijst.error || !Array.isArray(lijst.data)) throw new Error('boekfotos-laden');
+          if (!lijst.data.length) return;
+          const paden = lijst.data.map(foto => {
+            // Uploads liggen direct in de eigen map. Onverwachte mappen of paden stoppen het wissen.
+            if (!foto.id || typeof foto.name !== 'string' || !foto.name || /[/\\]/.test(foto.name) || foto.name === '.' || foto.name === '..') throw new Error('boekfoto-pad');
+            return eigenaar + '/' + foto.name;
+          });
+          const gewist = await bucket.remove(paden);
+          await controleer();
+          if (gewist.error) throw gewist.error;
+        }
+        throw new Error('boekfotos-limiet');
+      };
+
       knop.addEventListener('click', async () => {
         if (bezig || !auth.client) return;
         bezig = true;
         knop.disabled = true;
         knop.textContent = 'Even geduld…';
         fout.hidden = true;
+        let eigenaar = null;
+        let sessieGewijzigd = false;
+        let fase = 'account';
+        const sessieFout = new Error('sessie-gewijzigd');
+        const controleer = async () => {
+          const user = await auth.gebruiker();
+          if (sessieGewijzigd || !user || user.id !== eigenaar) throw sessieFout;
+        };
+        const bijUitloggen = event => {
+          if (event.target.closest?.('[data-account-uitloggen]')) sessieGewijzigd = true;
+        };
+        document.addEventListener('click', bijUitloggen, true);
+        const { data: { subscription } } = auth.client.auth.onAuthStateChange((event, session) => {
+          if (event === 'SIGNED_OUT' || (eigenaar && session?.user?.id !== eigenaar)) sessieGewijzigd = true;
+        });
         try {
+          const user = await auth.gebruiker();
+          if (sessieGewijzigd || !user) throw sessieFout;
+          eigenaar = user.id;
+          await controleer();
+          fase = 'fotos';
+          await boekfotosWissen(eigenaar, controleer);
+          await controleer();
+          fase = 'account';
           await redenBewaren();
+          await controleer();
           const { error } = await auth.client.rpc('account_verwijderen');
+          await controleer();
           if (error) throw error;
           [1, 2, 3].forEach(n => { document.getElementById('stap-' + n).hidden = true; });
           stappen.hidden = true;
@@ -227,13 +275,24 @@
           document.getElementById('stap-klaar-kop').setAttribute('tabindex', '-1');
           document.getElementById('stap-klaar-kop').focus({ preventScroll: true });
           try { await auth.client.auth.signOut(); } catch {}
-          window.setTimeout(() => window.location.replace('index.html'), 2500);
-        } catch {
-          bezig = false;
-          knop.disabled = false;
+          const huidig = await auth.gebruiker();
+          if (huidig && huidig.id !== eigenaar) throw sessieFout;
+          window.setTimeout(() => {
+            auth.gebruiker().then(user => { if (!user) window.location.replace('index.html'); }).catch(() => {});
+          }, 2500);
+        } catch (error) {
+          bezig = error === sessieFout;
+          knop.disabled = bezig;
           knop.textContent = 'Account verwijderen';
-          fout.textContent = 'Wissen is niet gelukt. Probeer het later opnieuw of mail naar berie007yldrm@gmail.com.';
+          fout.textContent = error === sessieFout
+            ? 'Je account is gewijzigd of je bent uitgelogd. Laad de pagina opnieuw.'
+            : fase === 'fotos'
+              ? "Je boekfoto's konden niet allemaal worden gewist. Je account is nog niet gewist. Probeer het opnieuw."
+              : 'Wissen is niet gelukt. Probeer het later opnieuw of mail naar berie007yldrm@gmail.com.';
           fout.hidden = false;
+        } finally {
+          subscription.unsubscribe();
+          document.removeEventListener('click', bijUitloggen, true);
         }
       });
     });

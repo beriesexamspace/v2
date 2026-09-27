@@ -76,14 +76,40 @@
     const prefix = row.user_id + '/';
     return row.fotos.slice(0, 3).filter(path => typeof path === 'string' && path.startsWith(prefix) && /^[a-zA-Z0-9_-]+\.jpg$/.test(path.slice(prefix.length)));
   };
+  // De bucket is privé: foto's krijgen een tijdelijke link (1 uur), alleen in het geheugen en alleen voor ingelogden.
+  const signed = new Map();
+  let signing = null;
+  let lastSignTry = 0;
+  const needsSigning = () => rows.some(row => safePaths(row).some(path => !(signed.get(path)?.until > Date.now() + 60000)));
+  const signPhotos = async () => {
+    if (!user || !client) return;
+    const ctx = context();
+    const ticket = request;
+    const paths = [...new Set(rows.flatMap(safePaths))].filter(path => !(signed.get(path)?.until > Date.now() + 60000));
+    for (let index = 0; index < paths.length; index += 100) {
+      try {
+        const { data, error } = await client.storage.from('boekfotos').createSignedUrls(paths.slice(index, index + 100), 3600);
+        if (!current(ctx) || ticket !== request) return;
+        if (!error && Array.isArray(data)) data.forEach(item => { if (item && !item.error && item.path && item.signedUrl) signed.set(item.path, { url: item.signedUrl, until: Date.now() + 3500000 }); });
+      } catch {}
+    }
+  };
+  const signAndRender = () => {
+    if (signing || !needsSigning() || Date.now() - lastSignTry < 15000) return;
+    lastSignTry = Date.now();
+    signing = signPhotos().finally(() => { signing = null; render(); });
+  };
   const photoUrl = (row, path) => {
     if (!user || !safePaths(row).includes(path)) return '';
+    const entry = signed.get(path);
+    if (!entry || entry.until <= Date.now()) return '';
     try {
       const base = new URL(window.BES_CONFIG?.supabaseUrl);
       if (!/^https?:$/.test(base.protocol)) return '';
-      const expected = new URL('/storage/v1/object/public/boekfotos/' + path, base);
-      const actual = new URL(client.storage.from('boekfotos').getPublicUrl(path).data.publicUrl);
-      return /^https?:$/.test(actual.protocol) && !actual.username && !actual.password && !actual.search && !actual.hash && actual.origin === expected.origin && actual.pathname === expected.pathname ? actual.href : '';
+      const actual = new URL(entry.url);
+      const expected = new URL('/storage/v1/object/sign/boekfotos/' + path, base);
+      const alleenToken = [...actual.searchParams.keys()].every(key => key === 'token') && actual.searchParams.has('token');
+      return /^https?:$/.test(actual.protocol) && !actual.username && !actual.password && !actual.hash && alleenToken && actual.origin === expected.origin && actual.pathname === expected.pathname ? actual.href : '';
     } catch { return ''; }
   };
 
@@ -317,6 +343,26 @@
     // Ook in een lang geopend tabblad verdwijnen verlopen contactlinks tijdig.
     const deadlines = rows.filter(active).map(row => Date.parse(row.verloopt));
     if (deadlines.length) expiryTimer = window.setTimeout(render, Math.min(2147483647, Math.max(50, Math.min(...deadlines) - Date.now() + 50)));
+    signAndRender();
+  };
+
+  // Losse eigen foto's (van een gewiste of nooit geplaatste advertentie) weghalen: niet in een eigen boek,
+  // ouder dan 15 minuten en niet van een plaatsing die nog gecontroleerd moet worden.
+  const opruimen = async (ctx, ticket) => {
+    try {
+      const bucket = client.storage.from('boekfotos');
+      const lijst = await bucket.list(user.id, { limit: 100, offset: 0 });
+      if (!current(ctx) || ticket !== request || lijst.error || !Array.isArray(lijst.data)) return;
+      const inGebruik = new Set(rows.filter(row => row.user_id === user.id).flatMap(safePaths));
+      (pendingPlacement?.paths || []).forEach(path => inGebruik.add(path));
+      const grens = Date.now() - 15 * 60 * 1000;
+      const weg = lijst.data
+        .filter(foto => foto && foto.id && typeof foto.name === 'string' && /^[a-zA-Z0-9_-]+\.jpg$/.test(foto.name))
+        .filter(foto => Date.parse(foto.created_at) < grens)
+        .map(foto => user.id + '/' + foto.name)
+        .filter(path => !inGebruik.has(path));
+      if (weg.length && current(ctx) && ticket === request) await bucket.remove(weg);
+    } catch {}
   };
 
   const load = async () => {
@@ -324,6 +370,7 @@
     const ctx = context();
     const ticket = ++request;
     loaded = false;
+    lastSignTry = 0;
     rows = [];
     render();
     empty.hidden = true;
@@ -347,6 +394,7 @@
       rows = [...fetched.values()];
       loaded = true;
       render();
+      opruimen(ctx, ticket);
     } catch {
       if (!current(ctx) || ticket !== request) return;
       listStatus.textContent = 'De boeken konden niet worden geladen. Probeer het zo opnieuw.';
@@ -564,6 +612,7 @@
     window.clearTimeout(expiryTimer);
     rows.forEach(row => { row.whatsapp = ''; });
     rows = [];
+    signed.clear();
     mutations.clear();
     user = next;
     loaded = false;

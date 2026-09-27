@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="assets/deur.js?v=64"></script>
+  <script src="assets/deur.js?v=65"></script>
   <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta property="og:type" content="website">
@@ -18,20 +18,29 @@
   <meta name="description" content="Geef je studieboeken een volgende plek. Bekijk boeken en spreek samen de koop af.">
   <meta name="theme-color" content="#FFFFFF">
   <meta name="robots" content="noindex">
+  <script>
+    (() => {
+      let keuze;
+      try { keuze = window.localStorage.getItem('bes_thema'); } catch {}
+      const donker = keuze === 'donker' || (keuze !== 'licht' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.dataset.theme = donker ? 'dark' : 'light';
+      document.querySelector('meta[name="theme-color"]').content = donker ? '#0B0B0C' : '#FFFFFF';
+    })();
+  </script>
   <title>Verkoop je boeken | Berie's Exam Space</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=64">
-  <link rel="stylesheet" href="assets/boeken.css?v=64">
-  <script src="assets/app.js?v=64" defer></script>
-  <script src="assets/config.js?v=64" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=65">
+  <link rel="stylesheet" href="assets/boeken.css?v=65">
+  <script src="assets/app.js?v=65" defer></script>
+  <script src="assets/config.js?v=65" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=64" defer></script>
-  <script src="assets/plan.js?v=64" defer></script>
-  <script src="assets/vakken.js?v=64" defer></script>
-  <script src="assets/activiteit.js?v=64" defer></script>
-  <script src="assets/boeken.js?v=64" defer></script>
+  <script src="assets/auth.js?v=65" defer></script>
+  <script src="assets/plan.js?v=65" defer></script>
+  <script src="assets/vakken.js?v=65" defer></script>
+  <script src="assets/activiteit.js?v=65" defer></script>
+  <script src="assets/boeken.js?v=65" defer></script>
 </head>
 <body data-nav="vast">
   <a class="skip-link" href="#inhoud">Ga naar inhoud</a>
