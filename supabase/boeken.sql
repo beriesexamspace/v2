@@ -1,4 +1,4 @@
--- Verkoop je boeken. Foto's privé (tijdelijke links voor ingelogden), besloten 27-09-2026.
+-- Verkoop je boeken. Foto's privé, via geauthenticeerde Storage.download, besloten 27-09-2026.
 -- Zolang de site dicht is (toegang.sql) zien alleen accounts met toegang de boeken van anderen.
 -- Vereist de bestaande public.is_beheerder() uit account-en-beheer.sql.
 -- Uitvoervolgorde: dit bestand, account-en-beheer.sql, beheer-overzicht.sql.
@@ -137,6 +137,8 @@ create policy "boekmeldingen lezen door beheerder" on public.boek_meldingen for 
 -- Deze kleine beheer-RPC kan daarom ook een verlopen/verkocht boek wissen,
 -- zonder beheerders extra leesrechten op het WhatsApp-nummer te geven.
 -- Foto's blijven eigendom van de verkoper; deze functie wist geen Storage-metadata.
+-- Zonder advertentie kunnen andere accounts die foto's niet meer opvragen.
+-- Account wissen ruimt ook deze overgebleven bestanden op via de Storage API.
 create or replace function public.beheer_boek_wissen(p_boek_id uuid)
 returns boolean
 language plpgsql security definer set search_path = ''
@@ -152,9 +154,10 @@ $$;
 revoke all on function public.beheer_boek_wissen(uuid) from public, anon;
 grant execute on function public.beheer_boek_wissen(uuid) to authenticated;
 
--- BOEKFOTOS: privaat (besluit 27-09-2026); de pagina toont ze met tijdelijke links.
--- Een publieke bucket omzeilt lees-RLS; wijzig dit niet zonder de privacytekst
--- en de gekozen downloadmethode samen te controleren.
+-- BOEKFOTOS: privaat, ook bij rechtstreeks openen is een geldige sessie vereist.
+-- De eigenaar leest eigen bestanden altijd; andere accounts met toegang alleen
+-- foto's van niet verkochte, niet verlopen advertenties. De pagina gebruikt
+-- geauthenticeerde downloads, geen openbare of ondertekende URL's.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('boekfotos', 'boekfotos', false, 1048576, array['image/jpeg'])
 on conflict (id) do update set public = excluded.public,
@@ -222,7 +225,8 @@ commit;
 -- from pg_policies where (schemaname = 'public' and tablename in ('boeken', 'boek_meldingen'))
 --   or (schemaname = 'storage' and tablename = 'objects' and policyname like '%boekfoto%')
 -- order by schemaname, tablename, policyname;
--- 3. Bucketlimieten en beveiliging van de beheer-RPC.
+-- 3. Bucketlimieten en beheer-RPC: public=false, 1048576 bytes, image/jpeg;
+--    anon_beheer_rpc=false, account_beheer_rpc=true (functie controleert beheerder).
 -- select b.id, b.public, b.file_size_limit, b.allowed_mime_types,
 --   has_function_privilege('anon', 'public.beheer_boek_wissen(uuid)', 'EXECUTE') as anon_beheer_rpc,
 --   has_function_privilege('authenticated', 'public.beheer_boek_wissen(uuid)', 'EXECUTE') as account_beheer_rpc

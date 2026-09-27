@@ -1,6 +1,9 @@
 -- Eenmalig uitvoeren in de SQL-editor van Supabase (project Berie's Exam Space).
 -- 1. account_verwijderen(): de ingelogde gebruiker wist zijn eigen account, inclusief voortgang,
---    feedback, studieactiviteit (cascade) en de profielfoto in de bucket avatars.
+--    feedback, studieactiviteit, boeken en boekmeldingen (cascade).
+--    Boekfoto's worden eerst via de Storage API op account-wissen.html gewist;
+--    de functie controleert dat de eigen boekfotomap leeg is.
+--    De bestaande verwijdering van avatar-metadata blijft behouden.
 -- 2. beheerders + studie_dagcijfers(): alleen voor de eigenaar, telt per dag hoeveel accounts oefenden.
 --    Alleen aantallen, nooit namen of e-mailadressen.
 
@@ -20,7 +23,7 @@ begin
   -- foto's van eerder door beheer verwijderde advertenties. Een SQL DELETE
   -- wist alleen metadata, niet het bestand in de onderliggende opslag:
   -- https://supabase.com/docs/guides/storage/schema/design
-  -- Vereist de voorbereidende Storage-opruiming op account-wissen.html.
+  -- account-wissen.html voert die opruiming uit voordat het deze functie aanroept.
   if exists (
     select 1 from storage.objects
     where bucket_id = 'boekfotos' and (storage.foldername(name))[1] = eigenaar::text
@@ -39,6 +42,25 @@ $$;
 
 revoke all on function public.account_verwijderen() from public, anon;
 grant execute on function public.account_verwijderen() to authenticated;
+
+-- Bind de bevestiging op de pagina aan hetzelfde account in het verzoek.
+-- Zo kan een sessiewissel tijdens het versturen nooit het nieuwe account wissen.
+-- De bestaande functie zonder argument blijft beschikbaar voor oudere pagina's.
+create or replace function public.account_verwijderen(p_eigenaar uuid)
+returns void
+language plpgsql security invoker set search_path = ''
+as $$
+declare
+  eigenaar uuid := auth.uid();
+begin
+  if eigenaar is null or p_eigenaar is distinct from eigenaar then
+    raise exception 'Je account is gewijzigd. Laad de pagina opnieuw.' using errcode = '42501';
+  end if;
+  perform public.account_verwijderen();
+end;
+$$;
+revoke all on function public.account_verwijderen(uuid) from public, anon;
+grant execute on function public.account_verwijderen(uuid) to authenticated;
 
 -- Beheerders: alleen de gebruikers-id's die de dagcijfers mogen zien. Vul via Table Editor (geen e-mail in code).
 create table if not exists public.beheerders (
