@@ -155,6 +155,153 @@
     checkAnswer.hidden = true;
     byId('volgende-vraag').before(checkAnswer);
 
+    // Een melding blijft bij de vraag: de lopende oefening en gekozen antwoorden blijven staan.
+    const reportDialog = create('dialog', 'vraag-melding');
+    reportDialog.setAttribute('aria-labelledby', 'vraag-melding-kop');
+    const reportForm = create('form');
+    reportForm.noValidate = true;
+    const reportHeading = create('h2', '', 'Meld een fout');
+    reportHeading.id = 'vraag-melding-kop';
+    const reportContext = create('p', 'vraag-melding-context');
+    const reportQuestion = create('p', 'vraag-melding-vraag');
+    const reportHint = create('p', 'vak-hint');
+    const reportLabel = create('label', '', 'Wat klopt er niet?');
+    reportLabel.htmlFor = 'vraag-melding-tekst';
+    const reportText = create('textarea', 'auth-input');
+    reportText.id = 'vraag-melding-tekst';
+    reportText.rows = 4;
+    reportText.setAttribute('aria-describedby', 'vraag-melding-teller vraag-melding-fout');
+    const reportCounter = create('p', 'vak-hint');
+    reportCounter.id = 'vraag-melding-teller';
+    const reportError = create('p', 'auth-error');
+    reportError.id = 'vraag-melding-fout';
+    reportError.setAttribute('role', 'alert');
+    const reportSuccess = create('p', 'vraag-melding-gelukt');
+    reportSuccess.setAttribute('role', 'status');
+    const reportActions = create('div', 'vak-knoppen');
+    const reportClose = create('button', 'knop-secundair', 'Annuleren');
+    reportClose.type = 'button';
+    const reportSubmit = create('button', 'knop', 'Versturen →');
+    reportSubmit.type = 'submit';
+    reportActions.append(reportClose, reportSubmit);
+    reportForm.append(reportHeading, reportContext, reportQuestion, reportHint, reportLabel, reportText, reportCounter, reportError, reportSuccess, reportActions);
+    reportDialog.append(reportForm);
+    document.body.append(reportDialog);
+    let report = null;
+    let reportSource = null;
+
+    const updateReportCounter = () => { reportCounter.textContent = `${reportText.value.length} / ${reportText.maxLength}`; };
+    const reportFailure = message => {
+      reportError.textContent = message;
+      reportError.hidden = !message;
+    };
+    function openReport(question, runLevel, runMode, source) {
+      if (!context.owner || reportDialog.open) return;
+      const number = Number(String(question.id).replace('hard:', '')) + 1;
+      const label = `${levelLabel(runLevel)} · ${chapterNames[question.h]}`;
+      // Het bronnummer en de sleutel blijven gelijk wanneer vragen en opties geschud worden.
+      const prefix = `${data.naam.slice(0, 150)}\n${label.slice(0, 200)}\n${modeLabel(runMode)} · Bronvraag ${number} · ${vraagSleutel(question)}\nVraag: ${question.q.slice(0, 600)}\n\nMelding: `;
+      report = { owner: context.owner, prefix, busy: false };
+      reportSource = source;
+      reportContext.textContent = label;
+      reportQuestion.textContent = question.q;
+      reportHint.textContent = screen === 'oefenen' && session?.durationMs
+        ? 'Je oefening blijft open. De klok loopt door terwijl je een fout meldt.'
+        : 'Vak, niveau en vraag worden automatisch meegestuurd.';
+      reportText.value = '';
+      reportText.maxLength = 2000 - prefix.length;
+      reportText.readOnly = false;
+      reportText.removeAttribute('aria-invalid');
+      [reportLabel, reportText, reportCounter, reportSubmit].forEach(element => { element.hidden = false; });
+      reportSubmit.disabled = false;
+      reportSubmit.textContent = 'Versturen →';
+      reportClose.textContent = 'Annuleren';
+      reportSuccess.hidden = true;
+      reportSuccess.textContent = '';
+      reportForm.removeAttribute('aria-busy');
+      reportFailure('');
+      updateReportCounter();
+      reportDialog.showModal();
+      reportText.focus();
+    }
+    function reportButton(question, runLevel, runMode) {
+      const button = create('button', 'vak-tekstknop vraag-melden', 'Meld een fout');
+      button.type = 'button';
+      button.addEventListener('click', () => openReport(question, runLevel, runMode, button));
+      return button;
+    }
+    const currentReportButton = create('button', 'vak-tekstknop vraag-melden', 'Meld een fout');
+    currentReportButton.type = 'button';
+    currentReportButton.id = 'vraag-melden';
+    currentReportButton.addEventListener('click', () => {
+      if (!session || screen !== 'oefenen' || timeExpired()) return;
+      openReport(session.questions[session.index].question, session.level, session.mode, currentReportButton);
+    });
+    byId('volgende-vraag').parentElement.prepend(currentReportButton);
+    reportClose.addEventListener('click', () => reportDialog.close());
+    reportDialog.addEventListener('close', () => {
+      if (reportDialog.open) return;
+      report = null;
+      const target = reportSource?.isConnected && reportSource.getClientRects().length
+        ? reportSource : byId(screen === 'einde' ? 'score-kop' : 'start-oefening');
+      target.focus({ preventScroll: true });
+    });
+    reportText.addEventListener('input', () => {
+      updateReportCounter();
+      reportText.removeAttribute('aria-invalid');
+      reportFailure('');
+    });
+    reportForm.addEventListener('submit', async event => {
+      event.preventDefault();
+      const active = report;
+      if (!active || active.busy) return;
+      const message = reportText.value.trim();
+      if (message.length < 5 || message.length > reportText.maxLength) {
+        reportFailure(message.length < 5 ? 'Schrijf kort wat er niet klopt, minstens 5 tekens.' : 'Maak je melding iets korter.');
+        reportText.setAttribute('aria-invalid', 'true');
+        reportText.focus();
+        return;
+      }
+      active.busy = true;
+      reportSubmit.disabled = true;
+      reportText.readOnly = true;
+      reportSubmit.textContent = 'Even geduld…';
+      reportClose.textContent = 'Sluiten';
+      reportForm.setAttribute('aria-busy', 'true');
+      reportFailure('');
+      try {
+        const user = await BES.auth?.gebruiker?.();
+        if (report !== active || !reportDialog.open) return;
+        if (!user || user.id !== active.owner || context.owner !== active.owner || !BES.auth?.client) throw new Error('Geen account');
+        const { error } = await BES.auth.client.from('feedback').insert({
+          user_id: user.id,
+          naam: BES.auth.naamGegevens?.(user)?.volledig || user.user_metadata?.naam || null,
+          email: user.email || null,
+          soort: 'fout', vak: data.id,
+          tekst: active.prefix + message,
+          pagina: window.location.pathname
+        });
+        if (error) throw error;
+        if (report !== active || !reportDialog.open) return;
+        [reportLabel, reportText, reportCounter, reportSubmit].forEach(element => { element.hidden = true; });
+        reportSuccess.textContent = 'Bedankt! Je melding is verstuurd.';
+        reportSuccess.hidden = false;
+        reportClose.textContent = screen === 'oefenen' ? 'Verder oefenen' : 'Sluiten';
+        reportClose.focus();
+      } catch {
+        if (report === active && reportDialog.open) reportFailure('Versturen is niet gelukt. Je tekst blijft staan. Probeer het opnieuw.');
+      } finally {
+        active.busy = false;
+        if (report === active) {
+          reportSubmit.disabled = false;
+          reportText.readOnly = false;
+          reportSubmit.textContent = 'Versturen →';
+          if (reportSuccess.hidden) reportClose.textContent = 'Annuleren';
+          reportForm.removeAttribute('aria-busy');
+        }
+      }
+    });
+
     const steps = ['modus', ...(showLevelStep ? ['niveau'] : []), 'tijd', 'hoofdstukken'];
     steps.forEach((name, index) => {
       byId(`stap-${name}`).querySelector('.keuze-stap').textContent = `Stap ${index + 1}`;
@@ -460,6 +607,8 @@
     function setAccount(user) {
       const owner = user?.id || null;
       if (owner === context.owner && context.authReady) return;
+      if (reportDialog.open) reportDialog.close();
+      report = null;
       const previous = context;
       authGeneration += 1;
       banks.forEach((bank, value) => {
@@ -653,6 +802,9 @@
 
     function start(questions, runMode = mode, runLevel = level, runSeconds = timed ? secondsPerQuestion : 0) {
       if (!questions.length || !context.authReady || runLevel !== level) return;
+      if (context.owner) {
+        try { window.localStorage.setItem(`bes_laatst_geoefend_${context.owner}`, JSON.stringify({ vak: data.id })); } catch {}
+      }
       stopClock();
       session = {
         mode: runMode, level: runLevel, owner: context, index: 0,
@@ -867,6 +1019,7 @@
             item.append(create('p', '', `Juiste antwoord: ${entry.question.o[entry.question.a]}`));
           }
           item.append(create('p', '', entry.question.u));
+          item.append(reportButton(entry.question, session.level, session.mode));
           byId('overzicht-vragen').append(item);
         });
       }
@@ -875,7 +1028,8 @@
       bewaarSessie(good, answers.length);
       bewaarFouten(answers, correct);
       showScreen('einde');
-      byId('score-kop').focus({ preventScroll: true });
+      if (reportDialog.open) reportHint.textContent = 'De tijd is om. Je uitslag staat klaar zodra je deze melding sluit.';
+      else byId('score-kop').focus({ preventScroll: true });
       byId('eindscherm').scrollIntoView({ block: 'start', behavior: 'instant' });
       scheduleSync();
     }
@@ -1221,7 +1375,7 @@
     document.addEventListener('visibilitychange', updateClock);
     byId('terug-vak').addEventListener('click', () => { session = null; showScreen('keuzes'); byId('start-oefening').focus(); });
     document.addEventListener('keydown', event => {
-      if (!session || screen !== 'oefenen' || currentTab !== 'paneel-oefenen' || event.repeat || event.ctrlKey || event.metaKey || event.altKey || !byId('stop-bevestiging').hidden) return;
+      if (reportDialog.open || !session || screen !== 'oefenen' || currentTab !== 'paneel-oefenen' || event.repeat || event.ctrlKey || event.metaKey || event.altKey || !byId('stop-bevestiging').hidden) return;
       const target = event.target;
       if (target.closest?.('input, textarea, select, [contenteditable="true"]')) return;
       if (/^[0-9]$/.test(event.key)) { event.preventDefault(); answer(event.key === '0' ? 9 : Number(event.key) - 1); }

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="assets/deur.js?v=62"></script>
+  <script src="assets/deur.js?v=63"></script>
   <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta property="og:type" content="website">
@@ -15,7 +15,7 @@
   <meta property="og:image:height" content="630">
   <meta property="og:url" content="https://beriesexamspace.com/v2/hub.html">
   <meta name="twitter:card" content="summary_large_image">
-  <script src="assets/updates.js?v=62"></script>
+  <script src="assets/updates.js?v=63"></script>
   <script>
     // Welkomstscherm (Wat is nieuw) één keer per persoon per versie.
     // Op dit toestel al gezien: meteen door. Anders even wachten op het account (misschien al gezien op een ander toestel).
@@ -59,16 +59,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=62">
-  <link rel="stylesheet" href="assets/intro.css?v=62">
-  <script src="assets/app.js?v=62"></script>
-  <script src="assets/intro.js?v=62"></script>
-  <script src="assets/config.js?v=62" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=63">
+  <link rel="stylesheet" href="assets/intro.css?v=63">
+  <script src="assets/app.js?v=63"></script>
+  <script src="assets/intro.js?v=63"></script>
+  <script src="assets/vakken.js?v=63"></script>
+  <script src="assets/config.js?v=63" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=62" defer></script>
-  <script src="assets/plan.js?v=62" defer></script>
-  <script src="assets/comit.js?v=62" defer></script>
-  <script src="assets/activiteit.js?v=62" defer></script>
+  <script src="assets/auth.js?v=63" defer></script>
+  <script src="assets/plan.js?v=63" defer></script>
+  <script src="assets/comit.js?v=63" defer></script>
+  <script src="assets/activiteit.js?v=63" defer></script>
   <style>
     html { scroll-behavior: smooth; }
 
@@ -124,6 +125,9 @@
     :where(html.has-hover) a.kaart.jaar[data-jaar]:not([aria-disabled="true"]):active { transform: scale(.99); }
 
     .hub-sectie { scroll-margin-top: 88px; }
+    .hub-verder { margin-bottom: 24px; }
+    .hub-verder .kaart { min-height: 44px; padding: 20px 24px; }
+    .hub-verder-label { color: var(--accent); font-size: .8125rem; font-weight: 600; }
     .kaart-binnenkort { cursor: default; opacity: .8; }
     /* Comit: een eigen knop in het midden onder de drie jaren, met een rand in teal naar blauw. */
     .hub-comit { display: flex; justify-content: center; margin-top: 28px; }
@@ -223,6 +227,17 @@
         <h1 id="begroeting">Welkom.</h1>
         <p id="hub-vraag">In welk jaar zit je?</p>
       </header>
+
+      <div class="hub-verder" id="hub-verder" hidden>
+        <a class="kaart kaart-pijl" id="hub-verder-link">
+          <span class="kaart-tekst">
+            <span class="hub-verder-label">Verder oefenen</span>
+            <span class="kaart-titel" id="hub-verder-vak"></span>
+            <span class="kaart-sub">Kies je oefenvorm en hoofdstukken.</span>
+          </span>
+          <span class="pijl" aria-hidden="true">→</span>
+        </a>
+      </div>
 
       <section class="rijst" aria-label="Kies je jaar">
         <div class="rooster-3">
@@ -358,6 +373,43 @@
       };
       updateBegroeting();
       window.addEventListener('bes:auth', event => updateBegroeting(event.detail?.user));
+
+      const verder = document.getElementById('hub-verder');
+      const verderLink = document.getElementById('hub-verder-link');
+      const verderVak = document.getElementById('hub-verder-vak');
+      let verderEigenaar = null;
+      let authOntvangen = false;
+      const updateVerderOefenen = () => {
+        verder.hidden = true;
+        verderLink.removeAttribute('href');
+        verderVak.textContent = '';
+        if (!verderEigenaar) return;
+        try {
+          const laatstGeoefend = JSON.parse(window.localStorage.getItem('bes_laatst_geoefend_' + verderEigenaar));
+          const vak = bes.vakken?.find(item => item.v2 === true && item.id === laatstGeoefend?.vak);
+          if (!vak) return;
+          verderVak.textContent = vak.naam;
+          verderLink.href = 'vak/' + vak.id + '/';
+          verder.hidden = false;
+        } catch {}
+      };
+      const verderVoorGebruiker = user => {
+        verderEigenaar = typeof user?.id === 'string' && user.id ? user.id : null;
+        updateVerderOefenen();
+      };
+      window.addEventListener('bes:auth', event => {
+        authOntvangen = true;
+        verderVoorGebruiker(event.detail?.uitloggen ? null : event.detail?.user);
+      });
+      document.addEventListener('DOMContentLoaded', () => {
+        Promise.resolve(bes.auth?.gebruiker?.()).then(user => {
+          if (!authOntvangen) verderVoorGebruiker(user);
+        }).catch(() => {});
+      }, { once: true });
+      window.addEventListener('storage', event => {
+        if (event.key === null || event.key === 'bes_laatst_geoefend_' + verderEigenaar) updateVerderOefenen();
+      });
+      window.addEventListener('pageshow', updateVerderOefenen);
 
       const kaarten = Array.from(document.querySelectorAll('.jaar[data-jaar]'));
       const laatst = typeof bes.jaarOphalen === 'function' ? bes.jaarOphalen() : null;
