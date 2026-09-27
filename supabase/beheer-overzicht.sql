@@ -90,6 +90,20 @@ begin
         from (select soort, vak, tekst, gemaakt from public.feedback order by gemaakt desc limit 5) as f
       )
     ),
+    'boeken', json_build_object(
+      'te_koop', (select count(*) from public.boeken where not verkocht and verloopt > now()),
+      'verkocht', (select count(*) from public.boeken where verkocht),
+      'meldingen', (
+        select coalesce(json_agg(json_build_object(
+          'boek_id', m.boek_id, 'titel', m.titel, 'reden', m.reden, 'gemaakt', m.gemaakt
+        ) order by m.gemaakt desc, m.id desc), '[]'::json)
+        from (
+          select bm.id, bm.boek_id, b.titel, bm.reden, bm.gemaakt
+          from public.boek_meldingen bm join public.boeken b on b.id = bm.boek_id
+          order by bm.gemaakt desc, bm.id desc limit 10
+        ) as m
+      )
+    ),
     'vertrek', (select coalesce(json_object_agg(v.reden, v.n), '{}'::json) from (select reden, count(*) as n from public.vertrek_redenen group by reden) as v)
   ) into v_uit;
   return v_uit;

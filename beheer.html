@@ -60,6 +60,17 @@
     .beheer-plan[data-plan="pro"] { background: #0b0a08; color: #e6c872; }
     .beheer-feedback li { display: block; }
     .beheer-feedback p { margin: 4px 0 0; color: var(--ink); font-size: .9375rem; line-height: 1.5; overflow-wrap: anywhere; }
+    .beheer-boeken-kaart { margin-top: 12px; }
+    .beheer-boek-meldingen li { display: block; }
+    .beheer-boek-meldingen strong, .beheer-boek-meldingen p { overflow-wrap: anywhere; }
+    .beheer-boek-meldingen strong { display: block; margin-bottom: 4px; }
+    .beheer-boek-meldingen p { margin: 6px 0 10px; line-height: 1.5; }
+    .beheer-boek-acties { display: flex; flex-wrap: wrap; gap: 8px; }
+    .beheer-boek-acties button { min-height: 44px; max-width: 100%; white-space: normal; }
+    .beheer-boek-bevestiging { margin-top: 10px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+    .beheer-boek-bevestiging:not([hidden]) { animation: menu-open 200ms var(--ease); }
+    .beheer-boek-status { margin: 10px 0 0; color: var(--ink-soft); font-size: .9375rem; overflow-wrap: anywhere; }
+    .beheer-boek-status:empty { margin: 0; }
     .beheer-leeg { margin: 0; color: var(--ink-soft); font-size: .9375rem; }
     .beheer-verborgen { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
     .beheer-zoek { position: sticky; z-index: 5; top: 68px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin: 0 -4px 12px; padding: 8px 4px; background: var(--bg); }
@@ -170,6 +181,15 @@
           <div class="kaart" style="margin-top: 12px"><ul class="beheer-rijen beheer-feedback" id="beheer-feedback"></ul></div>
         </section>
 
+        <section class="beheer-sectie" id="beheer-boeken" aria-labelledby="boeken-kop">
+          <h2 class="sectie-kop" id="boeken-kop" tabindex="-1">Boeken</h2>
+          <div class="beheer-cijfers" id="beheer-boeken-cijfers"></div>
+          <div class="kaart beheer-boeken-kaart">
+            <ul class="beheer-rijen beheer-boek-meldingen" id="beheer-boek-meldingen" aria-label="Nieuwste boekmeldingen"></ul>
+          </div>
+          <p class="beheer-boek-status" id="beheer-boek-status" role="status"></p>
+        </section>
+
         <section class="beheer-sectie" aria-labelledby="vertrek-kop">
           <h2 class="sectie-kop" id="vertrek-kop">Waarom mensen hun account wisten</h2>
           <div class="kaart"><ul class="beheer-rijen" id="beheer-vertrek"></ul></div>
@@ -236,6 +256,96 @@
 
       let accounts = [];
       let totaalAccounts = 0;
+      let laadVersie = 0;
+      let beheerderId = null;
+      let boekBezig = false;
+      let sluitBoekBevestiging = null;
+      const boekStatus = $('beheer-boek-status');
+      const boekKnoppen = (bezig) => {
+        $('beheer-boeken').setAttribute('aria-busy', String(bezig));
+        $('beheer-boek-meldingen').querySelectorAll('button').forEach((knop) => { knop.disabled = bezig; });
+      };
+      const boekMelding = (rij, index) => {
+        const li = el('li');
+        li.append(el('strong', '', rij.titel), el('small', '', lang.format(new Date(rij.gemaakt))), el('p', '', rij.reden));
+        const acties = el('div', 'beheer-boek-acties');
+        const wis = el('button', 'knop-secundair', 'Wis dit boek');
+        wis.type = 'button';
+        wis.disabled = boekBezig;
+        wis.setAttribute('aria-expanded', 'false');
+        const bevestiging = el('div', 'beheer-boek-bevestiging');
+        bevestiging.id = 'beheer-boek-bevestiging-' + index;
+        bevestiging.hidden = true;
+        bevestiging.setAttribute('role', 'group');
+        const vraag = el('p', '', 'Wil je "' + rij.titel + '" wissen? Het boek en de bijbehorende meldingen verdwijnen uit het overzicht.');
+        vraag.id = bevestiging.id + '-vraag';
+        bevestiging.setAttribute('aria-labelledby', vraag.id);
+        wis.setAttribute('aria-controls', bevestiging.id);
+        const keuze = el('div', 'beheer-boek-acties');
+        const ja = el('button', 'knop', 'Ja, wis dit boek');
+        const nee = el('button', 'knop-secundair', 'Annuleren');
+        ja.type = nee.type = 'button';
+        ja.disabled = nee.disabled = boekBezig;
+        const sluit = (focus = true) => {
+          bevestiging.hidden = true;
+          wis.setAttribute('aria-expanded', 'false');
+          if (sluitBoekBevestiging === sluit) sluitBoekBevestiging = null;
+          if (focus && wis.isConnected) wis.focus();
+        };
+        wis.addEventListener('click', () => {
+          if (boekBezig || !beheerderId) return;
+          if (!bevestiging.hidden) { sluit(); return; }
+          if (sluitBoekBevestiging) sluitBoekBevestiging(false);
+          sluitBoekBevestiging = sluit;
+          boekStatus.textContent = '';
+          bevestiging.hidden = false;
+          wis.setAttribute('aria-expanded', 'true');
+          nee.focus();
+        });
+        nee.addEventListener('click', () => { if (!boekBezig) sluit(); });
+        bevestiging.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape' && !boekBezig) { event.preventDefault(); sluit(); }
+        });
+        ja.addEventListener('click', async () => {
+          if (boekBezig || !beheerderId || bevestiging.hidden) return;
+          const eigenaar = beheerderId;
+          boekBezig = true;
+          boekKnoppen(true);
+          ja.textContent = 'Bezig met wissen.';
+          boekStatus.textContent = '';
+          try {
+            const user = await auth.gebruiker();
+            if (!user || user.id !== eigenaar || beheerderId !== eigenaar) { await laadOverzicht(); return; }
+            // De RPC controleert de beheerder en kan ook verlopen of verkochte boeken wissen.
+            const resultaat = await auth.client.rpc('beheer_boek_wissen', { p_boek_id: rij.boek_id });
+            if (resultaat.error) throw resultaat.error;
+            const huidig = await auth.gebruiker();
+            if (!huidig || huidig.id !== eigenaar) return;
+            const vernieuwd = await laadOverzicht();
+            if (vernieuwd && beheerderId === eigenaar) {
+              boekStatus.textContent = resultaat.data === false ? 'Dit boek was al gewist. Het overzicht is bijgewerkt.' : 'Het boek is gewist.';
+              $('boeken-kop').focus();
+            } else if (vernieuwd === false && (await auth.gebruiker())?.id === eigenaar) {
+              status.textContent = 'Het boek is gewist, maar het overzicht kon niet worden geladen. Vernieuw de pagina.';
+            }
+          } catch {
+            if (beheerderId === eigenaar && li.isConnected) {
+              boekStatus.textContent = 'Wissen is niet gelukt. Probeer het opnieuw.';
+              sluit(false);
+            }
+          } finally {
+            boekBezig = false;
+            boekKnoppen(false);
+            ja.textContent = 'Ja, wis dit boek';
+            if (li.isConnected && bevestiging.hidden && !inhoud.hidden) wis.focus();
+          }
+        });
+        acties.append(wis);
+        keuze.append(ja, nee);
+        bevestiging.append(vraag, keuze);
+        li.append(acties, bevestiging);
+        return li;
+      };
       const zoek = $('beheer-zoek');
       const telAccounts = () => {
         const term = zoek.value.trim().toLowerCase();
@@ -247,18 +357,20 @@
       };
       zoek.addEventListener('input', telAccounts);
 
-      const laad = async () => {
+      const laad = async (versie) => {
         await auth.gereed;
         const user = await auth.gebruiker();
-        if (!user) { status.textContent = 'Log in om dit overzicht te zien.'; inhoud.hidden = true; return; }
+        if (versie !== laadVersie) return null;
+        if (!user) { status.textContent = 'Log in om dit overzicht te zien.'; return false; }
         status.textContent = 'Even laden.';
         const [overzicht, dagen] = await Promise.all([
           auth.client.rpc('beheer_overzicht'),
           auth.client.rpc('studie_dagcijfers', { p_dagen: 30 })
         ]);
-        if (overzicht.error) { status.textContent = 'Laden is niet gelukt. Staat de SQL uit supabase/beheer-overzicht.sql al in het project?'; inhoud.hidden = true; return; }
+        if (versie !== laadVersie) return null;
+        if (overzicht.error) { status.textContent = 'Laden is niet gelukt. Staat de SQL uit supabase/beheer-overzicht.sql al in het project?'; return false; }
         const o = overzicht.data;
-        if (!o) { status.textContent = 'Dit overzicht is alleen voor de beheerder.'; inhoud.hidden = true; return; }
+        if (!o) { status.textContent = 'Dit overzicht is alleen voor de beheerder.'; return false; }
 
         $('tegel-accounts').textContent = o.accounts.totaal;
         $('tegel-nieuw').textContent = o.accounts.week;
@@ -360,6 +472,12 @@
           return li;
         }), 'Nog geen feedback.');
 
+        cijfers('beheer-boeken-cijfers', [
+          [o.boeken ? o.boeken.te_koop : '-', 'te koop'],
+          [o.boeken ? o.boeken.verkocht : '-', 'verkocht']
+        ]);
+        rijen('beheer-boek-meldingen', (o.boeken?.meldingen || []).map(boekMelding), o.boeken ? 'Nog geen boekmeldingen.' : 'Boekenbeheer is nog niet ingeschakeld.');
+
         rijen('beheer-vertrek', Object.entries(o.vertrek || {}).sort((a, b) => b[1] - a[1]).map(([reden, aantal]) => {
           const li = el('li');
           li.append(el('span', '', redenen[reden] || reden), el('small', '', aantal + ' keer'));
@@ -370,11 +488,26 @@
         balken('beheer-nieuw-lijst', o.accounts.per_dag || [], 'nieuw', 'nieuwe accounts');
 
         status.textContent = '';
+        beheerderId = user.id;
         inhoud.hidden = false;
+        return true;
       };
 
-      window.addEventListener('bes:auth', laad);
-      laad().catch(() => { status.textContent = 'Laden is niet gelukt. Probeer het later opnieuw.'; });
+      const laadOverzicht = () => {
+        const versie = ++laadVersie;
+        beheerderId = null;
+        inhoud.hidden = true;
+        sluitBoekBevestiging = null;
+        boekStatus.textContent = '';
+        $('beheer-boek-meldingen').replaceChildren();
+        return laad(versie).catch(() => {
+          if (versie !== laadVersie) return null;
+          status.textContent = 'Laden is niet gelukt. Probeer het later opnieuw.';
+          return false;
+        });
+      };
+      window.addEventListener('bes:auth', laadOverzicht);
+      laadOverzicht();
     });
   </script>
 </body>
