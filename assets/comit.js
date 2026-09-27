@@ -13,6 +13,7 @@
     svg.setAttribute('height', maat);
     svg.setAttribute('aria-hidden', 'true');
     svg.setAttribute('focusable', 'false');
+    svg.style.display = 'block';
     const defs = document.createElementNS(ns, 'defs');
     const verloop = document.createElementNS(ns, 'linearGradient');
     const id = `comit-verloop-${++logoNummer}`;
@@ -29,19 +30,15 @@
     });
     defs.append(verloop);
     svg.append(defs);
-    [
-      'M72 22C62 12 47 9 33 15C17 21 9 37 12 53C14 64 20 72 29 77L25 88L44 81C56 82 67 78 75 69L65 60C59 66 51 69 42 66L36 69L37 61C30 58 26 52 26 45C26 33 35 25 47 25C54 25 60 28 64 32Z',
-      'M76 31C78 39 81 42 89 44C81 46 78 49 76 57C74 49 71 46 63 44C71 42 74 39 76 31Z'
-    ].forEach(d => {
-      const pad = document.createElementNS(ns, 'path');
-      pad.setAttribute('d', d);
-      pad.setAttribute('fill', `url(#${id})`);
-      svg.append(pad);
-    });
+    const pad = document.createElementNS(ns, 'path');
+    pad.setAttribute('d', 'M48 6C51 31 65 45 90 48C65 51 51 65 48 90C45 65 31 51 6 48C31 45 45 31 48 6Z');
+    pad.setAttribute('fill', `url(#${id})`);
+    svg.append(pad);
     return svg;
   };
 
   async function initialize() {
+    document.querySelectorAll('.comit-gezicht').forEach(plek => plek.replaceChildren(BES.comitLogo(24)));
     const pagina = document.querySelector('.comit-pagina');
     if (!pagina) return;
     let user;
