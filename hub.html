@@ -233,13 +233,13 @@
           <span class="kaart-tekst">
             <span class="hub-verder-label">Verder oefenen</span>
             <span class="kaart-titel" id="hub-verder-vak"></span>
-            <span class="kaart-sub">Kies je oefenvorm en hoofdstukken.</span>
+            <span class="kaart-sub" id="hub-verder-sub">Kies je oefenvorm en hoofdstukken.</span>
           </span>
           <span class="pijl" aria-hidden="true">→</span>
         </a>
       </div>
 
-      <section class="rijst" aria-label="Kies je jaar">
+      <section class="rijst hub-sectie" id="kies-je-jaar" aria-label="Kies je jaar">
         <div class="rooster-3">
           <a class="kaart jaar" href="jaar-1ba.html" data-jaar="1ba">
             <span class="jaar-band">
@@ -377,24 +377,56 @@
       const verder = document.getElementById('hub-verder');
       const verderLink = document.getElementById('hub-verder-link');
       const verderVak = document.getElementById('hub-verder-vak');
+      const verderSub = document.getElementById('hub-verder-sub');
+      const verderVakken = (bes.vakken || []).filter(vak => vak.v2 === true);
       let verderEigenaar = null;
+      let verderGeneratie = 0;
+      let verderSessieVak = null;
+      let verderSessieOpgevraagd = false;
       let authOntvangen = false;
+      const lokaalVerderVak = () => {
+        try {
+          const laatstGeoefend = JSON.parse(window.localStorage.getItem('bes_laatst_geoefend_' + verderEigenaar));
+          return verderVakken.find(vak => vak.id === laatstGeoefend?.vak) || null;
+        } catch { return null; }
+      };
+      const laadVerderSessie = async () => {
+        const client = bes.auth?.client;
+        if (!verderEigenaar || !client || verderSessieOpgevraagd || !verderVakken.length) return;
+        const eigenaar = verderEigenaar;
+        const generatie = verderGeneratie;
+        verderSessieOpgevraagd = true;
+        try {
+          const { data: sessies, error } = await client.from('sessies').select('vak')
+            .eq('user_id', eigenaar).in('vak', verderVakken.map(vak => vak.id))
+            .order('gemaakt_op', { ascending: false }).limit(1);
+          if (generatie !== verderGeneratie || eigenaar !== verderEigenaar) return;
+          if (!error) verderSessieVak = verderVakken.find(vak => vak.id === sessies?.[0]?.vak) || null;
+        } catch {}
+        if (generatie === verderGeneratie && eigenaar === verderEigenaar) updateVerderOefenen();
+      };
       const updateVerderOefenen = () => {
         verder.hidden = true;
         verderLink.removeAttribute('href');
         verderVak.textContent = '';
+        verderSub.textContent = '';
         if (!verderEigenaar) return;
-        try {
-          const laatstGeoefend = JSON.parse(window.localStorage.getItem('bes_laatst_geoefend_' + verderEigenaar));
-          const vak = bes.vakken?.find(item => item.v2 === true && item.id === laatstGeoefend?.vak);
-          if (!vak) return;
-          verderVak.textContent = vak.naam;
-          verderLink.href = 'vak/' + vak.id + '/';
-          verder.hidden = false;
-        } catch {}
+        // Een net gestarte ronde op dit toestel gaat altijd voor de opgehaalde geschiedenis.
+        const vak = lokaalVerderVak() || verderSessieVak;
+        verderVak.textContent = vak ? vak.naam : 'Kies een vak';
+        verderSub.textContent = vak ? 'Kies je oefenvorm en hoofdstukken.' : 'Ga naar je jaar en kies een vak om te oefenen.';
+        verderLink.href = vak ? 'vak/' + vak.id + '/' : '#kies-je-jaar';
+        verder.hidden = false;
+        if (!vak) laadVerderSessie();
       };
       const verderVoorGebruiker = user => {
-        verderEigenaar = typeof user?.id === 'string' && user.id ? user.id : null;
+        const eigenaar = typeof user?.id === 'string' && user.id ? user.id : null;
+        if (eigenaar !== verderEigenaar) {
+          verderEigenaar = eigenaar;
+          verderGeneratie += 1;
+          verderSessieVak = null;
+          verderSessieOpgevraagd = false;
+        }
         updateVerderOefenen();
       };
       window.addEventListener('bes:auth', event => {
