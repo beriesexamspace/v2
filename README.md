@@ -248,6 +248,10 @@ Sinds 20-09-2026 (nacht) staat hier de Apple-carrousel `BES.carrousel(element, {
 
 De sectie `hub.html#hoe-werkt-het` bestaat uit vier korte kaarten (Log in, Kies je jaar en vak, Kies hoofdstukken en oefenvorm, Zie je voortgang groeien) en daaronder een `details` "Volledige uitleg →" met tien tekststappen (Waar / Klik op / Daarna) met de exacte knopnamen van de site. Vaste regel: uitleg op de hub is tekst. Geen screenshots van de site in de site, geen nagemaakte muis, geen animaties in uitleg; maximaal vier kaarten zichtbaar, de rest ingeklapt. Verandert een knopnaam, pas dan ook de tekst hier aan.
 
+## Wie is Berie (hub)
+
+Sinds 29-09-2026 staat op de hub onder de slideshow Hoe werkt het het blok Wie is Berie (`#wie-is-berie`): links een korte tekst over Berat (geen woord over de site), rechts een grote staande foto (`assets/berie-foto.jpg`, 768 x 1344, uitgesneden met `object-fit: cover`). Op de telefoon staat de foto boven de tekst. De knop Lees meer gaat naar `over-mij.html`. De volgorde onderaan de hub is nu: Hoe werkt het, Wie is Berie, Wat is nieuw. Later wordt Over mij uitgebreid met het lange verhaal en meer foto's.
+
 ## Comit
 
 Sinds 27-09-2026 is het Comit-logo een vierpuntige ster met gebogen zijden en het bestaande verloop van teal naar blauw (`--teal` en `--accent`). De gedeelde SVG via `BES.comitLogo` staat op de hub, bij de kennismaking, in de chat en geschiedenis, en vervangt ook de C bij het oefenresultaat. De vakpagina's en het sjabloon laden hiervoor hetzelfde bestaande `assets/comit.js`; de chat start alleen op de Comit-pagina. Cachenummer: 65.

@@ -127,6 +127,19 @@
     :where(html.has-hover) a.kaart.jaar[data-jaar]:not([aria-disabled="true"]):active { transform: scale(.99); }
 
     .hub-sectie { scroll-margin-top: 88px; }
+    /* Wie is Berie: tekst links, grote staande foto rechts; op de telefoon staat de foto boven de tekst. */
+    .hub-wie-kaart { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 460px; padding: 0; overflow: hidden; }
+    .hub-wie-tekst { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 16px; padding: clamp(28px, 5vw, 56px); }
+    .hub-wie-tekst h2 { margin: 0; font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 700; line-height: 1.1; letter-spacing: -.03em; }
+    .hub-wie-tekst p { max-width: 36ch; margin: 0; color: var(--ink-soft); font-size: 1.0625rem; line-height: 1.65; }
+    .hub-wie-tekst .knop-secundair { margin-top: 8px; }
+    .hub-wie-foto { position: relative; min-height: 320px; background: #3a1013; }
+    .hub-wie-foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 38%; }
+    @media (max-width: 720px) {
+      .hub-wie-kaart { grid-template-columns: minmax(0, 1fr); min-height: 0; }
+      .hub-wie-foto { order: -1; aspect-ratio: 4 / 5; min-height: 0; }
+      .hub-wie-tekst { padding: 24px 22px 28px; }
+    }
     .hub-verder { margin-bottom: 24px; }
     .hub-verder .kaart { min-height: 44px; padding: 20px 24px; }
     .hub-verder-label { color: var(--accent); font-size: .8125rem; font-weight: 600; }
@@ -348,18 +361,31 @@
         </div>
       </section>
 
+      <section class="sectie hub-sectie" id="hoe-werkt-het" aria-labelledby="hoe-werkt-het-kop">
+        <h2 class="sectie-kop" id="hoe-werkt-het-kop">Hoe werkt het</h2>
+        <section class="hub-intro" id="hub-intro" aria-roledescription="carrousel" aria-label="Hoe werkt het"></section>
+
+      </section>
+
+      <section class="sectie hub-sectie hub-wie" id="wie-is-berie" aria-labelledby="wie-kop">
+        <div class="kaart hub-wie-kaart">
+          <div class="hub-wie-tekst">
+            <h2 id="wie-kop">Wie is Berie?</h2>
+            <p>Hoi, ik ben Berie. Ik werk sinds 2023 als zelfstandig elektricien in de bouw en heb elektrotechniek gestudeerd. Ik hou van bouwen en ontwerpen, van een woning tot een website.</p>
+            <a class="knop-secundair" href="over-mij.html">Lees meer →</a>
+          </div>
+          <div class="hub-wie-foto">
+            <img src="assets/berie-foto.jpg?v=67" width="768" height="1344" alt="Berie in profiel, met een pet, voor een donkerrode achtergrond" loading="lazy" decoding="async">
+          </div>
+        </div>
+      </section>
+
       <section class="sectie hub-sectie" id="nieuw" aria-labelledby="nieuw-kop">
         <h2 class="sectie-kop" id="nieuw-kop">Wat is nieuw</h2>
         <div class="kaart">
           <ul class="hub-updates" id="hub-updates"></ul>
           <button class="knop-secundair hub-updates-knop" id="hub-updates-knop" type="button" aria-expanded="false" aria-controls="hub-updates" hidden>Alles bekijken →</button>
         </div>
-      </section>
-
-      <section class="sectie hub-sectie" id="hoe-werkt-het" aria-labelledby="hoe-werkt-het-kop">
-        <h2 class="sectie-kop" id="hoe-werkt-het-kop">Hoe werkt het</h2>
-        <section class="hub-intro" id="hub-intro" aria-roledescription="carrousel" aria-label="Hoe werkt het"></section>
-
       </section>
 
     </div>
