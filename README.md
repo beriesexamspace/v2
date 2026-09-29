@@ -250,7 +250,7 @@ De sectie `hub.html#hoe-werkt-het` bestaat uit vier korte kaarten (Log in, Kies 
 
 ## Wie is Berie (hub)
 
-Sinds 29-09-2026 staat op de hub onder de slideshow Hoe werkt het het blok Wie is Berie (`#wie-is-berie`): links een korte tekst over Berat (geen woord over de site), rechts een grote staande foto (`assets/berie-foto.jpg`, 768 x 1344, uitgesneden met `object-fit: cover`). Op de telefoon staat de foto boven de tekst. De knop Lees meer gaat naar `over-mij.html`. De volgorde onderaan de hub is nu: Hoe werkt het, Wie is Berie, Wat is nieuw. Later wordt Over mij uitgebreid met het lange verhaal en meer foto's.
+Sinds 29-09-2026 staat op de hub onder de slideshow Hoe werkt het het blok Wie is Berie (`#wie-is-berie`): links een korte tekst over Berat (geen woord over de site), rechts de hele staande foto (`assets/berie-foto.jpg`, 768 x 1344, zonder bijsnijden, dus het blok is zo hoog als de foto). Het hele blok is donkerrood (`#450c11`), precies de achtergrondkleur van de foto zoals Chrome die toont, zodat tekst en foto in elkaar overlopen. De foto is via Chrome naar sRGB omgezet en heeft geen ICC-profiel meer; met het oorspronkelijke profiel wijkt de kleur af en zie je een naad. Op de telefoon staat de foto boven de tekst. De knop Lees meer gaat naar `over-mij.html`. De volgorde onderaan de hub is nu: Hoe werkt het, Wie is Berie, Wat is nieuw. Later wordt Over mij uitgebreid met het lange verhaal en meer foto's.
 
 ## Comit
 

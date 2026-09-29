@@ -127,17 +127,19 @@
     :where(html.has-hover) a.kaart.jaar[data-jaar]:not([aria-disabled="true"]):active { transform: scale(.99); }
 
     .hub-sectie { scroll-margin-top: 88px; }
-    /* Wie is Berie: tekst links, grote staande foto rechts; op de telefoon staat de foto boven de tekst. */
-    .hub-wie-kaart { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 460px; padding: 0; overflow: hidden; }
+    /* Wie is Berie: donkerrood blok (de kleur van de foto), tekst links, de hele staande foto rechts; op de telefoon staat de foto boven de tekst. */
+    .hub-wie-kaart { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 42%); padding: 0; overflow: hidden; border-color: rgba(255, 255, 255, .1); background: #450c11; color: #fff; }
     .hub-wie-tekst { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 16px; padding: clamp(28px, 5vw, 56px); }
-    .hub-wie-tekst h2 { margin: 0; font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 700; line-height: 1.1; letter-spacing: -.03em; }
-    .hub-wie-tekst p { max-width: 36ch; margin: 0; color: var(--ink-soft); font-size: 1.0625rem; line-height: 1.65; }
-    .hub-wie-tekst .knop-secundair { margin-top: 8px; }
-    .hub-wie-foto { position: relative; min-height: 320px; background: #3a1013; }
-    .hub-wie-foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 38%; }
+    .hub-wie-tekst h2 { margin: 0; color: #fff; font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 700; line-height: 1.1; letter-spacing: -.03em; }
+    .hub-wie-tekst p { max-width: 36ch; margin: 0; color: rgba(255, 255, 255, .8); font-size: 1.0625rem; line-height: 1.65; }
+    .hub-wie-tekst .knop-secundair { margin-top: 8px; border-color: rgba(255, 255, 255, .4); background: transparent; color: #fff; }
+    :where(html.has-hover) .hub-wie-tekst .knop-secundair:hover { border-color: #fff; background: rgba(255, 255, 255, .14); color: #fff; }
+    .hub-wie-tekst .knop-secundair:focus-visible { outline-color: #fff; }
+    .hub-wie-foto { background: #450c11; }
+    .hub-wie-foto img { display: block; width: 100%; height: auto; }
     @media (max-width: 720px) {
-      .hub-wie-kaart { grid-template-columns: minmax(0, 1fr); min-height: 0; }
-      .hub-wie-foto { order: -1; aspect-ratio: 4 / 5; min-height: 0; }
+      .hub-wie-kaart { grid-template-columns: minmax(0, 1fr); }
+      .hub-wie-foto { order: -1; }
       .hub-wie-tekst { padding: 24px 22px 28px; }
     }
     .hub-verder { margin-bottom: 24px; }
@@ -375,7 +377,7 @@
             <a class="knop-secundair" href="over-mij.html">Lees meer →</a>
           </div>
           <div class="hub-wie-foto">
-            <img src="assets/berie-foto.jpg?v=67" width="768" height="1344" alt="Berie in profiel, met een pet, voor een donkerrode achtergrond" loading="lazy" decoding="async">
+            <img src="assets/berie-foto.jpg?v=68" width="768" height="1344" alt="Berie in profiel, met een pet, voor een donkerrode achtergrond" loading="lazy" decoding="async">
           </div>
         </div>
       </section>
