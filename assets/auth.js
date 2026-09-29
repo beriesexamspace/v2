@@ -364,6 +364,12 @@
       try {
         await request(api => api.signOut());
         recoveryUserId = null;
+        // Na uitloggen beslist het account weer of de kennismaking al gezien is (user_metadata.versie_gezien),
+        // niet meer dit toestel. Zo kan een volgend account op hetzelfde toestel de kennismaking wel krijgen.
+        try {
+          window.localStorage.removeItem('bes_versie_gezien');
+          window.localStorage.removeItem('bes_comit_voorgesteld');
+        } catch {}
         setUser(null, true);
         window.location.assign(pagePrefix + 'index.html');
       } catch (error) {
