@@ -167,7 +167,7 @@
     kop.append(naam, plan);
     lijst.append(kop);
     const pagina = window.location.pathname.split('/').pop() || 'index.html';
-    [['Profiel', 'profiel.html'], ['Weekoverzicht', 'voortgang.html'], ['Foutenlijst', 'fouten.html'], ['Examenplan', 'examenplan.html']].forEach(([tekst, pad]) => {
+    [['Profiel', 'profiel.html'], ['Weekoverzicht', 'voortgang.html'], ['Foutenlijst', 'fouten.html'], ['Examenplan', 'examenplan.html'], ['Feedback', 'feedback.html']].forEach(([tekst, pad]) => {
       const link = document.createElement('a');
       link.href = pagePrefix + pad;
       link.textContent = tekst;

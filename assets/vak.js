@@ -1025,7 +1025,7 @@
       }
       renderComit(answers, correct);
       toonVooruitgang(good, answers.length, session);
-      bewaarSessie(good, answers.length);
+      bewaarSessie(good, answers.length, answers, correct);
       bewaarFouten(answers, correct);
       showScreen('einde');
       if (reportDialog.open) reportHint.textContent = 'De tijd is om. Je uitslag staat klaar zodra je deze melding sluit.';
@@ -1068,11 +1068,20 @@
       regel.hidden = false;
     }
 
-    function bewaarSessie(goed, totaal) {
+    // Ook per hoofdstuk van deze ronde: [{ h, goed, totaal }] (supabase/sessie-hoofdstukken.sql), voor de groei per hoofdstuk later.
+    function bewaarSessie(goed, totaal, answers, correct) {
       const owner = context.owner;
       const client = BES.auth?.client;
       if (!owner || !client || !session || !totaal) return;
-      client.from('sessies').insert({ user_id: owner, vak: data.id, niveau: session.level || 'normaal', modus: session.mode, goed, totaal }).then(() => {}, () => {});
+      const rij = { user_id: owner, vak: data.id, niveau: session.level || 'normaal', modus: session.mode, goed, totaal };
+      const hoofdstukken = data.hoofdstukken.map(chapter => {
+        const group = answers.filter(entry => entry.question.h === chapter.id);
+        return { h: chapter.id, goed: group.filter(correct).length, totaal: group.length };
+      }).filter(item => item.totaal > 0);
+      // Alleen opnieuw zonder hoofdstukken als de kolom ontbreekt (PGRST204) of de vorm niet klopt (23514), nooit bij een netwerkfout (anders dubbele ronde).
+      client.from('sessies').insert({ ...rij, hoofdstukken }).then(({ error }) => {
+        if (error && (error.code === 'PGRST204' || error.code === '23514')) return client.from('sessies').insert(rij);
+      }).then(() => {}, () => {});
     }
 
     // Comit-basis zonder AI: sterke en zwakke hoofdstukken uit deze ronde, plus één tip met een knop.
