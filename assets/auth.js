@@ -206,6 +206,10 @@
       }
       controls.replaceChildren();
       navigation.querySelectorAll('.account-uitloggen-mobiel, [data-account-uitloggen], [data-beheer-nav]').forEach(link => link.remove());
+      // Over mij op open pagina's: ingelogd naar het rode blok Wie is Berie op de hub, anders naar Over mij (de hub zit achter de login).
+      navigation.querySelectorAll('.navigation-links a[data-over-mij]').forEach(link => {
+        link.href = pagePrefix + (currentUser ? 'hub.html#wie-is-berie' : 'over-mij.html');
+      });
       if (!currentUser) {
         beheerderBelofte = null;
         const login = document.createElement('a');

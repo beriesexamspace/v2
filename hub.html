@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="assets/deur.js?v=68"></script>
+  <script src="assets/deur.js?v=69"></script>
   <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta property="og:type" content="website">
@@ -15,7 +15,7 @@
   <meta property="og:image:height" content="630">
   <meta property="og:url" content="https://beriesexamspace.com/v2/hub.html">
   <meta name="twitter:card" content="summary_large_image">
-  <script src="assets/updates.js?v=68"></script>
+  <script src="assets/updates.js?v=69"></script>
   <script>
     // Welkomstscherm (Wat is nieuw) één keer per persoon per versie.
     // Op dit toestel al gezien: meteen door. Anders even wachten op het account (misschien al gezien op een ander toestel).
@@ -61,17 +61,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=68">
-  <link rel="stylesheet" href="assets/intro.css?v=68">
-  <script src="assets/app.js?v=68"></script>
-  <script src="assets/intro.js?v=68"></script>
-  <script src="assets/vakken.js?v=68"></script>
-  <script src="assets/config.js?v=68" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=69">
+  <link rel="stylesheet" href="assets/intro.css?v=69">
+  <script src="assets/app.js?v=69"></script>
+  <script src="assets/intro.js?v=69"></script>
+  <script src="assets/vakken.js?v=69"></script>
+  <script src="assets/config.js?v=69" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=68" defer></script>
-  <script src="assets/plan.js?v=68" defer></script>
-  <script src="assets/comit.js?v=68" defer></script>
-  <script src="assets/activiteit.js?v=68" defer></script>
+  <script src="assets/auth.js?v=69" defer></script>
+  <script src="assets/plan.js?v=69" defer></script>
+  <script src="assets/comit.js?v=69" defer></script>
+  <script src="assets/activiteit.js?v=69" defer></script>
   <style>
     html { scroll-behavior: smooth; }
 
@@ -241,7 +241,7 @@
       <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu">Menu</button>
       <ul class="navigation-links" id="site-menu">
         <li><a href="hub.html#hoe-werkt-het">Hoe werkt het</a></li>
-        <li><a href="over-mij.html">Over mij</a></li>
+        <li><a href="hub.html#wie-is-berie">Over mij</a></li>
         <li><a href="whatsapp.html">WhatsApp-groep</a></li>
         <li><a href="feedback.html">Feedback</a></li>
       </ul>
@@ -539,7 +539,7 @@
 
       const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
       const sectionForHash = hash => {
-        if (hash !== '#nieuw' && hash !== '#hoe-werkt-het') return null;
+        if (hash !== '#nieuw' && hash !== '#hoe-werkt-het' && hash !== '#wie-is-berie') return null;
         return document.getElementById(hash.slice(1));
       };
       let scrollRequest = 0;
