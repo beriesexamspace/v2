@@ -30,7 +30,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=67">
+<link rel="stylesheet" href="assets/style.css?v=68">
 <style>
   *{margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -49,7 +49,7 @@
   }
   .sig{
     display:block;
-    width:min(76vw,960px,125vh);
+    width:min(86vw,1100px,140vh);
     height:auto;
     margin:0 auto -6%;
     opacity:.95;
@@ -60,12 +60,12 @@
   .sig .verbinding{stroke-width:6}
   .hero-in{
     position:relative;z-index:1;
-    max-width:1100px;
+    max-width:1260px;
     opacity:0;
     animation:rise .7s cubic-bezier(.2,.8,.2,1) .05s forwards;
   }
   h1{
-    font-size:clamp(2.75rem,min(7.2vw,12.5vh),6.25rem);
+    font-size:clamp(3rem,min(8.3vw,14vh),7.25rem);
     font-weight:700;
     line-height:1.02;
     text-wrap:balance;
@@ -74,9 +74,9 @@
   h1 .r2{display:block;color:var(--grey-title)}
   .lead{
     color:var(--ink-soft);
-    font-size:clamp(1.05rem,1.55vw,1.35rem);
+    font-size:clamp(1.1rem,1.8vw,1.55rem);
     line-height:1.5;
-    max-width:44rem;
+    max-width:48rem;
     margin:clamp(14px,2.6vh,24px) auto 0;
   }
   .cta{
@@ -84,13 +84,16 @@
     opacity:0;
     animation:rise .7s cubic-bezier(.2,.8,.2,1) .2s forwards;
   }
-  .account-options,.account-session{display:flex;flex-direction:column;align-items:center;gap:12px}
+  .account-options,.account-session{display:flex;flex-direction:column;align-items:center;gap:14px}
+  .cta .knop{min-height:56px;padding-inline:36px;font-size:1.125rem}
+  .cta .tekstlink{font-size:1.0625rem}
   .account-session{max-width:34rem;margin:0 auto}
 
   @media (max-width:768px){
     .hero{padding:clamp(16px,3vh,28px) 20px clamp(12px,2.5vh,20px)}
     .sig{width:98vw;opacity:.9;margin-bottom:-4%}
-    .lead{font-size:1.05rem}
+    .lead{font-size:1.1rem}
+    .cta .knop{min-height:52px;font-size:1.0625rem}
   }
   @media (prefers-reduced-motion:reduce){
     .hero-in,.cta{animation:none;opacity:1}
@@ -207,11 +210,11 @@
   setTimeout(schrijf, 400);
 })();
 </script>
-<script src="assets/app.js?v=67"></script>
-<script src="assets/config.js?v=67" defer></script>
+<script src="assets/app.js?v=68"></script>
+<script src="assets/config.js?v=68" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-<script src="assets/auth.js?v=67" defer></script>
-<script src="assets/plan.js?v=67" defer></script>
-  <script src="assets/activiteit.js?v=67" defer></script>
+<script src="assets/auth.js?v=68" defer></script>
+<script src="assets/plan.js?v=68" defer></script>
+  <script src="assets/activiteit.js?v=68" defer></script>
 </body>
 </html>

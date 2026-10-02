@@ -205,8 +205,8 @@ html[data-theme="dark"] .stap-beeld { background: linear-gradient(180deg, #4A4A4
 .carrousel .stap-kaart.is-dia { flex: 0 0 var(--carrousel-breedte); min-height: 440px; scroll-snap-align: center; }
 .carrousel-bediening { display: flex; justify-content: center; align-items: center; gap: 12px; }
 .carrousel-stippen { display: flex; align-items: center; gap: 2px; min-height: 44px; padding: 0 10px; border-radius: var(--radius-pill); background: var(--surface); }
-.carrousel-stip { display: grid; place-items: center; width: 24px; min-width: 24px; height: 44px; padding: 0; border: 0; background: none; cursor: pointer; transition: opacity 180ms var(--ease), transform 180ms var(--ease); }
-.carrousel-stip i { display: block; width: 8px; height: 8px; border-radius: 4px; background: var(--ink); opacity: .35; transition: opacity 200ms var(--ease), background-color 200ms var(--ease); }
+.carrousel-stip { display: grid; place-items: center; width: 24px; min-width: 24px; height: 44px; padding: 0; border: 0; background: none; cursor: pointer; transition: width 360ms var(--ease), min-width 360ms var(--ease), opacity 180ms var(--ease), transform 180ms var(--ease); }
+.carrousel-stip i { display: block; width: 8px; height: 8px; border-radius: 4px; background: var(--ink); opacity: .35; transition: width 360ms var(--ease), opacity 240ms var(--ease), background-color 200ms var(--ease); }
 .carrousel-stip[aria-selected="true"] { width: 52px; min-width: 52px; }
 .carrousel-stip[aria-selected="true"] i { position: relative; width: 36px; opacity: .25; overflow: hidden; }
 .carrousel-stip[aria-selected="true"] i::after { content: ''; position: absolute; inset: 0; width: 0; background: var(--ink); }
@@ -286,6 +286,7 @@ html[data-theme="dark"] .stap-beeld { background: linear-gradient(180deg, #4A4A4
 }
 @media (prefers-reduced-motion: reduce) {
   .carrousel-baan { scroll-behavior: auto; }
+  .carrousel-stip, .carrousel-stip i { transition: none; }
   .carrousel-stip[aria-selected="true"] i::after { animation: none !important; width: 100%; }
   .stap-kaart, .stap-kaart * { animation: none !important; }
   .stap-kaart .anim-vul { width: var(--doel, 100%); }

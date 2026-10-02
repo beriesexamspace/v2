@@ -113,7 +113,8 @@
     element.replaceChildren(image);
   }
 
-  // Profielmenu in de nav: een knop die een lijstje uitklapt (Profiel, Abonnement, Weekoverzicht, Foutenlijst, Examenplan, Uitloggen).
+  // Profielmenu in de nav: een knop die een lijstje uitklapt (Profiel, Weekoverzicht, Foutenlijst, Examenplan, Uitloggen).
+  // Abonnement staat niet in het menu: dat pas je aan via Profiel (blok Jouw abonnement).
   function zetProfielMenu(menu, open) {
     const knop = menu.querySelector('.profiel-knop');
     const lijst = menu.querySelector('.profiel-menu-lijst');
@@ -123,7 +124,7 @@
     menu.classList.toggle('is-open', open);
   }
 
-  // Is dit account beheerder? Eén keer per pagina gevraagd; dan komt Beheer in het profielmenu.
+  // Is dit account beheerder? Eén keer per account per pagina gevraagd; dan komt Beheer als link in de navigatiebalk.
   let beheerderBelofte = null;
   const isBeheerder = () => {
     if (!beheerderBelofte) beheerderBelofte = client && currentUser ? client.rpc('is_beheerder').then(({ data }) => data === true, () => false) : Promise.resolve(false);
@@ -166,21 +167,12 @@
     kop.append(naam, plan);
     lijst.append(kop);
     const pagina = window.location.pathname.split('/').pop() || 'index.html';
-    [['Profiel', 'profiel.html'], ['Abonnement', 'abonnement.html'], ['Weekoverzicht', 'voortgang.html'], ['Foutenlijst', 'fouten.html'], ['Examenplan', 'examenplan.html']].forEach(([tekst, pad]) => {
+    [['Profiel', 'profiel.html'], ['Weekoverzicht', 'voortgang.html'], ['Foutenlijst', 'fouten.html'], ['Examenplan', 'examenplan.html']].forEach(([tekst, pad]) => {
       const link = document.createElement('a');
       link.href = pagePrefix + pad;
       link.textContent = tekst;
       if (pagina === pad) link.setAttribute('aria-current', 'page');
       lijst.append(link);
-    });
-    isBeheerder().then(ja => {
-      if (!ja || lijst.querySelector('[data-beheer-link]')) return;
-      const link = document.createElement('a');
-      link.href = pagePrefix + 'beheer.html';
-      link.textContent = 'Beheer';
-      link.setAttribute('data-beheer-link', '');
-      if (pagina === 'beheer.html') link.setAttribute('aria-current', 'page');
-      lijst.querySelector('hr')?.before(link);
     });
     const uitloggen = document.createElement('button');
     uitloggen.type = 'button';
@@ -213,8 +205,9 @@
         original.replaceWith(controls);
       }
       controls.replaceChildren();
-      navigation.querySelectorAll('.account-uitloggen-mobiel, [data-account-uitloggen]').forEach(link => link.remove());
+      navigation.querySelectorAll('.account-uitloggen-mobiel, [data-account-uitloggen], [data-beheer-nav]').forEach(link => link.remove());
       if (!currentUser) {
+        beheerderBelofte = null;
         const login = document.createElement('a');
         login.className = 'pill login-button';
         login.textContent = 'Inloggen →';
@@ -223,6 +216,20 @@
         return;
       }
       controls.append(maakProfielMenu(index));
+      // Beheer als laatste link in de navigatiebalk, alleen voor de beheerder.
+      const eigenaar = currentUser.id;
+      isBeheerder().then(ja => {
+        const links = navigation.querySelector('.navigation-links');
+        if (!ja || !links || currentUser?.id !== eigenaar || links.querySelector('[data-beheer-nav]')) return;
+        const item = document.createElement('li');
+        item.setAttribute('data-beheer-nav', '');
+        const link = document.createElement('a');
+        link.href = pagePrefix + 'beheer.html';
+        link.textContent = 'Beheer';
+        if ((window.location.pathname.split('/').pop() || 'index.html') === 'beheer.html') link.setAttribute('aria-current', 'page');
+        item.append(link);
+        links.append(item);
+      });
     });
     document.querySelectorAll('[data-account-opties]').forEach(element => { element.hidden = Boolean(currentUser); });
     document.querySelectorAll('[data-account-sessie]').forEach(element => {
