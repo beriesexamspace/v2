@@ -34,7 +34,8 @@
   max-width: 800px;
   height: 100%;
   margin: 0 auto;
-  padding-bottom: var(--comit-invoer-hoogte, 62px);
+  /* Plus de ruimte voor het demo-zinnetje boven de typbalk. */
+  padding-bottom: calc(var(--comit-invoer-hoogte, 62px) + 52px);
 }
 
 .comit-kop {
@@ -107,8 +108,6 @@
 
 .comit-begroeting-rij { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 12px; }
 .comit-demo-label { flex-shrink: 0; }
-.comit-demo-uitleg { max-width: 34rem; margin: 12px auto 0; color: var(--ink-soft); font-size: .875rem; line-height: 1.6; overflow-wrap: anywhere; }
-.comit-demo-uitleg a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
 
 .comit-begroeting {
   min-width: 0;
@@ -227,6 +226,10 @@
   transition: border-color 150ms var(--ease), box-shadow 150ms var(--ease);
 }
 
+/* Klein demo-zinnetje net boven de typbalk: absoluut, zodat de balk zelf even hoog blijft. */
+.comit-demo-regel { position: absolute; left: 50%; bottom: calc(100% + 8px); translate: -50% 0; width: max-content; max-width: calc(100% - 24px); margin: 0; padding: 3px 12px; border-radius: 980px; background: var(--bg); color: var(--ink-soft); font-size: .75rem; line-height: 1.5; text-align: center; }
+.comit-demo-regel a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+
 .comit-invoer:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, var(--transparent)), var(--shadow-soft); }
 .comit-invoer textarea { display: block; flex: 1 1 auto; width: 100%; min-width: 0; min-height: 44px; max-height: 116px; padding: 10px 10px 10px 14px; border: 0; border-radius: 20px; outline: none; resize: none; background: var(--transparent); color: var(--ink); font: 400 1rem/24px var(--font); overflow-x: hidden; overflow-y: auto; }
 .comit-invoer textarea::placeholder { color: var(--ink-soft); opacity: 1; }
@@ -240,18 +243,18 @@
 
 .comit-pagina-body :is(.home-knop, .thema-knop) { flex-basis: 44px; width: 44px; height: 44px; }
 .comit-pagina-body :is(.menu-toggle, .profiel-knop, .login-button, .navigation-links a) { min-height: 44px; }
-.comit-pagina-body .site-footer { padding-bottom: calc(var(--comit-invoer-hoogte, 62px) + 40px); }
+.comit-pagina-body .site-footer { padding-bottom: calc(var(--comit-invoer-hoogte, 62px) + 92px); }
 
 .comit-pagina[data-opening="eerste"]::before { animation: comit-kleur 200ms var(--ease) 300ms both; }
 .comit-pagina[data-opening="eerste"] .comit-hero-logo { animation: comit-logo 800ms var(--ease) both; }
 .comit-pagina[data-opening="eerste"] .comit-hero-logo::before { animation: comit-gloed 700ms var(--ease) 300ms both; }
 .comit-pagina[data-opening="eerste"] .comit-hero-logo::after { animation: comit-ring 700ms var(--ease) 320ms both; }
 .comit-pagina[data-opening="eerste"] .comit-woord { animation: comit-verschijnen 200ms var(--ease) calc(750ms + var(--woord-index, 0) * var(--comit-woord-interval, 100ms)) both; }
-.comit-pagina[data-opening="eerste"] :is(.comit-demo-label, .comit-demo-uitleg) { animation: comit-omhoog 200ms var(--ease) var(--comit-intro-vervolg, 900ms) both; }
+.comit-pagina[data-opening="eerste"]  .comit-demo-label { animation: comit-omhoog 200ms var(--ease) var(--comit-intro-vervolg, 900ms) both; }
 .comit-pagina[data-opening="eerste"] :is(.comit-hulpvraag, .comit-kop) { animation: comit-verschijnen 200ms var(--ease) calc(var(--comit-intro-vervolg, 900ms) + 200ms) both; }
 .comit-pagina[data-opening="eerste"] .comit-voorstel { animation: comit-omhoog 150ms var(--ease) calc(var(--comit-intro-vervolg, 900ms) + 400ms + var(--voorstel-index, 0) * 50ms) both; }
 .comit-pagina[data-opening="eerste"] .comit-invoer { animation: comit-omhoog 200ms var(--ease) calc(var(--comit-intro-vervolg, 900ms) + 700ms) both; }
-.comit-pagina[data-opening="herhaal"] :is(.comit-begroeting-rij, .comit-demo-uitleg) { animation: comit-verschijnen 300ms var(--ease) both; }
+.comit-pagina[data-opening="herhaal"]  .comit-begroeting-rij { animation: comit-verschijnen 300ms var(--ease) both; }
 
 /* De ster draait in het midden van het scherm binnen, groeit even aan, en schuift dan rustig naar zijn plek. */
 @keyframes comit-logo { 0% { opacity: 0; transform: translateY(var(--comit-logo-start-y, 0px)) scale(.3) rotate(-135deg); } 42% { opacity: 1; transform: translateY(var(--comit-logo-start-y, 0px)) scale(1.08) rotate(0deg); } 58% { transform: translateY(var(--comit-logo-start-y, 0px)) scale(1) rotate(0deg); } 100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); } }

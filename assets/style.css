@@ -138,8 +138,9 @@ a:focus-visible, button:focus-visible {
   align-items: center;
   gap: 22px;
   padding: 0 8px 0 16px;
-  border: solid var(--line);
-  border-width: 0 0 1px;
+  /* Randen altijd 1px; boven en opzij onzichtbaar. Zo verandert bij het zweven alleen de kleur en springt er niets aan de zijkanten. */
+  border: 1px solid var(--transparent);
+  border-bottom-color: var(--line);
   border-radius: 0;
   background: var(--bg);
   box-shadow: none;
@@ -147,16 +148,17 @@ a:focus-visible, button:focus-visible {
   backdrop-filter: saturate(100%) blur(0);
   /* De balk krimpt bij het scrollen vloeiend tot een zwevende pil (bewust ook top en breedte). */
   transition: top 220ms var(--ease), width 220ms var(--ease), max-width 220ms var(--ease),
-    border-width 220ms var(--ease), border-radius 220ms var(--ease),
-    border-color 220ms var(--ease), background-color 220ms var(--ease), box-shadow 220ms var(--ease);
+    border-radius 220ms var(--ease), border-color 220ms var(--ease), background-color 220ms var(--ease),
+    box-shadow 220ms var(--ease), -webkit-backdrop-filter 220ms var(--ease), backdrop-filter 220ms var(--ease);
 }
 
 .navigation.is-zwevend, .nav-vol.is-zwevend {
   top: 10px;
   width: calc(100% - 20px);
   max-width: 1100px;
-  border-width: 1px;
-  border-radius: var(--radius-pill);
+  border-color: var(--line);
+  /* Halve hoogte (56px): ziet eruit als een pil, maar de hoeken lopen de hele animatie mee in plaats van op het eind recht te klappen. */
+  border-radius: 28px;
   background: var(--glass-white);
   box-shadow: var(--shadow-nav);
   -webkit-backdrop-filter: saturate(180%) blur(20px);

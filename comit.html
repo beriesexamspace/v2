@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="assets/deur.js?v=71"></script>
-  <script src="assets/vakken.js?v=71"></script>
+  <script src="assets/deur.js?v=72"></script>
+  <script src="assets/vakken.js?v=72"></script>
   <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta name="robots" content="noindex">
@@ -32,16 +32,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=71">
-  <script src="assets/app.js?v=71" defer></script>
-  <script src="assets/config.js?v=71" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=72">
+  <script src="assets/app.js?v=72" defer></script>
+  <script src="assets/config.js?v=72" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=71" defer></script>
-  <script src="assets/plan.js?v=71" defer></script>
-  <link rel="stylesheet" href="assets/comit.css?v=71">
-  <script src="assets/comit-antwoorden.js?v=71" defer></script>
-  <script src="assets/comit-ai.js?v=71" defer></script>
-  <script src="assets/comit.js?v=71" defer></script>
+  <script src="assets/auth.js?v=72" defer></script>
+  <script src="assets/plan.js?v=72" defer></script>
+  <link rel="stylesheet" href="assets/comit.css?v=72">
+  <script src="assets/comit-antwoorden.js?v=72" defer></script>
+  <script src="assets/comit-ai.js?v=72" defer></script>
+  <script src="assets/comit.js?v=72" defer></script>
 </head>
 <body class="comit-pagina-body" data-nav="vast">
   <a class="skip-link" href="#inhoud">Ga naar inhoud</a>
@@ -81,7 +81,6 @@
             <h2 id="comit-begroeting" class="comit-begroeting"></h2>
             <span class="label comit-demo-label">Demo</span>
           </div>
-          <p class="comit-demo-uitleg">Dit is een demo. Comit leert nog en wordt steeds beter. Klopt iets niet? Laat het weten via <a href="feedback.html">Feedback</a>.</p>
           <p class="comit-hulpvraag">Waar kan ik je mee helpen?</p>
           <div class="comit-voorstellen">
             <button class="comit-voorstel" type="button" style="--voorstel-index: 0">Waar moet ik nog op oefenen?</button>
@@ -93,6 +92,7 @@
         <div id="comit-gesprek" class="comit-gesprek" role="log" aria-live="polite" aria-relevant="additions text" aria-label="Gesprek met Comit"></div>
       </div>
       <form id="comit-form" class="comit-invoer" autocomplete="off">
+        <p class="comit-demo-regel">Comit is een demo en kan zich vergissen. Klopt iets niet? Meld het via <a href="feedback.html">Feedback</a>.</p>
         <label class="comit-sr-only" for="comit-tekst">Vraag Comit iets</label>
         <textarea id="comit-tekst" name="vraag" rows="1" placeholder="Vraag Comit iets"></textarea>
         <button id="comit-verstuur" class="comit-verstuur" type="submit" aria-label="Verstuur je vraag" disabled>
