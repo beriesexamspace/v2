@@ -30,14 +30,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=70">
-  <script src="assets/app.js?v=70" defer></script>
-  <script src="assets/config.js?v=70" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=71">
+  <script src="assets/app.js?v=71" defer></script>
+  <script src="assets/config.js?v=71" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=70" defer></script>
-  <script src="assets/plan.js?v=70" defer></script>
-  <script src="assets/plan.js?v=70" defer></script>
-  <script src="assets/activiteit.js?v=70" defer></script>
+  <script src="assets/auth.js?v=71" defer></script>
+  <script src="assets/plan.js?v=71" defer></script>
+  <script src="assets/plan.js?v=71" defer></script>
+  <script src="assets/activiteit.js?v=71" defer></script>
   <style>
     .ab-plannen {
       display: grid;
@@ -124,6 +124,13 @@
     .ab-plan .knop.is-huidig:disabled { opacity: 1; background: var(--surface); color: var(--ink-soft); box-shadow: none; }
     .ab-melding { max-width: 560px; margin: 20px 0 0; color: var(--ink); font-size: .9375rem; line-height: 1.5; }
     .ab-melding:empty { display: none; }
+    /* Vinkje Laat mijn plan meteen starten: nodig voor elke proefmaand (start_proef, supabase/herroepen.sql). */
+    .ab-meteen { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 12px; align-items: start; max-width: 640px; margin: 24px 0 0; padding: 16px 18px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); font-size: .9375rem; line-height: 1.55; cursor: pointer; transition: border-color 180ms var(--ease), box-shadow 180ms var(--ease); }
+    .ab-meteen input { width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--accent); cursor: pointer; }
+    .ab-meteen input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .ab-meteen.is-nodig { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+    .ab-meteen span { color: var(--ink-soft); }
+    .ab-meteen strong { color: var(--ink); font-weight: 600; }
   </style>
 </head>
 <body data-nav="vast">
@@ -223,6 +230,10 @@
           </div>
         </section>
       </div>
+      <label class="ab-meteen" id="ab-meteen-blok" for="ab-meteen">
+        <input type="checkbox" id="ab-meteen">
+        <span><strong>Laat mijn plan meteen starten.</strong> Ik weet dat ik bij herroepen binnen de bedenktijd van 14 dagen alleen betaal voor de dagen tot dan.</span>
+      </label>
       <p class="ab-melding" id="ab-melding" role="status" aria-live="polite"></p>
 
       <section class="ab-sectie" aria-labelledby="weten-kop">
@@ -249,6 +260,12 @@
       const BES = window.BES || {};
       const melding = document.getElementById('ab-melding');
       const knoppen = [...document.querySelectorAll('[data-proef]')];
+      const meteen = document.getElementById('ab-meteen');
+      const meteenBlok = document.getElementById('ab-meteen-blok');
+      meteen.addEventListener('change', () => {
+        meteenBlok.classList.remove('is-nodig');
+        if (meteen.checked && melding.dataset.soort === 'meteen') { melding.textContent = ''; delete melding.dataset.soort; }
+      });
 
       const zetStand = (p) => {
         document.querySelectorAll('.ab-jouw').forEach((label) => label.remove());
@@ -280,12 +297,23 @@
         const auth = BES.auth;
         const gebruiker = auth ? await auth.gebruiker().catch(() => null) : null;
         if (!gebruiker || !auth.client) { window.location.href = 'inloggen.html?terug=abonnement.html'; return; }
+        if (!meteen.checked) {
+          melding.textContent = 'Zet eerst het vinkje "Laat mijn plan meteen starten" aan.';
+          melding.dataset.soort = 'meteen';
+          meteenBlok.classList.add('is-nodig');
+          meteenBlok.scrollIntoView({ block: 'center', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+          meteen.focus({ preventScroll: true });
+          return;
+        }
         const oud = knop.textContent;
         knop.disabled = true;
         knop.textContent = 'Even geduld';
         melding.textContent = '';
+        delete melding.dataset.soort;
         try {
-          const { data, error } = await auth.client.rpc('start_proef', { p_plan: plan });
+          // Tot supabase/herroepen.sql is uitgevoerd bestaat alleen start_proef(p_plan); dan zonder p_meteen opnieuw.
+          let { data, error } = await auth.client.rpc('start_proef', { p_plan: plan, p_meteen: true });
+          if (error && error.code === 'PGRST202') ({ data, error } = await auth.client.rpc('start_proef', { p_plan: plan }));
           if (error) throw error;
           if (data && data.ok) { window.location.href = 'profiel.html?proef=' + plan + '#abonnement'; return; }
           const naam = BES.planNaam(plan);
@@ -293,6 +321,7 @@
             al_actief: 'Je hebt ' + naam + ' al.',
             al_hoger: 'Je hebt Pro al, en daar zit alles van Plus in.',
             al_gebruikt: 'Je hebt je proefmaand van ' + naam + ' al gebruikt.',
+            meteen_nodig: 'Zet eerst het vinkje "Laat mijn plan meteen starten" aan.',
           })[data && data.reden] || 'Dat lukte niet. Probeer het zo opnieuw.';
           zetStand(await BES.plan(true));
         } catch {

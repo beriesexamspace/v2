@@ -87,6 +87,8 @@ html {
   background: var(--bg);
   color: var(--ink);
   -webkit-text-size-adjust: 100%;
+  /* Geen stuiter bij snel scrollen tegen de boven- of onderkant (touchpad, telefoon): anders zakt de pagina met de balk even weg. */
+  overscroll-behavior-y: none;
   transition: background-color 200ms var(--ease), color 200ms var(--ease);
 }
 
