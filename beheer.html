@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="assets/deur.js?v=76"></script>
+  <script src="assets/deur.js?v=77"></script>
   <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta name="robots" content="noindex">
@@ -21,13 +21,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=76">
-  <script src="assets/app.js?v=76" defer></script>
-  <script src="assets/vakken.js?v=76"></script>
-  <script src="assets/config.js?v=76" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=77">
+  <script src="assets/app.js?v=77" defer></script>
+  <script src="assets/vakken.js?v=77"></script>
+  <script src="assets/config.js?v=77" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=76" defer></script>
-  <script src="assets/plan.js?v=76" defer></script>
+  <script src="assets/auth.js?v=77" defer></script>
+  <script src="assets/plan.js?v=77" defer></script>
   <style>
     .beheer-wrap { max-width: 760px; }
     .beheer-tegels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
@@ -99,6 +99,11 @@
     .beheer-account-gegevens dt { color: var(--ink-soft); font-size: .75rem; }
     .beheer-account-gegevens dd { margin: 2px 0 0; font-size: .875rem; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
     .beheer-plan.is-beheerder { background: var(--accent-zacht); color: var(--accent); }
+    .beheer-over { display: grid; gap: 6px; margin: 16px 0 0; padding-top: 14px; border-top: 1px solid var(--line); }
+    .beheer-over p { margin: 0; }
+    .beheer-over-kop { color: var(--ink-soft); font-size: .75rem; }
+    .beheer-over-regel { font-size: .875rem; font-weight: 600; overflow-wrap: anywhere; }
+    .beheer-over-tekst { font-size: .9375rem; line-height: 1.55; white-space: pre-line; overflow-wrap: anywhere; }
     @media (max-width: 600px) {
       .beheer-tegels, .beheer-tegels.is-vijf { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .beheer-lijst li { grid-template-columns: 72px minmax(0, 1fr) 56px; }
@@ -394,6 +399,7 @@
           return planNaam(rij.plan) + ', ' + soort + (rij.plan_tot ? ' tot ' + kort.format(new Date(rij.plan_tot)) : '');
         };
         const inlogNamen = { google: 'Google', email: 'E-mail en wachtwoord' };
+        const jaarNamen = { '1ba': '1ste bachelor', '2ba': '2de bachelor', '3ba': '3de bachelor', master: 'Master', anders: 'Anders' };
         accounts = (o.accounts.nieuwste || []).map((rij) => {
           const li = el('li', 'kaart beheer-account');
           li.dataset.plan = rij.plan;
@@ -434,6 +440,18 @@
             gegevens.append(paar);
           });
           li.append(gegevens);
+          // Wat iemand over zichzelf vertelde (optioneel), als platte tekst.
+          const over = rij.over && typeof rij.over === 'object' ? rij.over : null;
+          const overTekst = (waarde, max) => (typeof waarde === 'string' ? waarde.trim() : '').slice(0, max);
+          const overJaar = over && Object.hasOwn(jaarNamen, over.jaar) ? jaarNamen[over.jaar] : '';
+          if (over && (overTekst(over.studie, 60) || overJaar || overTekst(over.tekst, 300))) {
+            const blok = el('div', 'beheer-over');
+            blok.append(el('p', 'beheer-over-kop', over.openbaar === true ? 'Over zichzelf, openbaar' : 'Over zichzelf, alleen voor jou'));
+            const regel = [overTekst(over.studie, 60), overJaar].filter(Boolean).join(' · ');
+            if (regel) blok.append(el('p', 'beheer-over-regel', regel));
+            if (overTekst(over.tekst, 300)) blok.append(el('p', 'beheer-over-tekst', overTekst(over.tekst, 300)));
+            li.append(blok);
+          }
           return li;
         });
         totaalAccounts = o.accounts.totaal || accounts.length;

@@ -73,7 +73,7 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 76), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 77), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.
@@ -110,6 +110,8 @@ Sinds 22-09-2026 opent `profiel.html` als één kaart met foto, naam en e-mailad
 Nieuwe accounts bewaren `voornaam`, `achternaam` en de optionele `bijnaam` in Supabase user metadata. `naam` blijft de volledige naam voor bestaande koppelingen. `BES.auth.naamGegevens(user)` geeft de volledige naam en aanspreeknaam terug; `BES.naamOpslaan` bewaart de bijnaam of voornaam. Alleen Profiel toont de volledige naam. Een oude, ongesplitste naam wordt niet automatisch verdeeld en blijft op Profiel behouden; de hub gebruikt daarvoor een algemene begroeting totdat de gebruiker de losse velden invult. Bestaande gebruikers hoeven naamvelden niet opnieuw in te vullen om hun wachtwoord of e-mailadres te wijzigen.
 
 De client wordt na `app.js` en `config.js` geladen; `auth.js` regelt de sessie en de inloglink centraal. `BES.auth.client` geeft de bestaande Supabase-client door aan de vakpagina. Voortgang tussen toestellen werkt voor ingelogde gebruikers na het aanmaken van de tabel en toegangsregels onder "Vakpagina".
+
+Sinds 04-10-2026 komt na Account maken een optioneel scherm "Vertel een beetje over jezelf" (studie, jaar, een vrije tekst van hoogstens 300 tekens en de keuze Alleen Berie of Openbaar), met Opslaan of Overslaan. Het formulier en de weergave staan in `assets/over-jezelf.js` (`BES.overJezelf`), de gegevens in `user_metadata.over` via `BES.auth.profielBijwerken({ over })`; `auth.js` maakt ze schoon en `BES.auth.overGegevens(user)` leest ze. Op `profiel.html` staat het blok Over jezelf met Bewerken en Alles weghalen. `beheer.html` toont het per account zodra `supabase/beheer-overzicht.sql` opnieuw is uitgevoerd. Openbare profielen zijn voor anderen nog nergens te lezen; dat is de volgende stap. Cachenummer: 77.
 
 ### Inloggen met Google
 

@@ -2,6 +2,7 @@
 -- Per account (de laatste 500) naam, e-mailadres, plan en hoeveel er geoefend is, op vraag van Berat (26-09-2026);
 -- nooit Comit-gesprekken of antwoorden op vragen. Feedbacktekst ingekort.
 -- Uitgevoerd in de SQL-editor van Supabase op 26-09-2026 (daarna opnieuw met de accountgegevens).
+-- 04-10-2026: per account ook 'over' (Over jezelf: studie, jaar, tekst, openbaar). Nog uitvoeren in de SQL-editor.
 
 create or replace function public.beheer_overzicht()
 returns json
@@ -38,6 +39,13 @@ begin
             nullif(trim(x.raw_user_meta_data->>'name'), '')
           ),
           'bijnaam', nullif(trim(x.raw_user_meta_data->>'bijnaam'), ''),
+          -- Alleen de vier bekende velden, ingekort: user_metadata kan iedereen voor zijn eigen account zelf schrijven.
+          'over', case when jsonb_typeof(x.raw_user_meta_data->'over') = 'object' then jsonb_build_object(
+            'studie', left(x.raw_user_meta_data->'over'->>'studie', 60),
+            'jaar', left(x.raw_user_meta_data->'over'->>'jaar', 10),
+            'tekst', left(x.raw_user_meta_data->'over'->>'tekst', 300),
+            'openbaar', coalesce(x.raw_user_meta_data->'over'->'openbaar' = 'true'::jsonb, false)
+          ) end,
           'gemaakt', x.created_at,
           'laatst_ingelogd', x.last_sign_in_at,
           'bevestigd', x.email_confirmed_at is not null,

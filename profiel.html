@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="assets/deur.js?v=76"></script>
+  <script src="assets/deur.js?v=77"></script>
   <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta property="og:type" content="website">
@@ -31,16 +31,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=76">
-  <link rel="stylesheet" href="assets/kalender.css?v=76">
-  <script src="assets/app.js?v=76" defer></script>
-  <script src="assets/config.js?v=76" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=77">
+  <link rel="stylesheet" href="assets/kalender.css?v=77">
+  <script src="assets/app.js?v=77" defer></script>
+  <script src="assets/config.js?v=77" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=76" defer></script>
-  <script src="assets/plan.js?v=76" defer></script>
-  <script src="assets/activiteit.js?v=76" defer></script>
-  <script src="assets/vakken.js?v=76"></script>
-  <script src="assets/inzichten.js?v=76" defer></script>
+  <script src="assets/auth.js?v=77" defer></script>
+  <script src="assets/over-jezelf.js?v=77" defer></script>
+  <script src="assets/plan.js?v=77" defer></script>
+  <script src="assets/activiteit.js?v=77" defer></script>
+  <script src="assets/vakken.js?v=77"></script>
+  <script src="assets/inzichten.js?v=77" defer></script>
   <style>
     .profiel-wrap { max-width: 640px; }
     /* Bovenaan alleen foto, naam en e-mail met één knop Bewerken; de velden komen pas na die klik. */
@@ -58,7 +59,9 @@
     :where(html.has-hover) .profiel-wissen-link:hover { color: var(--fout); }
     #studiekalender { margin-top: 20px; }
     /* Jouw abonnement: tussen profielkaart en studiekalender. Nu heeft iedereen Free; het plan komt later uit Supabase. */
+    #over-jezelf { margin-top: 20px; }
     #abonnement { margin-top: 20px; }
+    #over-jezelf + #abonnement { margin-top: 40px; }
     #abonnement + #studiekalender { margin-top: 40px; }
     .abo-kaart { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 20px; padding: clamp(22px, 5vw, 32px); }
     .abo-label { margin: 0; color: var(--ink-soft); font-size: .875rem; font-weight: 500; }
@@ -249,6 +252,15 @@
           </span>
         </div>
       </form>
+
+      <section id="over-jezelf" class="sectie" aria-labelledby="over-kop" hidden>
+        <h2 id="over-kop">Over jezelf</h2>
+        <div class="kaart over-kaart">
+          <div class="over-inhoud" data-over-inhoud></div>
+          <button class="knop-secundair" type="button" data-over-bewerk hidden>Bewerken</button>
+          <p class="over-status" data-over-status role="status" aria-live="polite"></p>
+        </div>
+      </section>
 
       <section id="abonnement" class="sectie" aria-labelledby="abonnement-kop">
         <h2 id="abonnement-kop">Jouw abonnement</h2>
@@ -798,6 +810,69 @@
         try { proef = new URLSearchParams(window.location.search).get('proef') || ''; } catch {}
         if (p.status === 'proef' && proef === p.plan) $('melding').textContent = 'Je proefmaand van ' + BES.planNaam(p.plan) + ' is gestart.';
       });
+    });
+  </script>
+  <script>
+    // Over jezelf: tonen wat je vertelde, met Bewerken. Leeg is een uitnodiging om iets te vertellen.
+    document.addEventListener('DOMContentLoaded', async () => {
+      const auth = window.BES && window.BES.auth;
+      const over = window.BES && window.BES.overJezelf;
+      const sectie = document.getElementById('over-jezelf');
+      if (!auth || !over || !sectie) return;
+      const inhoud = sectie.querySelector('[data-over-inhoud]');
+      const knop = sectie.querySelector('[data-over-bewerk]');
+      const status = sectie.querySelector('[data-over-status]');
+      let user = null;
+      try { user = await auth.gereed; } catch {}
+      if (!user) return;
+
+      const toon = () => {
+        const gegevens = auth.overGegevens(user);
+        const leeg = !gegevens.studie && !gegevens.jaar && !gegevens.tekst;
+        if (leeg) {
+          const uitnodiging = document.createElement('p');
+          uitnodiging.className = 'over-leeg';
+          uitnodiging.textContent = 'Je hebt nog niets over jezelf verteld. Berie vindt het leuk om te lezen wie zijn website gebruikt.';
+          inhoud.replaceChildren(uitnodiging);
+        } else {
+          inhoud.replaceChildren(over.weergave(gegevens));
+        }
+        knop.textContent = leeg ? 'Vertel iets over jezelf' : 'Bewerken';
+        knop.hidden = false;
+      };
+
+      knop.addEventListener('click', () => {
+        const huidig = auth.overGegevens(user);
+        status.textContent = '';
+        const { form, focus } = over.formulier({
+          waarde: huidig,
+          leegMag: true,
+          wissen: Boolean(huidig.studie || huidig.jaar || huidig.tekst),
+          tweede: { tekst: 'Annuleren', bijKlik: () => { toon(); knop.focus(); } },
+          opslaan: async gegevens => {
+            const bijgewerkt = await auth.profielBijwerken({ over: gegevens });
+            if (bijgewerkt) user = bijgewerkt;
+            // Intussen op Annuleren gedrukt: het formulier is weg, dus niets overschrijven.
+            if (!form.isConnected) return;
+            toon();
+            status.textContent = gegevens ? 'Opgeslagen.' : 'Weggehaald.';
+            knop.focus();
+          }
+        });
+        inhoud.replaceChildren(form);
+        knop.hidden = true;
+        focus();
+      });
+
+      // Uitgelogd in een ander tabblad: het blok verdwijnt.
+      window.addEventListener('bes:auth', event => {
+        const nieuw = event.detail && event.detail.user;
+        if (!nieuw || nieuw.id !== user.id) { sectie.hidden = true; return; }
+        user = nieuw;
+      });
+
+      toon();
+      sectie.hidden = false;
     });
   </script>
 </body>
