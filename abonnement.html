@@ -82,6 +82,14 @@
     .ab-lijst li { display: grid; grid-template-columns: 20px minmax(0, 1fr); column-gap: 12px; align-items: start; }
     .ab-vink { width: 20px; height: 20px; margin-top: 1px; fill: none; stroke: var(--teal-tekst); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
     .ab-lijst .label { margin-left: 6px; vertical-align: 1px; }
+    /* In de Pro-kaart: wat ook in Plus zit, rustiger onder wat alleen in Pro zit. */
+    .ab-lijst-kop.is-ook-kop { margin-top: 20px; color: var(--ink-soft); font-weight: 500; }
+    .ab-lijst.is-ook { gap: 8px; }
+    .ab-lijst.is-ook span { color: var(--ink-soft); }
+    .ab-lijst.is-ook .ab-vink { opacity: .55; }
+    /* Pro: nieuwe onderdelen als eerste. */
+    .ab-eerst { display: flex; align-items: center; gap: 8px; margin: 20px 0 0; color: var(--teal-tekst); font-size: .8125rem; font-weight: 500; line-height: 1.4; }
+    .ab-eerst svg { flex: 0 0 16px; width: 16px; height: 16px; fill: currentColor; }
     .ab-plan-voet { display: grid; margin-top: auto; padding-top: 28px; }
     .ab-plan .knop, .ab-plan .knop-secundair { width: 100%; min-width: 0; max-width: none; margin-inline: 0; }
     .ab-plan .knop-secundair:disabled { opacity: .6; cursor: default; transform: none; }
@@ -169,17 +177,13 @@
             <h2 class="ab-plan-naam" id="plan-free">Free</h2>
           </div>
           <div class="ab-prijs-blok">
-            <p class="ab-prijs"><span class="ab-bedrag">0 euro</span></p>
+            <p class="ab-prijs"><span class="ab-bedrag">Voor iedereen</span></p>
           </div>
           <p class="ab-plan-sub">Alles om te oefenen voor je examens.</p>
           <ul class="ab-lijst">
-            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Alle vragen van alle 34 vakken</span></li>
-            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Training en simulatie, zo vaak je wilt</span></li>
+            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Alle vakken oefenen</span></li>
             <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Uitleg bij elke vraag</span></li>
-            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Je voortgang per vak en hoofdstuk, op elk toestel</span></li>
-            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Je studiekalender</span></li>
-            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Comit, je studiemaatje</span></li>
-            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Leren leren, Reken je punten en Examen-info</span></li>
+            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Je voortgang bijhouden</span></li>
           </ul>
           <div class="ab-plan-voet">
             <a class="knop-secundair" href="hub.html">Begin met oefenen</a>
@@ -200,9 +204,12 @@
           <ul class="ab-lijst">
             <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Hard mode: moeilijke toepassingsvragen op examenniveau</span></li>
             <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Simulatie met tijdklok, zoals op de examendag</span></li>
-            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Weekoverzicht met grafiek en verbeterpunten</span></li>
             <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Foutenlijst: al je fouten op één plek</span></li>
-            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Meer vragen per dag aan Comit</span></li>
+            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Je fouten opnieuw oefenen tot je ze kent</span></li>
+            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Weekoverzicht met grafiek en verbeterpunten</span></li>
+            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Hacks voor je zwakste hoofdstukken, per vak</span></li>
+            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Een hack erbij als je een vraag fout hebt</span></li>
+            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>30 vragen per dag aan Comit</span></li>
           </ul>
           <div class="ab-plan-voet">
             <button class="knop" type="button" data-proef="plus">Probeer 1 maand</button>
@@ -218,14 +225,24 @@
             <p class="ab-daarna"><strong>1 maand gratis</strong> om te proberen.</p>
           </div>
           <p class="ab-plan-sub">Comit wordt je persoonlijke examencoach.</p>
-          <p class="ab-lijst-kop">Alles van Plus, plus:</p>
+          <p class="ab-lijst-kop">Alleen in Pro:</p>
           <ul class="ab-lijst">
-            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Een persoonlijk plan tot je examen</span></li>
-            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Ezelsbruggetjes voor je zwakke hoofdstukken</span></li>
+            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Een persoonlijk studieplan naar je examens</span></li>
+            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Ezelsbruggetjes van Comit voor je zwakke hoofdstukken</span></li>
             <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Na elke simulatie zien of je vooruitgaat</span></li>
-            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Elke week een overzicht met verbeterpunten</span></li>
-            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>De meeste vragen per dag aan Comit</span></li>
+            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>60 vragen per dag aan Comit</span></li>
           </ul>
+          <p class="ab-lijst-kop is-ook-kop">En alles van Plus:</p>
+          <ul class="ab-lijst is-ook">
+            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Hard mode: moeilijke toepassingsvragen op examenniveau</span></li>
+            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Simulatie met tijdklok, zoals op de examendag</span></li>
+            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Foutenlijst: al je fouten op één plek</span></li>
+            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Je fouten opnieuw oefenen tot je ze kent</span></li>
+            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Weekoverzicht met grafiek en verbeterpunten</span></li>
+            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Hacks voor je zwakste hoofdstukken, per vak</span></li>
+            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Een hack erbij als je een vraag fout hebt</span></li>
+          </ul>
+          <p class="ab-eerst"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c.5 4.9 2.6 7 7.5 7.5-4.9.5-7 2.6-7.5 7.5-.5-4.9-2.6-7-7.5-7.5 4.9-.5 7-2.6 7.5-7.5Z"/></svg><span>Nieuwe onderdelen krijg je met Pro als eerste.</span></p>
           <div class="ab-plan-voet">
             <button class="knop" type="button" data-proef="pro">Probeer 1 maand</button>
           </div>
