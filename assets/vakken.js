@@ -15,7 +15,7 @@
 
   window.BES_VAKKEN = [
     // 1ste bachelor
-    { id: 'inlped', jaar: '1ba', naam: 'Inleiding tot de pedagogische wetenschappen', tekst: '127 vragen, waarvan 50 uit echte examens en reconstructies.', v2: true },
+    { id: 'inlped', jaar: '1ba', naam: 'Inleiding tot de pedagogische wetenschappen', tekst: '145 vragen, waarvan 50 uit echte examens.', v2: true },
     { id: 'stat2', jaar: '1ba', naam: 'Statistiek II: kansrekening en inductieve statistiek', tekst: '155 oefenvragen over 9 hoofdstukken, met uitleg.', v2: true },
     { id: 'stat1', jaar: '1ba', naam: 'Statistiek I: meetschalen en beschrijvende statistiek', tekst: '90 oefenvragen per hoofdstuk, met uitleg.', v2: true },
     { id: 'ontwikkeling', jaar: '1ba', naam: 'Ontwikkelingspsychologie', tekst: '84 oefenvragen over de levensloop, met uitleg.', v2: true },
@@ -52,7 +52,7 @@
     { id: 'ppka', jaar: '3ba', naam: 'Psychopathologie van kinderen en adolescenten', tekst: '93 oefenvragen per hoofdstuk, met uitleg.', v2: true },
     { id: 'hrm', jaar: '3ba', naam: 'Principles of Human Resources Management', tekst: '98 oefenvragen per hoofdstuk, met uitleg.', v2: true },
     { id: 'ohv', jaar: '3ba', naam: 'Organisatie van de hulpverlening', tekst: '66 oefenvragen per hoofdstuk, met uitleg.', v2: true },
-    { id: 'forensische', jaar: '3ba', naam: 'Forensische Psychiatrie', tekst: '47 oefenvragen uit examenreconstructie, met uitleg.', v2: true }
+    { id: 'forensische', jaar: '3ba', naam: 'Forensische Psychiatrie', tekst: '47 oefenvragen over 6 hoofdstukken, met uitleg.', v2: true }
   ];
 
   // Link naar een vak: in v2 zodra het is omgezet, anders de bestaande tool.

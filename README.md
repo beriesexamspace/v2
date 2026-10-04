@@ -80,6 +80,8 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Relatieve links, zodat alles lokaal en op GitHub Pages werkt.
 - De live site (beriesexamspace.github.io) wordt niet aangeraakt tot v2 klaar is.
 
+Sinds 04-10-2026 toont de vakkaart Inleiding pedagogiek 145 vragen, waarvan 50 uit echte examens. Forensische Psychiatrie vermeldt 47 oefenvragen over 6 hoofdstukken, met uitleg. De verwijzingen naar examenreconstructies zijn verwijderd volgens de afspraak van 21-09-2026. De vakdata zijn gelijk gebleven. Cachenummer: 77.
+
 Elke regel in `assets/updates.js` heeft `soort: 'nieuw'` of `soort: 'verbeterd'`, een datum en tekst. De hub toont eerst vier regels; bij meer regels wisselt de knop tussen Alles bekijken en Minder tonen. Het updatescherm na inloggen toont altijd alle regels. Beide gebruiken dezelfde labels en veilige tekstweergave.
 
 In `assets/updates.js` mogen korte belangrijke stukjes in `tekst` tussen `**dubbele sterretjes**` staan. Ze verschijnen als vetgedrukte tekst op de hub en het updatescherm. De rest blijft gewone tekst; HTML wordt niet uitgevoerd. Gebruik nadruk voor de naam van een veranderd onderdeel, niet voor hele alinea's.
