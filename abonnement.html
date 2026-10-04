@@ -95,8 +95,10 @@
     .ab-plus-chip { display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 980px; background: rgba(63,185,178,.16); color: #7fd6d0; font-size: .6875rem; font-weight: 600; line-height: 1.5; vertical-align: 1px; }
     .ab-pro-chip { display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 980px; background: rgba(212,175,55,.16); color: #e6c872; font-size: .6875rem; font-weight: 600; line-height: 1.5; vertical-align: 1px; }
     /* Pro: nieuwe onderdelen als eerste. */
-    .ab-eerst { display: flex; align-items: center; gap: 8px; margin: 20px 0 0; color: var(--teal-tekst); font-size: .8125rem; font-weight: 500; line-height: 1.4; }
-    .ab-eerst svg { flex: 0 0 16px; width: 16px; height: 16px; fill: currentColor; }
+    /* Vroege toegang: klein gouden blok, zodat het als voordeel opvalt. */
+    .ab-eerst { display: flex; align-items: flex-start; gap: 10px; margin: 24px 0 0; padding: 12px 14px; border: 1px solid rgba(212,175,55,.35); border-radius: 12px; background: rgba(212,175,55,.08); color: var(--ink); font-size: .8125rem; line-height: 1.5; }
+    .ab-eerst svg { flex: 0 0 16px; width: 16px; height: 16px; margin-top: 1px; fill: var(--teal-tekst); }
+    .ab-eerst strong { display: block; color: var(--teal-tekst); font-size: .8125rem; font-weight: 700; letter-spacing: .02em; }
     .ab-plan-voet { display: grid; margin-top: auto; padding-top: 28px; }
     .ab-plan .knop, .ab-plan .knop-secundair { width: 100%; min-width: 0; max-width: none; margin-inline: 0; }
     .ab-plan .knop-secundair:disabled { opacity: .6; cursor: default; transform: none; }
@@ -366,7 +368,7 @@
             <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Weekoverzicht: 7 dagen en 4 weken terugkijken, met verbeterpunten</span></li>
             <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Een hack erbij als je een vraag fout hebt</span></li>
           </ul>
-          <p class="ab-eerst"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c.5 4.9 2.6 7 7.5 7.5-4.9.5-7 2.6-7.5 7.5-.5-4.9-2.6-7-7.5-7.5 4.9-.5 7-2.6 7.5-7.5Z"/></svg><span>Nieuwe onderdelen krijg je met Pro als eerste.</span></p>
+          <p class="ab-eerst"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c.5 4.9 2.6 7 7.5 7.5-4.9.5-7 2.6-7.5 7.5-.5-4.9-2.6-7-7.5-7.5 4.9-.5 7-2.6 7.5-7.5Z"/></svg><span><strong>Vroege toegang</strong>Nieuwe onderdelen krijg je met Pro als eerste, nog voordat Free en Plus ze krijgen.</span></p>
           <div class="ab-plan-voet">
             <button class="knop" type="button" data-proef="pro">Probeer 1 maand</button>
           </div>
@@ -545,7 +547,7 @@
                   <td class="is-pro"><svg class="ab-v-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span class="ab-sr">Inbegrepen</span></td>
                 </tr>
                 <tr>
-                  <th scope="row"><span class="ab-v-naam">Nieuwe onderdelen eerst</span><span class="ab-v-uitleg">Wat nieuw is, krijg je met Pro als eerste.</span></th>
+                  <th scope="row"><span class="ab-v-naam">Vroege toegang</span><span class="ab-v-uitleg">Nieuwe onderdelen krijg je met Pro als eerste, nog voor Free en Plus.</span></th>
                   <td class="is-free"><span class="ab-v-leeg" aria-hidden="true"></span><span class="ab-sr">Niet in Free</span></td>
                   <td class="is-plus"><span class="ab-v-leeg" aria-hidden="true"></span><span class="ab-sr">Niet in Plus</span></td>
                   <td class="is-pro"><svg class="ab-v-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span class="ab-sr">Inbegrepen</span></td>
