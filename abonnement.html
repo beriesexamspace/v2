@@ -87,6 +87,12 @@
     .ab-lijst.is-ook { gap: 8px; }
     .ab-lijst.is-ook span { color: var(--ink-soft); }
     .ab-lijst.is-ook .ab-vink { opacity: .55; }
+    /* Free en Plus: wat je mist, grijs met een slotje. */
+    .ab-lijst-kop.is-mist-kop { margin-top: 28px; color: var(--ink-soft); font-weight: 500; }
+    .ab-lijst.is-mist { gap: 8px; }
+    .ab-lijst.is-mist > li > span { color: var(--ink-soft); opacity: .8; }
+    .ab-slot { width: 18px; height: 18px; margin-top: 2px; fill: none; stroke: var(--ink-soft); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; opacity: .7; }
+    .ab-pro-chip { display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 980px; background: rgba(212,175,55,.16); color: #e6c872; font-size: .6875rem; font-weight: 600; line-height: 1.5; vertical-align: 1px; }
     /* Pro: nieuwe onderdelen als eerste. */
     .ab-eerst { display: flex; align-items: center; gap: 8px; margin: 20px 0 0; color: var(--teal-tekst); font-size: .8125rem; font-weight: 500; line-height: 1.4; }
     .ab-eerst svg { flex: 0 0 16px; width: 16px; height: 16px; fill: currentColor; }
@@ -280,6 +286,17 @@
             <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Handige tools: punten berekenen, examen-info en sjablonen</span></li>
             <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>10 vragen per dag aan Comit</span></li>
           </ul>
+          <p class="ab-lijst-kop is-mist-kop">Niet in Free:</p>
+          <ul class="ab-lijst is-mist">
+            <li><svg class="ab-slot" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Hard mode</span></li>
+            <li><svg class="ab-slot" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Onbeperkt simulaties met tijdklok</span></li>
+            <li><svg class="ab-slot" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Foutenlijst</span></li>
+            <li><svg class="ab-slot" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Weekoverzicht</span></li>
+            <li><svg class="ab-slot" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Examenplan tot je examen<span class="ab-pro-chip">Pro</span></span></li>
+            <li><svg class="ab-slot" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Klaar-meter per vak<span class="ab-pro-chip">Pro</span></span></li>
+            <li><svg class="ab-slot" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Waarom niet mijn antwoord?<span class="ab-pro-chip">Pro</span></span></li>
+            <li><svg class="ab-slot" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Geavanceerd overzicht<span class="ab-pro-chip">Pro</span></span></li>
+          </ul>
           <div class="ab-plan-voet">
             <a class="knop-secundair" href="hub.html">Begin met oefenen</a>
           </div>
@@ -303,6 +320,15 @@
             <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Weekoverzicht: 7 dagen en 4 weken terugkijken, met verbeterpunten</span></li>
             <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Een hack erbij als je een vraag fout hebt</span></li>
             <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>30 vragen per dag aan Comit</span></li>
+          </ul>
+          <p class="ab-lijst-kop is-mist-kop">Niet in Plus:</p>
+          <ul class="ab-lijst is-mist">
+            <li><svg class="ab-slot" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Examenplan tot je examen<span class="ab-pro-chip">Pro</span></span></li>
+            <li><svg class="ab-slot" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Klaar-meter per vak<span class="ab-pro-chip">Pro</span></span></li>
+            <li><svg class="ab-slot" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Waarom niet mijn antwoord?<span class="ab-pro-chip">Pro</span></span></li>
+            <li><svg class="ab-slot" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Geavanceerd overzicht<span class="ab-pro-chip">Pro</span></span></li>
+            <li><svg class="ab-slot" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Ezelsbruggetjes van Comit<span class="ab-pro-chip">Pro</span></span></li>
+            <li><svg class="ab-slot" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Hacks voor je zwakste hoofdstukken<span class="ab-pro-chip">Pro</span></span></li>
           </ul>
           <div class="ab-plan-voet">
             <button class="knop" type="button" data-proef="plus">Probeer 1 maand</button>
