@@ -91,6 +91,8 @@ html.ball-cursor .vraag-melding textarea { cursor: text !important; }
 .score-hoofdstukken { display: grid; gap: 20px; max-width: 560px; margin: 36px auto; text-align: left; }
 .score-boven { margin-bottom: 10px; font-size: .9375rem; line-height: 1.5; }
 .score-boven span:last-child { color: var(--muted); }
+/* Knoppen onder de Comit-kaart: altijd afstand, nooit tegen de kaart aan. */
+.eindscherm .vak-knoppen { margin-top: 28px; }
 .eindscherm #terug-vak { margin: 20px 0; }
 .simulatie-overzicht { margin-top: 24px; text-align: left; }
 .simulatie-overzicht summary { width: fit-content; margin: 0 auto 24px; padding: 8px; color: var(--accent); cursor: pointer; font-size: .9375rem; font-weight: 500; }
