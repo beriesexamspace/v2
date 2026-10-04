@@ -46,6 +46,8 @@
   padding-inline: 4px;
 }
 
+/* Terug naar de hub, links in de kop, met een dun streepje voor de naam Comit. */
+.comit-terug { flex: 0 0 auto; min-height: 40px; margin: -6px 6px -6px 0; padding-right: 14px; border-right: 1px solid var(--line); }
 .comit-kop [data-comit-logo], .comit-bericht-logo { display: flex; flex: 0 0 24px; }
 .comit-kop h1 { margin: 0; color: var(--ink); font-size: 1rem; font-weight: 600; line-height: 1.4; letter-spacing: -.02em; }
 .comit-pagina [data-comit-logo] svg, .comit-bericht-logo svg { display: block; flex-shrink: 0; }
@@ -291,4 +293,10 @@
   .comit-pagina *, .comit-pagina::before, .comit-pagina *::before, .comit-pagina *::after { animation: none !important; transition: none !important; }
   :is(.comit-voorstel, .comit-verstuur):is(:hover, :active) { transform: none; }
   .comit-denkt .comit-denk-tekst { background: none; color: var(--ink-soft); }
+}
+
+/* Smalle telefoon: bij Geschiedenis alleen het klokje, zodat Terug, Comit en de knop niet tegen elkaar komen. Het woord blijft voor schermlezers. */
+@media (max-width: 420px) {
+  .comit-kop-knop { width: 44px; padding: 0; justify-content: center; }
+  .comit-kop-knop span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 }
