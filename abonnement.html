@@ -30,13 +30,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=74">
-  <script src="assets/app.js?v=74" defer></script>
-  <script src="assets/config.js?v=74" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=75">
+  <script src="assets/app.js?v=75" defer></script>
+  <script src="assets/config.js?v=75" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=74" defer></script>
-  <script src="assets/plan.js?v=74" defer></script>
-  <script src="assets/activiteit.js?v=74" defer></script>
+  <script src="assets/auth.js?v=75" defer></script>
+  <script src="assets/plan.js?v=75" defer></script>
+  <script src="assets/activiteit.js?v=75" defer></script>
   <style>
     .ab-plannen {
       display: grid;
@@ -274,10 +274,10 @@
           <p class="ab-plan-sub">Alles om te oefenen voor je examens.</p>
           <ul class="ab-lijst">
             <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Alle vakken oefenen</span></li>
-            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Training onbeperkt</span></li>
-            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>1 simulatie per dag per vak</span></li>
-            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Uitleg bij elke vraag</span></li>
-            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Je voortgang bijhouden</span></li>
+            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Training onbeperkt, 2 simulaties per dag per vak</span></li>
+            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Uitleg, theorie en studie-hacks per vak</span></li>
+            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Je voortgang en studiekalender</span></li>
+            <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Handige tools: punten berekenen, examen-info en sjablonen</span></li>
             <li><svg class="ab-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>10 vragen per dag aan Comit</span></li>
           </ul>
           <div class="ab-plan-voet">
@@ -383,8 +383,14 @@
                   <td class="is-pro"><svg class="ab-v-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span class="ab-sr">Inbegrepen</span></td>
                 </tr>
                 <tr>
+                  <th scope="row"><span class="ab-v-naam">Theorie en studie-hacks</span><span class="ab-v-uitleg">Per vak de kernpunten en slimme hacks om te onthouden.</span></th>
+                  <td class="is-free"><svg class="ab-v-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span class="ab-sr">Inbegrepen</span></td>
+                  <td class="is-plus"><svg class="ab-v-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span class="ab-sr">Inbegrepen</span></td>
+                  <td class="is-pro"><svg class="ab-v-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span class="ab-sr">Inbegrepen</span></td>
+                </tr>
+                <tr>
                   <th scope="row"><span class="ab-v-naam">Simulaties</span><span class="ab-v-uitleg">Een proefexamen met je uitslag op het einde.</span></th>
-                  <td class="is-free"><span class="ab-v-tekst">1 per dag per vak</span></td>
+                  <td class="is-free"><span class="ab-v-tekst">2 per dag per vak</span></td>
                   <td class="is-plus"><span class="ab-v-tekst">Onbe&shy;perkt</span></td>
                   <td class="is-pro"><span class="ab-v-tekst">Onbe&shy;perkt</span></td>
                 </tr>
@@ -420,9 +426,21 @@
                 </tr>
               </tbody>
               <tbody>
+                <tr>
+                  <th scope="row"><span class="ab-v-naam">Handige tools</span><span class="ab-v-uitleg">Punten berekenen, examen-info, sjablonen en boeken verkopen.</span></th>
+                  <td class="is-free"><svg class="ab-v-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span class="ab-sr">Inbegrepen</span></td>
+                  <td class="is-plus"><svg class="ab-v-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span class="ab-sr">Inbegrepen</span></td>
+                  <td class="is-pro"><svg class="ab-v-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span class="ab-sr">Inbegrepen</span></td>
+                </tr>
                 <tr class="ab-groep"><th scope="rowgroup" colspan="4">Inzicht in je voortgang</th></tr>
                 <tr>
                   <th scope="row"><span class="ab-v-naam">Je voortgang</span><span class="ab-v-uitleg">Per vak zie je wat je al geoefend hebt.</span></th>
+                  <td class="is-free"><svg class="ab-v-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span class="ab-sr">Inbegrepen</span></td>
+                  <td class="is-plus"><svg class="ab-v-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span class="ab-sr">Inbegrepen</span></td>
+                  <td class="is-pro"><svg class="ab-v-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span class="ab-sr">Inbegrepen</span></td>
+                </tr>
+                <tr>
+                  <th scope="row"><span class="ab-v-naam">Studiekalender</span><span class="ab-v-uitleg">Per dag zie je hoe lang je oefende.</span></th>
                   <td class="is-free"><svg class="ab-v-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span class="ab-sr">Inbegrepen</span></td>
                   <td class="is-plus"><svg class="ab-v-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span class="ab-sr">Inbegrepen</span></td>
                   <td class="is-pro"><svg class="ab-v-vink" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span class="ab-sr">Inbegrepen</span></td>

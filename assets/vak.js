@@ -136,7 +136,8 @@
     // Plan van het account: 'free', 'plus' of 'pro'. Zolang het niet bekend is, geldt Free maar nog zonder simulatielimiet.
     let accountPlan = 'free';
     let planBekend = false;
-    // Free: één examensimulatie per dag per vak. Teller van vandaag voor dit account (tabel sessies plus dit toestel).
+    // Free: twee examensimulaties per dag per vak (beslist 04-10-2026). Teller van vandaag voor dit account (tabel sessies plus dit toestel).
+    const FREE_SIMULATIES_PER_DAG = 2;
     let simTeller = { dag: '', eigenaar: null, aantal: 0 };
     let context = null;
     let authGeneration = 0;
@@ -326,18 +327,18 @@
     }
 
     function chooseMode(value) {
-      // Free met de simulatie van vandaag al gedaan: rustige melding, Training blijft gekozen.
+      // Free met de simulaties van vandaag al gedaan: rustige melding, Training blijft gekozen.
       if (value === 'simulatie' && simulatieOp()) { toonSimSlot(); return; }
       if (byId('sim-slot')) byId('sim-slot').hidden = true;
       setMode(value);
       revealStep(showLevelStep ? 'niveau' : 'tijd');
     }
 
-    // Free: één examensimulatie per dag per vak; Plus en Pro onbeperkt, Training altijd.
+    // Free: twee examensimulaties per dag per vak; Plus en Pro onbeperkt, Training altijd.
     const vandaag = () => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
     const eigenaarNu = () => context?.owner ?? null;
     const simVandaag = () => simTeller.dag === vandaag() && simTeller.eigenaar === eigenaarNu() ? simTeller.aantal : 0;
-    const simulatieOp = () => planBekend && accountPlan === 'free' && simVandaag() >= 1;
+    const simulatieOp = () => planBekend && accountPlan === 'free' && simVandaag() >= FREE_SIMULATIES_PER_DAG;
 
     function toonSimSlot() {
       let melding = byId('sim-slot');
@@ -349,7 +350,7 @@
       }
       const link = create('a', '', 'oefen onbeperkt met Plus');
       link.href = '../../abonnement.html';
-      melding.replaceChildren('Je simulatie van vandaag voor dit vak heb je gedaan. Morgen kan je weer, of ', link, '.');
+      melding.replaceChildren(`Je ${FREE_SIMULATIES_PER_DAG} simulaties van vandaag voor dit vak heb je gedaan. Morgen kan je weer, of `, link, '.');
       melding.hidden = false;
       return melding;
     }
@@ -360,7 +361,7 @@
       if (detail) {
         if (detail.dataset.origineel === undefined) detail.dataset.origineel = detail.textContent;
         const free = planBekend && accountPlan === 'free';
-        detail.textContent = simulatieOp() ? 'Vandaag gedaan, morgen weer' : free ? `${detail.dataset.origineel}, 1 keer per dag` : detail.dataset.origineel;
+        detail.textContent = simulatieOp() ? 'Vandaag gedaan, morgen weer' : free ? `${detail.dataset.origineel}, ${FREE_SIMULATIES_PER_DAG} keer per dag` : detail.dataset.origineel;
       }
       if (!simulatieOp() && byId('sim-slot')) byId('sim-slot').hidden = true;
     }
@@ -1620,7 +1621,7 @@
       if (!klaarScript) {
         klaarScript = new Promise((klaar, mislukt) => {
           const script = document.createElement('script');
-          script.src = new URL('klaarmeter.js?v=74', scriptBron).href;
+          script.src = new URL('klaarmeter.js?v=75', scriptBron).href;
           script.onload = () => (typeof BES.klaarMeter === 'function' ? klaar() : mislukt());
           script.onerror = () => { klaarScript = null; mislukt(); };
           document.head.append(script);
