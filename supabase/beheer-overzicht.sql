@@ -2,7 +2,7 @@
 -- Per account (de laatste 500) naam, e-mailadres, plan en hoeveel er geoefend is, op vraag van Berat (26-09-2026);
 -- nooit Comit-gesprekken of antwoorden op vragen. Feedbacktekst ingekort.
 -- Uitgevoerd in de SQL-editor van Supabase op 26-09-2026 (daarna opnieuw met de accountgegevens).
--- 04-10-2026: per account ook 'over' (Over jezelf: studie, jaar, tekst, openbaar). Nog uitvoeren in de SQL-editor.
+-- 04-10-2026: per account ook 'over' (Over jezelf: studie, jaar, tekst, openbaar). Uitgevoerd op 05-10-2026.
 
 create or replace function public.beheer_overzicht()
 returns json

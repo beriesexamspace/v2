@@ -1,5 +1,5 @@
 -- Herroepen, "plan meteen laten starten" en Plus na een proefmaand Pro (03-10-2026).
--- Eenmalig uitvoeren in de SQL-editor van Supabase, na abonnementen.sql.
+-- Eenmalig uitvoeren in de SQL-editor van Supabase, na abonnementen.sql. Uitgevoerd op 05-10-2026.
 --
 -- Nieuwe kolommen in abonnementen:
 --   betaald_plan      het plan waarvoor betaald_tot geldt. Zo blijft een betaalde Plus bestaan als je een proefmaand Pro start;
