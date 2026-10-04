@@ -2,6 +2,8 @@
   'use strict';
 
   const BES = window.BES = window.BES || {};
+  // Waar vak.js staat: zo vindt de pagina klaarmeter.js, los van de map van het vak.
+  const scriptBron = document.currentScript?.src || window.location.href;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   // Na een echte klik zacht naar de volgende stap scrollen; niet bij verminderde beweging en niet als het doel al in beeld staat
   const scrollNaar = element => {
@@ -131,7 +133,11 @@
     // Foutenlijst (Plus en Pro, supabase/fouten.sql): open fouten van dit vak, als sleutels. ?fouten=1 begint meteen met oefenen.
     let openFouten = new Set();
     let foutenUitUrl = new URLSearchParams(window.location.search).get('fouten') === '1';
-    let voorJouPlan = 'free';
+    // Plan van het account: 'free', 'plus' of 'pro'. Zolang het niet bekend is, geldt Free maar nog zonder simulatielimiet.
+    let accountPlan = 'free';
+    let planBekend = false;
+    // Free: één examensimulatie per dag per vak. Teller van vandaag voor dit account (tabel sessies plus dit toestel).
+    let simTeller = { dag: '', eigenaar: null, aantal: 0 };
     let context = null;
     let authGeneration = 0;
     let mode = 'training';
@@ -320,8 +326,94 @@
     }
 
     function chooseMode(value) {
+      // Free met de simulatie van vandaag al gedaan: rustige melding, Training blijft gekozen.
+      if (value === 'simulatie' && simulatieOp()) { toonSimSlot(); return; }
+      if (byId('sim-slot')) byId('sim-slot').hidden = true;
       setMode(value);
       revealStep(showLevelStep ? 'niveau' : 'tijd');
+    }
+
+    // Free: één examensimulatie per dag per vak; Plus en Pro onbeperkt, Training altijd.
+    const vandaag = () => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
+    const eigenaarNu = () => context?.owner ?? null;
+    const simVandaag = () => simTeller.dag === vandaag() && simTeller.eigenaar === eigenaarNu() ? simTeller.aantal : 0;
+    const simulatieOp = () => planBekend && accountPlan === 'free' && simVandaag() >= 1;
+
+    function toonSimSlot() {
+      let melding = byId('sim-slot');
+      if (!melding) {
+        melding = create('p', 'vak-hint plus-slot sim-slot');
+        melding.id = 'sim-slot';
+        melding.setAttribute('role', 'status');
+        byId('modus-keuzes').after(melding);
+      }
+      const link = create('a', '', 'oefen onbeperkt met Plus');
+      link.href = '../../abonnement.html';
+      melding.replaceChildren('Je simulatie van vandaag voor dit vak heb je gedaan. Morgen kan je weer, of ', link, '.');
+      melding.hidden = false;
+      return melding;
+    }
+
+    // Het kaartje Examensimulatie zegt vooraf hoe het zit voor Free; de melding verdwijnt zodra het weer mag.
+    function markeerSimulatie() {
+      const detail = byId('modus-keuzes')?.querySelector('[data-modus="simulatie"] .modus-detail');
+      if (detail) {
+        if (detail.dataset.origineel === undefined) detail.dataset.origineel = detail.textContent;
+        const free = planBekend && accountPlan === 'free';
+        detail.textContent = simulatieOp() ? 'Vandaag gedaan, morgen weer' : free ? `${detail.dataset.origineel}, 1 keer per dag` : detail.dataset.origineel;
+      }
+      if (!simulatieOp() && byId('sim-slot')) byId('sim-slot').hidden = true;
+    }
+
+    // Terug bij de keuzes met Simulatie gekozen terwijl het vandaag niet meer mag: terug naar Training, met de melding erbij.
+    function controleerSimulatie() {
+      markeerSimulatie();
+      if (screen !== 'keuzes' || mode !== 'simulatie' || !simulatieOp()) return;
+      setMode('training');
+      toonSimSlot();
+    }
+
+    async function laadSimTeller() {
+      const owner = eigenaarNu();
+      const dag = vandaag();
+      let aantal = 0;
+      try {
+        const lokaal = JSON.parse(window.localStorage.getItem(`bes_simulaties_${data.id}`));
+        if (lokaal && lokaal.dag === dag && lokaal.eigenaar === owner) aantal = integer(lokaal.aantal);
+      } catch {}
+      // Wat dit toestel al weet, geldt meteen; de telling uit sessies komt er daarna bij.
+      if (aantal > simVandaag()) {
+        simTeller = { dag, eigenaar: owner, aantal };
+        controleerSimulatie();
+      }
+      const client = BES.auth?.client;
+      if (owner && client && accountPlan === 'free') {
+        const middernacht = new Date();
+        middernacht.setHours(0, 0, 0, 0);
+        try {
+          const { count, error } = await client.from('sessies').select('id', { count: 'exact', head: true })
+            .eq('user_id', owner).eq('vak', data.id).eq('modus', 'simulatie').gte('gemaakt_op', middernacht.toISOString());
+          if (!error && Number.isSafeInteger(count)) aantal = Math.max(aantal, count);
+        } catch {}
+      }
+      if (eigenaarNu() !== owner || vandaag() !== dag) return;
+      simTeller = { dag, eigenaar: owner, aantal: Math.max(aantal, simVandaag()) };
+      controleerSimulatie();
+    }
+
+    // Na een afgeronde simulatie: meteen meetellen, ook als de rij in sessies nog onderweg is.
+    function telSimulatie() {
+      simTeller = { dag: vandaag(), eigenaar: eigenaarNu(), aantal: simVandaag() + 1 };
+      try { window.localStorage.setItem(`bes_simulaties_${data.id}`, JSON.stringify(simTeller)); } catch {}
+      markeerSimulatie();
+    }
+
+    function planToepassen(plan) {
+      plusOk = Boolean(plan && (plan.plan === 'plus' || plan.plan === 'pro'));
+      accountPlan = plan && ['free', 'plus', 'pro'].includes(plan.plan) ? plan.plan : 'free';
+      planBekend = Boolean(plan);
+      markeerPlus();
+      markeerSimulatie();
     }
 
     // Melding onder de keuze als iemand zonder Plus Hard mode of Met tijd kiest, met een link naar Abonnement.
@@ -346,11 +438,16 @@
       if (plusOk) { byId('plus-slot-niveau')?.remove(); byId('plus-slot-tijd')?.remove(); }
     }
 
+    // Korte vaste hash van een tekst (FNV-1a), als 8 hextekens.
+    function tekstHash(tekst) {
+      let hash = 0x811c9dc5;
+      for (const teken of tekst) { hash ^= teken.codePointAt(0); hash = Math.imul(hash, 0x01000193) >>> 0; }
+      return hash.toString(16).padStart(8, '0');
+    }
+
     // Korte vaste sleutel per vraag: hash van de vraagtekst, met h: voor Hard mode en n: voor Normaal.
     function vraagSleutel(question) {
-      let hash = 0x811c9dc5;
-      for (const teken of question.q) { hash ^= teken.codePointAt(0); hash = Math.imul(hash, 0x01000193) >>> 0; }
-      return (String(question.id).startsWith('hard:') ? 'h:' : 'n:') + hash.toString(16).padStart(8, '0');
+      return (String(question.id).startsWith('hard:') ? 'h:' : 'n:') + tekstHash(question.q);
     }
 
     const foutVragen = () => questionsFor(level).filter(question => openFouten.has(vraagSleutel(question)));
@@ -373,7 +470,9 @@
           start(shuffle(lijst), 'training', level, 0);
         });
         blok.append(tekst, knop);
-        byId('vak-instellingen').prepend(blok);
+        // Onder de Klaar-meter als die er staat, anders bovenaan de keuzes.
+        if (byId('klaar-meter')) byId('klaar-meter').after(blok);
+        else byId('vak-instellingen').prepend(blok);
       }
       blok.querySelector('.kaart-sub').textContent = `${countText(vragen.length)}${hasLevels ? ` in ${levelLabel(level)}` : ''} die je fout had en nog niet goed beantwoordde.`;
       blok.hidden = false;
@@ -382,10 +481,10 @@
     async function laadFouten() {
       const client = BES.auth?.client;
       const plan = BES.plan ? await BES.plan() : null;
-      plusOk = Boolean(plan && (plan.plan === 'plus' || plan.plan === 'pro'));
-      voorJouPlan = plan ? plan.plan : 'free';
-      markeerPlus();
+      planToepassen(plan);
       renderVoorJou();
+      renderKlaarMeter();
+      laadSimTeller();
       const owner = context?.owner;
       if (!plusOk || !owner || !client) { openFouten = new Set(); toonFoutenKnop(); return; }
       const { data: rijen, error } = await client.from('fouten').select('sleutel').eq('user_id', owner).eq('vak', data.id).eq('opgelost', false);
@@ -595,6 +694,7 @@
         });
         save(target);
         if (target === context) renderChapters();
+        if (target.level === 'normaal') renderKlaarMeter();
       } catch { syncError(); }
       finally {
         if (generation === authGeneration && target.owner === context.owner) {
@@ -798,10 +898,23 @@
         byId(id).hidden = name !== value;
         if (name === value) fade(byId(id));
       });
+      if (value === 'keuzes') {
+        controleerSimulatie();
+        renderKlaarMeter();
+      }
     }
 
     function start(questions, runMode = mode, runLevel = level, runSeconds = timed ? secondsPerQuestion : 0) {
       if (!questions.length || !context.authReady || runLevel !== level) return;
+      // Free: geen tweede simulatie vandaag voor dit vak. Terug naar de keuzes met de melding bij de modus.
+      if (runMode === 'simulatie' && simulatieOp()) {
+        if (screen !== 'keuzes') { session = null; showScreen('keuzes'); }
+        if (mode === 'simulatie') setMode('training');
+        toonSimSlot();
+        byId('modus-keuzes').querySelector('[data-modus="training"]')?.focus({ preventScroll: !reducedMotion.matches });
+        scrollNaar(byId('stap-modus'));
+        return;
+      }
       if (context.owner) {
         try { window.localStorage.setItem(`bes_laatst_geoefend_${context.owner}`, JSON.stringify({ vak: data.id, t: new Date().toISOString() })); } catch {}
       }
@@ -924,6 +1037,7 @@
       if (training) {
         byId('uitleg-tekst').textContent = current.question.u;
         toonHackBijFout(current);
+        toonWaarom(current);
         fade(byId('uitleg'));
         recordAnswer(current.question.h, correctAnswer(current));
       }
@@ -973,14 +1087,16 @@
         });
       }
       byId('tijd-om').hidden = !expired;
-      byId('tijd-resultaat').hidden = !session.durationMs;
-      byId('tijd-resultaat').textContent = session.durationMs
-        ? `Je deed er ${Math.ceil(Math.max(0, session.endedAt - session.startedAt) / 60000)} minuten over van de ${Math.ceil(session.durationMs / 60000)}.` : '';
+      // Tijd van elke ronde; met een klok ook hoeveel tijd er was.
+      byId('tijd-resultaat').hidden = false;
+      const beschikbaar = Math.ceil(session.durationMs / 60000);
+      byId('tijd-resultaat').textContent = `Je deed er ${duurTekst(session.endedAt - session.startedAt)} over${session.durationMs ? ` van de ${beschikbaar === 1 ? 'ene minuut' : `${beschikbaar} minuten`}` : ''}.`;
       const correct = correctAnswer;
       const good = answers.filter(correct).length;
-      const name = typeof BES.naamOphalen === 'function' ? BES.naamOphalen() : '';
+      const name = typeof BES.naamOphalen === 'function' ? (BES.naamOphalen() || '').trim() : '';
+      const procent = answers.length ? Math.round(good / answers.length * 100) : 0;
       byId('score-kop').textContent = `${good} van ${answers.length} goed.`;
-      byId('score-tekst').textContent = name ? `Goed gewerkt, ${name}. Je bent weer een stap verder.` : 'Goed gewerkt. Je bent weer een stap verder.';
+      toonScoreBericht(procent, name);
       if (hasLevels && byId('score-niveau')) byId('score-niveau').textContent = `${modeLabel(session.mode)} · ${levelLabel(session.level)}`;
       byId('score-hoofdstukken').replaceChildren();
       data.hoofdstukken.forEach(chapter => {
@@ -1019,19 +1135,134 @@
             item.append(create('p', '', `Juiste antwoord: ${entry.question.o[entry.question.a]}`));
           }
           item.append(create('p', '', entry.question.u));
+          if (waaromKan(entry)) item.append(waaromBlok(entry, false));
           item.append(reportButton(entry.question, session.level, session.mode));
           byId('overzicht-vragen').append(item);
         });
+        telSimulatie();
       }
       renderComit(answers, correct);
       toonVooruitgang(good, answers.length, session);
       bewaarSessie(good, answers.length, answers, correct);
       bewaarFouten(answers, correct);
+      renderKlaarMeter();
       showScreen('einde');
+      toonScoreRing(procent);
       if (reportDialog.open) reportHint.textContent = 'De tijd is om. Je uitslag staat klaar zodra je deze melding sluit.';
       else byId('score-kop').focus({ preventScroll: true });
       byId('eindscherm').scrollIntoView({ block: 'start', behavior: 'instant' });
       scheduleSync();
+    }
+
+    // Duur van een ronde in gewone woorden: "45 seconden" of "4 minuten en 12 seconden".
+    function duurTekst(ms) {
+      const seconden = Math.max(1, Math.round(ms / 1000));
+      const sec = waarde => `${waarde} ${waarde === 1 ? 'seconde' : 'seconden'}`;
+      if (seconden < 60) return sec(seconden);
+      const minuten = Math.floor(seconden / 60);
+      const rest = seconden % 60;
+      return `${minuten} ${minuten === 1 ? 'minuut' : 'minuten'}${rest ? ` en ${sec(rest)}` : ''}`;
+    }
+
+    // Eindscherm: een ring rond het percentage in plaats van het vaste vinkje, en een zin met icoon die bij de score past.
+    const ringOmtrek = 2 * Math.PI * 52;
+    const ringIcoonPaden = {
+      laag: 'M12 21v-9 M12 12c0-4-3-7-8-7 0 4 3 7 8 7z M12 10c0-3 2.5-6 7-6 0 3.5-2.5 6-7 6z',
+      midden: 'M3 17l6-6 4 4 8-8 M15 7h6v6',
+      goed: 'M7 11v9H4v-9h3z M7 11l4-7c1.6 0 2.6 1.2 2.3 2.8L12.7 10H18a2 2 0 0 1 2 2.3l-1.2 5.9A2.2 2.2 0 0 1 16.6 20H7',
+      top: 'M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8 6.6 19.7l1.1-6.1L3.2 9.4l6.1-.8z'
+    };
+    const ringTrede = procent => procent >= 85 ? 'top' : procent >= 70 ? 'goed' : procent >= 50 ? 'midden' : 'laag';
+    const ring = create('div', 'score-ring');
+    ring.id = 'score-ring';
+    ring.setAttribute('role', 'img');
+    const ringSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    ringSvg.setAttribute('viewBox', '0 0 120 120');
+    ringSvg.setAttribute('aria-hidden', 'true');
+    const ringSpoor = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    const ringBoog = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    [ringSpoor, ringBoog].forEach(cirkel => {
+      cirkel.setAttribute('cx', '60');
+      cirkel.setAttribute('cy', '60');
+      cirkel.setAttribute('r', '52');
+    });
+    ringSpoor.setAttribute('class', 'score-ring-spoor');
+    ringBoog.setAttribute('class', 'score-ring-boog');
+    ringBoog.setAttribute('transform', 'rotate(-90 60 60)');
+    ringBoog.style.strokeDasharray = String(ringOmtrek);
+    ringBoog.style.strokeDashoffset = String(ringOmtrek);
+    ringSvg.append(ringSpoor, ringBoog);
+    const ringGetal = create('span', 'score-ring-getal');
+    ringGetal.setAttribute('aria-hidden', 'true');
+    ring.append(ringSvg, ringGetal);
+    const vastVinkje = byId('eindscherm').querySelector('svg.vinkje');
+    if (vastVinkje) vastVinkje.replaceWith(ring); else byId('eindscherm').prepend(ring);
+    // De zin bij de score staat meteen onder "X van Y goed.".
+    byId('score-kop').after(byId('score-tekst'));
+    let ringTeller = 0;
+    let feestTimer = 0;
+
+    function toonScoreBericht(procent, naam) {
+      const trede = ringTrede(procent);
+      const [begin, teken, rest] = {
+        laag: ['Nog even doorzetten', '.', ' Elke ronde helpt.'],
+        midden: ['Op de goede weg', '.', ''],
+        goed: ['Sterk gedaan', '.', ''],
+        top: ['Uitstekend', '!', '']
+      }[trede];
+      const icoon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      icoon.setAttribute('viewBox', '0 0 24 24');
+      icoon.setAttribute('class', 'score-icoon');
+      icoon.setAttribute('aria-hidden', 'true');
+      const pad = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      pad.setAttribute('d', ringIcoonPaden[trede]);
+      icoon.append(pad);
+      const tekst = byId('score-tekst');
+      tekst.dataset.trede = trede;
+      tekst.replaceChildren(icoon, create('span', '', `${begin}${naam ? `, ${naam}` : ''}${teken}${rest}`));
+    }
+
+    function toonScoreRing(procent) {
+      const trede = ringTrede(procent);
+      ring.dataset.trede = trede;
+      ring.setAttribute('aria-label', `${procent} procent goed`);
+      ring.classList.remove('is-feest');
+      ring.querySelectorAll('.score-deeltje').forEach(deeltje => deeltje.remove());
+      window.cancelAnimationFrame(ringTeller);
+      window.clearTimeout(feestTimer);
+      ringBoog.getAnimations?.().forEach(animatie => animatie.cancel());
+      const doel = ringOmtrek * (1 - procent / 100);
+      ringBoog.style.opacity = procent > 0 ? '1' : '0';
+      ringBoog.style.strokeDashoffset = String(doel);
+      if (reducedMotion.matches || !ringBoog.animate) { ringGetal.textContent = `${procent}%`; return; }
+      const duur = 900;
+      const easing = window.getComputedStyle(ring).getPropertyValue('--ease').trim() || 'ease-out';
+      ringBoog.animate([{ strokeDashoffset: ringOmtrek }, { strokeDashoffset: doel }], { duration: duur, easing });
+      const begin = performance.now();
+      const stap = tijd => {
+        const t = Math.min(1, (tijd - begin) / duur);
+        ringGetal.textContent = `${Math.round(procent * (1 - Math.pow(1 - t, 3)))}%`;
+        if (t < 1) ringTeller = window.requestAnimationFrame(stap);
+      };
+      ringGetal.textContent = '0%';
+      ringTeller = window.requestAnimationFrame(stap);
+      if (trede !== 'top') return;
+      // 85 procent en meer: een korte gloed en een handvol deeltjes, samen hooguit 1,2 seconde.
+      ring.classList.add('is-feest');
+      for (let i = 0; i < 12; i += 1) {
+        const hoek = (i / 12) * Math.PI * 2 + (i % 2 ? .2 : 0);
+        const afstand = 76 + (i % 3) * 8;
+        const deeltje = create('span', 'score-deeltje');
+        deeltje.setAttribute('aria-hidden', 'true');
+        deeltje.style.setProperty('--dx', `${Math.round(Math.cos(hoek) * afstand)}px`);
+        deeltje.style.setProperty('--dy', `${Math.round(Math.sin(hoek) * afstand)}px`);
+        deeltje.dataset.kleur = String(i % 3);
+        ring.append(deeltje);
+      }
+      feestTimer = window.setTimeout(() => {
+        ring.classList.remove('is-feest');
+        ring.querySelectorAll('.score-deeltje').forEach(deeltje => deeltje.remove());
+      }, 1250);
     }
 
     // Eén rij per afgeronde ronde in de tabel sessies (voor de inzichten op Profiel). Alleen de score, geen antwoorden.
@@ -1041,7 +1272,7 @@
       if (!regel) {
         regel = create('p', 'vak-hint pro-vooruitgang');
         regel.id = 'pro-vooruitgang';
-        byId('score-tekst').after(regel);
+        byId('tijd-resultaat').after(regel);
       }
       regel.hidden = true;
       const client = BES.auth?.client;
@@ -1172,8 +1403,9 @@
       });
     }
 
-    // Studie-hacks "Voor jou" (Plus): je zwakste hoofdstukken in dit vak (Normaal, minstens 3 vragen, onder 80 procent)
-    // met hun eigen hacks, of anders de eerste kernpunten uit de theorie. Pro: ezelsbruggetjes van Comit per hoofdstuk.
+    // Studie-hacks "Voor jou" (Pro): je zwakste hoofdstukken in dit vak (Normaal, minstens 3 vragen, onder 80 procent)
+    // met hun eigen hacks, of anders de eerste kernpunten uit de theorie, plus ezelsbruggetjes van Comit per hoofdstuk.
+    // De hack bij een fout antwoord in Training (toonHackBijFout) blijft Plus.
     function renderVoorJou() {
       const hacks = byId('hacks-inhoud');
       if (!hacks) return;
@@ -1181,14 +1413,14 @@
       const blok = create('section', 'hack-voorjou kaart');
       blok.id = 'hack-voorjou';
       const kop = create('div', 'hack-voorjou-kop');
-      kop.append(create('h2', '', 'Voor jou'), create('span', 'label', 'Plus'));
+      kop.append(create('h2', '', 'Voor jou'), create('span', 'label label-pro', 'Pro'));
       blok.append(kop);
       const plek = hacks.querySelector('.hacks-algemeen');
       if (plek) plek.after(blok); else hacks.prepend(blok);
-      if (!plusOk) {
+      if (accountPlan !== 'pro') {
         blok.classList.add('is-slot');
-        const tekst = create('p', 'kaart-sub', 'Met Plus zie je hier de hacks en kernpunten van je zwakste hoofdstukken in dit vak, zodat je weet waar je het meest wint. ');
-        const link = create('a', 'tekstlink', 'Probeer Plus een maand');
+        const tekst = create('p', 'kaart-sub', 'Met Pro zie je hier de hacks en kernpunten van je zwakste hoofdstukken in dit vak, zodat je weet waar je het meest wint. ');
+        const link = create('a', 'tekstlink', 'Probeer Pro een maand');
         link.href = '../../abonnement.html';
         tekst.append(link);
         blok.append(tekst);
@@ -1228,7 +1460,6 @@
         });
         const brug = create('button', 'knop-secundair', 'Ezelsbruggetjes van Comit');
         brug.type = 'button';
-        if (voorJouPlan !== 'pro') brug.append(create('span', 'label gedimd', 'Pro'));
         const uitkomst = create('p', 'hack-brug');
         uitkomst.setAttribute('aria-live', 'polite');
         brug.addEventListener('click', () => maakEzelsbrug(chapter, brug, uitkomst));
@@ -1239,7 +1470,7 @@
     }
 
     async function maakEzelsbrug(chapter, knop, uitkomst) {
-      if (voorJouPlan !== 'pro') {
+      if (accountPlan !== 'pro') {
         const link = create('a', 'tekstlink', 'Probeer Pro een maand');
         link.href = '../../abonnement.html';
         uitkomst.replaceChildren('Ezelsbruggetjes van Comit zitten in Pro. ', link);
@@ -1275,6 +1506,200 @@
       const hack = plusOk && !correctAnswer(entry) ? data.hacks.find(item => item.h === entry.question.h) : null;
       regel.hidden = !hack;
       if (hack) regel.textContent = `Hack: ${hack.kop ? hack.kop.trim() + '. ' : ''}${hack.t}`;
+    }
+
+    // "Waarom niet mijn antwoord?" (Pro): bij een fout antwoord op een vraag met één juist antwoord legt Comit uit waarom
+    // jouw keuze niet klopt. Antwoorden blijven op dit toestel bewaard per vak, vraag en gekozen optie, dus een herhaling kost niets.
+    // Het ene juiste antwoord van een vraag (ook "Kies 1 antwoord" als lijst), of null bij meerdere juiste antwoorden.
+    const enigJuist = question => Array.isArray(question.a) ? (question.a.length === 1 ? question.a[0] : null) : question.a;
+    const waaromKan = entry => enigJuist(entry.question) !== null && !entry.unanswered && entry.selected?.length === 1 && !correctAnswer(entry);
+
+    function toonWaarom(entry) {
+      byId('waarom-blok')?.remove();
+      if (!waaromKan(entry)) return;
+      const blok = waaromBlok(entry, true);
+      blok.id = 'waarom-blok';
+      byId('uitleg').append(blok);
+    }
+
+    function waaromBlok(entry, inLiveRegio) {
+      const blok = create('div', 'waarom-blok');
+      const knop = create('button', 'knop-secundair waarom-knop', 'Waarom niet mijn antwoord?');
+      knop.type = 'button';
+      if (planBekend && accountPlan !== 'pro') knop.append(create('span', 'label label-pro', 'Pro'));
+      const uitkomst = create('p', 'waarom-antwoord');
+      // In Training staat dit in de uitleg, die zelf al wordt voorgelezen; in het overzicht van de simulatie niet.
+      if (!inLiveRegio) uitkomst.setAttribute('aria-live', 'polite');
+      knop.addEventListener('click', () => vraagWaarom(entry, knop, uitkomst));
+      blok.append(knop, uitkomst);
+      return blok;
+    }
+
+    const waaromBewaarSleutel = `bes_waarom_${data.id}`;
+    function leesWaarom() {
+      try {
+        const bewaard = JSON.parse(window.localStorage.getItem(waaromBewaarSleutel));
+        return bewaard && typeof bewaard === 'object' ? bewaard : {};
+      } catch { return {}; }
+    }
+    function bewaarWaarom(sleutel, tekst) {
+      try {
+        const bewaard = leesWaarom();
+        delete bewaard[sleutel];
+        bewaard[sleutel] = tekst;
+        // Alleen de laatste 40 antwoorden per vak.
+        const sleutels = Object.keys(bewaard);
+        sleutels.slice(0, Math.max(0, sleutels.length - 40)).forEach(oud => delete bewaard[oud]);
+        window.localStorage.setItem(waaromBewaarSleutel, JSON.stringify(bewaard));
+      } catch {}
+    }
+
+    // Vraag, opties, keuze, juist antwoord en de bestaande uitleg; samen hooguit 1500 tekens.
+    function waaromContext(question, gekozen) {
+      const opties = question.o.map((optie, index) => `${index + 1}) ${optie.slice(0, 200)}`).join('\n');
+      const basis = [
+        `Vak: ${data.naam.slice(0, 100)}`,
+        `Oefenvraag: ${question.q.slice(0, 500)}`,
+        ...(question.kies === 'fout' ? ['Bij deze vraag moest de student de foute uitspraak kiezen.'] : []),
+        `Opties:\n${opties}`,
+        `Gekozen antwoord van de student: ${gekozen.slice(0, 200)}`,
+        `Juiste antwoord: ${question.o[enigJuist(question)].slice(0, 200)}`
+      ].join('\n');
+      const ruimte = 1500 - basis.length - 22;
+      return (ruimte > 40 ? `${basis}\nUitleg bij de vraag: ${question.u.slice(0, ruimte)}` : basis).slice(0, 1500);
+    }
+
+    async function vraagWaarom(entry, knop, uitkomst) {
+      // Bezig vanaf de eerste klik, ook tijdens het opvragen van het plan: twee snelle klikken geven één aanroep.
+      if (knop.getAttribute('aria-busy') === 'true') return;
+      knop.setAttribute('aria-busy', 'true');
+      try {
+        const plan = BES.plan ? await BES.plan().catch(() => null) : null;
+        if (plan?.plan !== 'pro') {
+          const link = create('a', 'tekstlink', 'Probeer Pro een maand');
+          link.href = '../../abonnement.html';
+          uitkomst.classList.add('is-slot');
+          uitkomst.replaceChildren('Met Pro legt Comit uit waarom jouw antwoord niet klopt. ', link);
+          return;
+        }
+        uitkomst.classList.remove('is-slot');
+        const gekozen = entry.options[entry.selected[0]]?.text;
+        if (!gekozen) return;
+        const sleutel = `${vraagSleutel(entry.question)}|${tekstHash(gekozen)}`;
+        const bewaard = leesWaarom()[sleutel];
+        if (typeof bewaard === 'string' && bewaard) { uitkomst.textContent = bewaard; return; }
+        const fout = 'Comit kan nu even niet antwoorden. Probeer het later opnieuw.';
+        const client = BES.auth?.client;
+        if (!client?.functions) { uitkomst.textContent = fout; return; }
+        knop.setAttribute('aria-disabled', 'true');
+        uitkomst.classList.add('is-laden');
+        uitkomst.textContent = 'Comit denkt even na.';
+        const vraag = 'Leg in hooguit 4 zinnen uit waarom het gekozen antwoord van de student niet klopt bij deze oefenvraag, en wat het juiste antwoord anders maakt. Baseer je alleen op de oefenvraag, de opties en de uitleg die je meekrijgt.';
+        try {
+          const { data: antwoord, error } = await client.functions.invoke('comit', { body: { vraag, context: waaromContext(entry.question, gekozen) } });
+          const tekst = !error && typeof antwoord?.tekst === 'string' ? antwoord.tekst.trim() : '';
+          // Daglimiet van Comit: de melding tonen, maar niet bewaren.
+          if (tekst && antwoord.limiet) uitkomst.textContent = tekst;
+          else if (tekst) { uitkomst.textContent = tekst; bewaarWaarom(sleutel, tekst); }
+          else uitkomst.textContent = fout;
+        } catch {
+          uitkomst.textContent = fout;
+        }
+      } finally {
+        knop.removeAttribute('aria-busy');
+        knop.removeAttribute('aria-disabled');
+        uitkomst.classList.remove('is-laden');
+      }
+    }
+
+    // Klaar-meter (Pro): bovenaan Oefenen hoe klaar je bent voor dit vak op Normaal, van 0 tot 100 (assets/klaarmeter.js),
+    // met de twee snelste stappen omhoog. Zonder Pro een korte regel met slot; zonder account niets.
+    let klaarScript = null;
+    function laadKlaarMeterScript() {
+      if (typeof BES.klaarMeter === 'function') return Promise.resolve();
+      if (!klaarScript) {
+        klaarScript = new Promise((klaar, mislukt) => {
+          const script = document.createElement('script');
+          script.src = new URL('klaarmeter.js?v=74', scriptBron).href;
+          script.onload = () => (typeof BES.klaarMeter === 'function' ? klaar() : mislukt());
+          script.onerror = () => { klaarScript = null; mislukt(); };
+          document.head.append(script);
+        });
+      }
+      return klaarScript;
+    }
+
+    function renderKlaarMeter() {
+      const plek = byId('vak-instellingen');
+      if (!plek) return;
+      const owner = context?.owner;
+      let kaart = byId('klaar-meter');
+      if (!owner || !planBekend || !data.vragen.length || !context.authReady) { if (kaart) kaart.hidden = true; return; }
+      const pro = accountPlan === 'pro';
+      if (pro && typeof BES.klaarMeter !== 'function') {
+        if (kaart) kaart.hidden = true;
+        laadKlaarMeterScript().then(renderKlaarMeter, () => {});
+        return;
+      }
+      if (!kaart) {
+        kaart = create('section', 'kaart klaar-meter');
+        kaart.id = 'klaar-meter';
+        kaart.setAttribute('aria-labelledby', 'klaar-kop');
+        plek.prepend(kaart);
+      }
+      kaart.hidden = false;
+      kaart.classList.toggle('is-slot', !pro);
+      const kop = create('div', 'klaar-kop');
+      const titel = create('h2', '', 'Klaar-meter');
+      titel.id = 'klaar-kop';
+      kop.append(titel, create('span', 'label label-pro', 'Pro'));
+      if (!pro) {
+        const tekst = create('p', 'klaar-slot-tekst', 'Zie hoe klaar je bent voor dit vak, van 0 tot 100. ');
+        const link = create('a', 'tekstlink', 'Probeer Pro een maand');
+        link.href = '../../abonnement.html';
+        tekst.append(link);
+        kaart.replaceChildren(kop, tekst);
+        return;
+      }
+      const hoofdstukken = banks.get('normaal')?.get(owner)?.chapters || {};
+      const rijen = Object.entries(hoofdstukken).map(([hoofdstuk, rij]) => ({
+        hoofdstuk, beantwoord: rij.beantwoord, goed: rij.goed, laatst_goed: rij.laatstGoed, laatst_totaal: rij.laatstTotaal, bijgewerkt: rij.bijgewerkt
+      }));
+      const meter = BES.klaarMeter(data, rijen, Date.now());
+      const score = create('div', 'klaar-score');
+      const getal = create('p', 'klaar-getal');
+      getal.append(create('strong', '', String(meter.score)), create('span', '', ' van 100'));
+      const balk = create('span', 'klaar-balk');
+      balk.setAttribute('aria-hidden', 'true');
+      const vulling = create('span');
+      vulling.style.width = `${meter.score}%`;
+      balk.append(vulling);
+      score.append(getal, balk, create('p', 'klaar-noot', `${hasLevels ? 'Op Normaal. ' : ''}Geen voorspelling van je examencijfer.`));
+      const stappen = create('div', 'klaar-stappen');
+      if (meter.stappen.length) {
+        stappen.append(create('p', 'klaar-stappen-kop', meter.stappen.length === 1 ? 'Snelste stap omhoog' : 'Twee snelste stappen omhoog'));
+        const lijst = create('div', 'klaar-stappen-lijst');
+        meter.stappen.forEach(stap => {
+          const knop = create('button', 'klaar-stap');
+          knop.type = 'button';
+          knop.append(create('span', 'klaar-stap-tekst', BES.klaarStapTekst(stap)), create('span', 'klaar-stap-winst', `tot +${stap.winst}`));
+          knop.setAttribute('aria-label', `${BES.klaarStapTekst(stap)}. Tot ${stap.winst} punten erbij. Start een training van dit hoofdstuk.`);
+          knop.addEventListener('click', () => {
+            const vragen = data.vragen.filter(question => question.h === stap.hoofdstuk);
+            if (!vragen.length || screen !== 'keuzes') return;
+            if (level !== 'normaal') setLevel('normaal');
+            setMode('training');
+            start(vragen, 'training', 'normaal', 0);
+          });
+          lijst.append(knop);
+        });
+        stappen.append(lijst);
+      } else {
+        stappen.append(create('p', 'klaar-stappen-kop', 'Je zit goed in dit vak'), create('p', 'klaar-noot', 'Herhaal af en toe een hoofdstuk, dan blijft het zitten.'));
+      }
+      const inhoud = create('div', 'klaar-inhoud');
+      inhoud.append(score, stappen);
+      kaart.replaceChildren(kop, inhoud);
     }
 
     function selectTab(tab, focus = false) {
@@ -1326,7 +1751,8 @@
       event.preventDefault();
       const index = event.key === 'Home' ? 0 : event.key === 'End' ? modeButtons.length - 1 : (current + 1) % modeButtons.length;
       chooseMode(modeButtons[index].dataset.modus);
-      modeButtons[index].focus({ preventScroll: true });
+      // Mag de simulatie vandaag niet meer (Free), dan blijft de focus op de gekozen modus.
+      (modeButtons.find(button => button.dataset.modus === mode) || modeButtons[index]).focus({ preventScroll: true });
     });
     if (hasLevels && byId('niveau-keuzes')) {
       const levelButtons = [...byId('niveau-keuzes').querySelectorAll('[data-niveau]')];
@@ -1347,7 +1773,7 @@
       setLevel('normaal');
     }
     markeerPlus();
-    if (BES.plan) BES.plan().then((p) => { plusOk = p.plan === 'plus' || p.plan === 'pro'; markeerPlus(); });
+    if (BES.plan) BES.plan().then(planToepassen, () => {});
     const timeButtons = [...byId('tijd-keuzes').querySelectorAll('[data-tijd]')];
     timeButtons.forEach(button => button.addEventListener('click', () => setTime(button.dataset.tijd, true)));
     byId('tijd-keuzes').addEventListener('keydown', event => {

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="assets/deur.js?v=73"></script>
+  <script src="assets/deur.js?v=74"></script>
   <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta name="robots" content="noindex">
@@ -21,14 +21,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=73">
-  <script src="assets/app.js?v=73" defer></script>
-  <script src="assets/vakken.js?v=73"></script>
-  <script src="assets/config.js?v=73" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=74">
+  <script src="assets/app.js?v=74" defer></script>
+  <script src="assets/vakken.js?v=74"></script>
+  <script src="assets/config.js?v=74" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=73" defer></script>
-  <script src="assets/plan.js?v=73" defer></script>
-  <script src="assets/activiteit.js?v=73" defer></script>
+  <script src="assets/auth.js?v=74" defer></script>
+  <script src="assets/plan.js?v=74" defer></script>
+  <script src="assets/activiteit.js?v=74" defer></script>
   <style>
     .ep-wrap { max-width: 760px; }
     .ep-status { margin: 0 0 16px; color: var(--ink-soft); }
@@ -56,14 +56,35 @@
     .ep-melding { margin: 12px 0 0; color: var(--ink-soft); font-size: .875rem; }
     .ep-melding:empty { display: none; }
     .ep-leeg { margin: 0; color: var(--ink-soft); font-size: .9375rem; line-height: 1.5; }
+    .ep-plan-boven { display: flex; align-items: center; justify-content: space-between; gap: 16px 24px; }
+    .ep-uitleg { margin: 0; max-width: 30rem; color: var(--ink-soft); font-size: .9375rem; line-height: 1.5; }
+    .ep-plan-boven .knop-secundair { gap: 8px; width: auto; min-width: 0; margin: 0; padding: 10px 20px; font-size: .9375rem; }
+    .ep-plan-boven .knop-secundair svg { width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .ep-weken { margin-top: 24px; border-top: 1px solid var(--line); }
+    .ep-weken:empty { display: none; }
+    .ep-week { border-bottom: 1px solid var(--line); }
+    .ep-week:last-child { border-bottom: 0; }
+    .ep-week > summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 56px; margin: 4px -8px; padding: 8px; cursor: pointer; list-style: none; }
+    .ep-week > summary::-webkit-details-marker { display: none; }
+    .ep-week-tekst { display: grid; gap: 2px; min-width: 0; }
+    .ep-week-naam { font-size: 1rem; font-weight: 600; line-height: 1.35; }
+    .ep-week-meta { color: var(--ink-soft); font-size: .8125rem; line-height: 1.4; }
+    .ep-week-pijl { width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: var(--ink-soft); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 200ms var(--ease); }
+    .ep-week[open] .ep-week-pijl { transform: rotate(180deg); }
+    .ep-week .ep-dagen { padding-bottom: 8px; }
+    .ep-grens { margin-top: 16px; font-size: .875rem; }
     .ep-dagen { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
-    .ep-dag { display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+    .ep-dag { display: grid; grid-template-columns: 116px minmax(0, 1fr) auto; align-items: center; gap: 12px 16px; padding: 14px 0; border-bottom: 1px solid var(--line); }
     .ep-dag:last-child { border-bottom: 0; }
+    /* Vandaag springt eruit: zacht vlak binnen de kaartmarge, met minstens 16 px lucht rond de knop en tot de weekkop erboven. */
+    .ep-dag.is-vandaag { margin: 12px -12px; padding: 16px 16px 16px 12px; border-bottom-color: transparent; border-radius: 12px; background: var(--accent-zacht); }
     .ep-dag-naam { display: block; color: var(--ink-soft); font-size: .8125rem; font-weight: 600; }
     .ep-dag-naam::first-letter { text-transform: uppercase; }
-    .ep-dag-naam.is-vandaag { color: var(--accent); }
+    /* Op het zachte vlak is de donkerdere accentkleur nodig voor genoeg contrast (licht en donker thema). */
+    .ep-dag-naam.is-vandaag { color: var(--accent-dark); }
     .ep-dag-taak { font-size: .9375rem; line-height: 1.45; }
     .ep-dag-taak small { display: block; color: var(--ink-soft); font-size: .8125rem; }
+    .ep-dag-examen { display: flex; width: fit-content; margin-bottom: 6px; border-radius: 10px; }
     .ep-dag .knop-secundair, .ep-punt .knop-secundair { width: auto; min-width: 0; margin: 0; padding: 8px 16px; font-size: .9375rem; }
     .ep-week-cijfers { margin: 0 0 16px; font-size: .9375rem; line-height: 1.6; }
     .ep-punten { display: grid; gap: 12px; }
@@ -84,7 +105,10 @@
       .ep-nieuw .knop-secundair { width: 100%; max-width: none; }
       .ep-dag { grid-template-columns: minmax(0, 1fr) auto; }
       .ep-dag-naam { grid-column: 1 / -1; }
+      .ep-plan-boven { flex-direction: column; align-items: stretch; }
+      .ep-plan-boven .knop-secundair { width: 100%; max-width: none; }
     }
+    @media (prefers-reduced-motion: reduce) { .ep-week-pijl { transition: none; } }
   </style>
 </head>
 <body data-nav="vast">
@@ -120,7 +144,7 @@
       <section class="kaart ep-pro" id="ep-pro" aria-labelledby="ep-pro-kop" hidden>
         <div>
           <h2 id="ep-pro-kop">Je examenplan zit in Pro</h2>
-          <p>Met Pro krijg je een plan per dag tot je examen, ezelsbruggetjes van Comit voor je zwakke hoofdstukken en elke week een overzicht met verbeterpunten.</p>
+          <p>Met Pro krijg je een plan per dag tot je examen, dat je met één knop in je agenda zet. Je krijgt ook ezelsbruggetjes van Comit voor je zwakke hoofdstukken en per vak een Klaar-meter.</p>
         </div>
         <a class="knop-secundair" href="abonnement.html">Probeer Pro een maand</a>
       </section>
@@ -141,15 +165,24 @@
         </section>
 
         <section class="ep-sectie" aria-labelledby="ep-plan-kop">
-          <h2 class="sectie-kop" id="ep-plan-kop">Je plan voor de komende week</h2>
+          <h2 class="sectie-kop" id="ep-plan-kop">Je plan tot je examen</h2>
           <div class="kaart ep-kaart">
-            <ol class="ep-dagen" id="ep-dagen"></ol>
+            <div class="ep-plan-boven" id="ep-plan-boven" hidden>
+              <p class="ep-uitleg">Je plan rekent elke dag opnieuw met je voortgang van dat moment. Mis je een dag, dan schuift alles gewoon op.</p>
+              <button class="knop-secundair" type="button" id="ep-agenda">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4M9 15l2 2 4-4"/></svg>
+                Zet in je agenda
+              </button>
+            </div>
+            <p class="ep-melding" id="ep-agenda-melding" role="status" aria-live="polite"></p>
+            <div class="ep-weken" id="ep-weken"></div>
+            <p class="ep-leeg ep-grens" id="ep-grens" hidden></p>
             <p class="ep-leeg" id="ep-geen-plan">Zodra je een examen toevoegt, staat hier wat je elke dag oefent.</p>
           </div>
         </section>
 
         <section class="ep-sectie" aria-labelledby="ep-week-kop">
-          <h2 class="sectie-kop" id="ep-week-kop">Deze week</h2>
+          <h2 class="sectie-kop" id="ep-week-kop">Je week in cijfers</h2>
           <div class="kaart ep-kaart">
             <p class="ep-week-cijfers" id="ep-week-cijfers"></p>
             <div class="ep-punten" id="ep-punten"></div>
@@ -170,6 +203,7 @@
   <script>
     // Examenplan (Pro): examendata (supabase/examendata.sql), voortgang per hoofdstuk en sessies van de laatste twee weken.
     // Het plan zet per dag twee hoofdstukken klaar: eerst wat je nog niet oefende, dan je laagste scores. De dag voor een examen: een simulatie.
+    // Het loopt tot je laatste komende examen (hoogstens 120 dagen), per week gegroepeerd, en kan als .ics-bestand in je agenda.
     document.addEventListener('DOMContentLoaded', () => {
       const BES = window.BES || {};
       const status = document.getElementById('ep-status');
@@ -178,11 +212,20 @@
       const vakken = (window.BES_VAKKEN || []).filter((vak) => vak.v2);
       const vakNaam = new Map(vakken.map((vak) => [vak.id, vak.naam]));
       const dagMs = 86400000;
+      const maxDagen = 120;
       const begin = (datum) => new Date(datum.getFullYear(), datum.getMonth(), datum.getDate());
       const vandaag = begin(new Date());
+      // Kalenderdagen optellen, niet 24 uur: zo blijft elke dag middernacht, ook rond de overgang naar winter- of zomertijd.
+      const plusDagen = (datum, aantal) => new Date(datum.getFullYear(), datum.getMonth(), datum.getDate() + aantal);
       const iso = (datum) => datum.getFullYear() + '-' + String(datum.getMonth() + 1).padStart(2, '0') + '-' + String(datum.getDate()).padStart(2, '0');
       const leesDatum = (tekst) => { const [j, m, d] = tekst.split('-').map(Number); return new Date(j, m - 1, d); };
       const dagNaam = (datum, index) => index === 0 ? 'Vandaag' : index === 1 ? 'Morgen' : new Intl.DateTimeFormat('nl-BE', { weekday: 'long', day: 'numeric', month: 'short' }).format(datum);
+      const maandag = (datum) => plusDagen(datum, -((datum.getDay() + 6) % 7));
+      const weekNaam = (start) => {
+        const verschil = Math.round((start - maandag(vandaag)) / (7 * dagMs));
+        return verschil === 0 ? 'Deze week' : verschil === 1 ? 'Volgende week' : 'Week van ' + new Intl.DateTimeFormat('nl-BE', { day: 'numeric', month: 'long' }).format(start);
+      };
+      const opsomming = (delen) => delen.length > 1 ? delen.slice(0, -1).join(', ') + ' en ' + delen[delen.length - 1] : delen.join('');
 
       // Vakdata (hoofdstukken en vragen) één keer per vak laden; data.js zet window.BES_VAK, dus om beurten.
       const vakData = new Map();
@@ -204,6 +247,11 @@
       let gebruiker = null;
       let examens = [];
       let scores = new Map();
+      let planDagen = [];
+      // Volgnummer van de laatste planberekening: een tragere, oudere berekening tekent niet over een nieuwere heen.
+      let planBeurt = 0;
+      // Weken die je zelf open- of dichtklapte, zodat dat zo blijft als het plan opnieuw tekent.
+      const weekKeuze = new Map();
 
       const vulKeuzes = () => {
         const kies = $('ep-vak');
@@ -277,19 +325,28 @@
         }).sort((a, b) => a.score - b.score);
       };
 
+      // Waar de knop Oefen van een plandag naartoe gaat: bij een simulatie het vak, anders het eerste hoofdstuk van die dag.
+      const oefenLink = (item) => 'vak/' + encodeURIComponent(item.plan.vak) + '/' + (item.simulatie ? '' : '?hoofdstuk=' + encodeURIComponent(item.stukken[0].id));
+
       async function maakPlan() {
-        const lijst = $('ep-dagen');
-        const komend = examens.filter((examen) => leesDatum(examen.datum) > vandaag);
-        $('ep-geen-plan').hidden = komend.length > 0;
-        if (!komend.length) { lijst.replaceChildren(); return; }
+        const beurt = ++planBeurt;
+        const weken = $('ep-weken');
+        const lijstExamens = examens;
+        const komend = lijstExamens.filter((examen) => leesDatum(examen.datum) > vandaag);
         const plannen = (await Promise.all(komend.map(async (examen) => {
           const data = await laadVak(examen.vak);
           if (!data) return null;
-          return { vak: examen.vak, naam: vakNaam.get(examen.vak), datum: leesDatum(examen.datum), rij: wachtrij(data), plek: 0, beurten: 0 };
+          return { vak: examen.vak, naam: vakNaam.get(examen.vak), datum: leesDatum(examen.datum), rij: wachtrij(data), plek: 0, beurten: 0, gezien: new Set() };
         }))).filter(Boolean);
+        // Intussen een examen toegevoegd, verzet of weggehaald: dan tekent de nieuwere berekening.
+        if (beurt !== planBeurt) return;
+        $('ep-plan-kop').textContent = komend.length > 1 ? 'Je plan tot je examens' : 'Je plan tot je examen';
+        // Het plan loopt tot je laatste komende examen, hoogstens 120 dagen vooruit.
+        const laatste = plannen.reduce((verst, plan) => plan.datum > verst ? plan.datum : verst, vandaag);
+        const totLaatste = Math.round((laatste - vandaag) / dagMs);
         const dagen = [];
-        for (let i = 0; i < 7; i++) {
-          const dag = new Date(vandaag.getTime() + i * dagMs);
+        for (let i = 0; i < Math.min(maxDagen, totLaatste); i++) {
+          const dag = plusDagen(vandaag, i);
           const open = plannen.filter((plan) => plan.datum > dag && plan.rij.length);
           if (!open.length) break;
           // Examen morgen: simulatie. Anders het vak met de minste beurten, bij gelijkstand het dichtste examen.
@@ -298,26 +355,152 @@
           open.sort((a, b) => a.beurten - b.beurten || a.datum - b.datum);
           const plan = open[0];
           const stukken = [plan.rij[plan.plek % plan.rij.length], plan.rij[(plan.plek + 1) % plan.rij.length]].filter((stuk, index, alle) => alle.findIndex((ander) => ander.id === stuk.id) === index);
+          // Komt een hoofdstuk later in het plan terug, dan staat er herhalen in plaats van de score van vandaag.
+          const labels = stukken.map((stuk) => plan.gezien.has(stuk.id) ? 'herhalen' : stuk.score < 0 ? 'nieuw' : Math.round(stuk.score * 100) + '%');
+          stukken.forEach((stuk) => plan.gezien.add(stuk.id));
           plan.plek += stukken.length;
           plan.beurten++;
-          dagen.push({ dag, i, plan, stukken });
+          dagen.push({ dag, i, plan, stukken, labels });
         }
-        lijst.replaceChildren(...dagen.map((item) => {
-          const regel = el('li', 'ep-dag');
-          regel.append(el('span', 'ep-dag-naam' + (item.i === 0 ? ' is-vandaag' : ''), dagNaam(item.dag, item.i)));
-          const taak = el('div', 'ep-dag-taak');
-          const knop = el('a', 'knop-secundair', 'Oefen');
-          if (item.simulatie) {
-            taak.append(item.plan.naam, el('small', '', 'Morgen examen: doe een examensimulatie.'));
-            knop.href = 'vak/' + encodeURIComponent(item.plan.vak) + '/';
-          } else {
-            taak.append(item.plan.naam, el('small', '', item.stukken.map((stuk) => stuk.naam + (stuk.score < 0 ? ' (nieuw)' : ' (' + Math.round(stuk.score * 100) + '%)')).join(' en ')));
-            knop.href = 'vak/' + encodeURIComponent(item.plan.vak) + '/?hoofdstuk=' + encodeURIComponent(item.stukken[0].id);
-          }
-          regel.append(taak, knop);
-          return regel;
+        // Examens vanaf vandaag krijgen een label op hun dag; de dag van je laatste examen sluit het plan af.
+        const examenOp = new Map();
+        lijstExamens.filter((examen) => leesDatum(examen.datum) >= vandaag).forEach((examen) => examenOp.set(examen.datum, [...(examenOp.get(examen.datum) || []), vakNaam.get(examen.vak) || examen.vak]));
+        if (dagen.length && totLaatste <= maxDagen) dagen.push({ dag: laatste, i: totLaatste, alleenExamen: true });
+        dagen.forEach((item) => { item.examens = examenOp.get(iso(item.dag)) || []; });
+        planDagen = dagen.filter((item) => !item.alleenExamen);
+
+        $('ep-plan-boven').hidden = !planDagen.length;
+        $('ep-agenda-melding').textContent = '';
+        $('ep-geen-plan').hidden = planDagen.length > 0;
+        $('ep-geen-plan').textContent = komend.length && !plannen.length ? 'Je plan laden lukte niet. Probeer het later opnieuw.'
+          : lijstExamens.length && !komend.length ? 'Na vandaag staat er geen examen meer. Voeg je volgende examen toe, dan staat hier wat je elke dag oefent.'
+          : 'Zodra je een examen toevoegt, staat hier wat je elke dag oefent.';
+        $('ep-grens').hidden = !planDagen.length || totLaatste <= maxDagen;
+        $('ep-grens').textContent = 'Je plan toont de komende ' + maxDagen + ' dagen. Komt je examen dichterbij, dan loopt het vanzelf verder.';
+        if (!planDagen.length) { weken.replaceChildren(); return; }
+
+        // Per week groeperen (maandag tot zondag). Deze week staat open; heeft die nog maar een of twee dagen, dan volgende week ook.
+        const groepen = [];
+        dagen.forEach((item) => {
+          const start = maandag(item.dag);
+          const laatsteGroep = groepen[groepen.length - 1];
+          if (laatsteGroep && laatsteGroep.sleutel === iso(start)) laatsteGroep.dagen.push(item);
+          else groepen.push({ sleutel: iso(start), start, dagen: [item] });
+        });
+        weken.replaceChildren(...groepen.map((groep, index) => {
+          const week = el('details', 'ep-week');
+          week.dataset.week = groep.sleutel;
+          const standaard = index === 0 || (index === 1 && groepen[0].dagen.length < 3);
+          week.open = weekKeuze.has(groep.sleutel) ? weekKeuze.get(groep.sleutel) : standaard;
+          week.addEventListener('toggle', () => { if (week.open === standaard) weekKeuze.delete(groep.sleutel); else weekKeuze.set(groep.sleutel, week.open); });
+          const kop = el('summary');
+          const tekst = el('span', 'ep-week-tekst');
+          const oefendagen = groep.dagen.filter((item) => !item.alleenExamen).length;
+          const examenNamen = groep.dagen.flatMap((item) => item.examens);
+          const meta = [];
+          if (oefendagen) meta.push(oefendagen + (oefendagen === 1 ? ' dag' : ' dagen'));
+          if (examenNamen.length) meta.push((examenNamen.length === 1 ? 'examen ' : 'examens ') + opsomming(examenNamen));
+          // Een week met alleen je examendag begint met examen: dan met een hoofdletter.
+          const metaTekst = meta.join(', ');
+          tekst.append(el('span', 'ep-week-naam', weekNaam(groep.start)), el('span', 'ep-week-meta', metaTekst.charAt(0).toUpperCase() + metaTekst.slice(1)));
+          const pijl = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          pijl.setAttribute('class', 'ep-week-pijl');
+          pijl.setAttribute('viewBox', '0 0 24 24');
+          pijl.setAttribute('aria-hidden', 'true');
+          const lijn = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          lijn.setAttribute('d', 'm6 9 6 6 6-6');
+          pijl.append(lijn);
+          kop.append(tekst, pijl);
+          const lijst = el('ol', 'ep-dagen');
+          lijst.append(...groep.dagen.map(dagRegel));
+          week.append(kop, lijst);
+          return week;
         }));
       }
+
+      function dagRegel(item) {
+        const regel = el('li', 'ep-dag' + (item.i === 0 ? ' is-vandaag' : ''));
+        if (item.i === 0) regel.setAttribute('aria-current', 'date');
+        const naamDag = dagNaam(item.dag, item.i);
+        regel.append(el('span', 'ep-dag-naam' + (item.i === 0 ? ' is-vandaag' : ''), naamDag));
+        const taak = el('div', 'ep-dag-taak');
+        if (item.examens.length) taak.append(el('span', 'label ep-dag-examen', (item.examens.length === 1 ? 'Examen ' : 'Examens ') + opsomming(item.examens)));
+        if (item.alleenExamen) {
+          taak.append(el('small', '', item.examens.length > 1 ? 'Je laatste examens. Hier stopt je plan.' : 'Je laatste examen. Hier stopt je plan.'));
+          regel.append(taak);
+          return regel;
+        }
+        if (item.simulatie) taak.append(item.plan.naam, el('small', '', 'Morgen examen: doe een examensimulatie.'));
+        else taak.append(item.plan.naam, el('small', '', item.stukken.map((stuk, index) => stuk.naam + ' (' + item.labels[index] + ')').join(' en ')));
+        const knop = el('a', 'knop-secundair', 'Oefen');
+        knop.href = oefenLink(item);
+        knop.setAttribute('aria-label', 'Oefen ' + item.plan.naam + ', ' + naamDag.toLowerCase());
+        regel.append(taak, knop);
+        return regel;
+      }
+
+      // Agenda-bestand (iCalendar, RFC 5545): één afspraak voor de hele dag per plandag, regels met CRLF en gevouwen na 75 bytes.
+      const icsTekst = (tekst) => String(tekst).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+      const icsDatum = (datum) => iso(datum).replace(/-/g, '');
+      const bytes = new TextEncoder();
+      const vouw = (regel) => {
+        let uit = '', lengte = 0;
+        for (const teken of regel) {
+          const n = bytes.encode(teken).length;
+          if (lengte + n > 75) { uit += '\r\n '; lengte = 1; }
+          uit += teken;
+          lengte += n;
+        }
+        return uit;
+      };
+      // Kort in de titel: hoofdstuk 3 en 4. Een hoofdstuk zonder nummer (zoals oude examenvragen) staat er met zijn naam.
+      const hoofdstukKort = (stukken) => {
+        const nummers = stukken.map((stuk) => { const treffer = /^h(\d+)$/.exec(stuk.id); return treffer && !/examen|oefenvragen/i.test(stuk.naam) ? treffer[1] : null; });
+        if (nummers.every(Boolean)) return 'hoofdstuk ' + opsomming(nummers);
+        return opsomming(stukken.map((stuk, index) => nummers[index] ? 'hoofdstuk ' + nummers[index] : stuk.naam));
+      };
+      // In een agendatitel past de korte vaknaam: Statistiek II in plaats van de volledige naam na de dubbele punt.
+      const kortNaam = (naam) => String(naam).split(':')[0].trim();
+
+      function agendaBestand(dagen) {
+        const stempel = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
+        // Hoger volgnummer bij elke nieuwe download, zodat een agenda een plandag met dezelfde UID kan bijwerken.
+        const volgnummer = Math.max(0, Math.floor((Date.now() - Date.UTC(2026, 0, 1)) / 60000));
+        const regels = ['BEGIN:VCALENDAR', 'VERSION:2.0', "PRODID:-//Berie's Exam Space//Examenplan//NL", 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH'];
+        dagen.forEach((item) => {
+          const link = new URL(oefenLink(item), window.location.href).href;
+          const titel = item.simulatie ? 'Berie: simulatie ' + kortNaam(item.plan.naam) : 'Berie: ' + kortNaam(item.plan.naam) + ', ' + hoofdstukKort(item.stukken);
+          const uitleg = (item.simulatie ? 'Morgen examen ' + item.plan.naam + '. Doe vandaag een examensimulatie.' : 'Oefen ' + opsomming(item.stukken.map((stuk) => stuk.naam)) + '.') + '\nOefen hier: ' + link;
+          regels.push(
+            'BEGIN:VEVENT',
+            'UID:examenplan-' + icsDatum(item.dag) + '@beriesexamspace.com',
+            'DTSTAMP:' + stempel,
+            'SEQUENCE:' + volgnummer,
+            'DTSTART;VALUE=DATE:' + icsDatum(item.dag),
+            'DTEND;VALUE=DATE:' + icsDatum(plusDagen(item.dag, 1)),
+            'SUMMARY:' + icsTekst(titel),
+            'DESCRIPTION:' + icsTekst(uitleg),
+            'URL:' + link,
+            'TRANSP:TRANSPARENT',
+            'END:VEVENT'
+          );
+        });
+        regels.push('END:VCALENDAR');
+        return regels.map(vouw).join('\r\n') + '\r\n';
+      }
+
+      $('ep-agenda').addEventListener('click', () => {
+        if (!planDagen.length) return;
+        const bestand = new Blob([agendaBestand(planDagen)], { type: 'text/calendar;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(bestand);
+        link.download = 'berie-examenplan.ics';
+        document.body.append(link);
+        link.click();
+        link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(link.href), 4000);
+        $('ep-agenda-melding').textContent = 'Je agenda-bestand is gedownload. Open het om ' + (planDagen.length === 1 ? 'je plandag' : 'de ' + planDagen.length + ' plandagen') + ' in je agenda te zetten. Verschuift je plan, zet het dan gewoon opnieuw in je agenda.';
+      });
 
       // Ezelsbruggetjes van Comit (Pro) voor een zwak hoofdstuk, op basis van een paar vragen met het juiste antwoord.
       async function ezelsbrug(vak, hoofdstuk, doel, knop) {
