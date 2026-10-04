@@ -45,7 +45,8 @@
       max-width: 560px;
     }
     @media (min-width: 900px) {
-      .ab-plannen { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: none; }
+      /* Elke kaart zo hoog als zijn eigen inhoud, de knop direct eronder (Berat, 04-10-2026). */
+      .ab-plannen { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: none; align-items: start; }
     }
     .ab-plan {
       display: flex;
@@ -92,6 +93,7 @@
     .ab-lijst.is-mist { gap: 8px; }
     .ab-lijst.is-mist > li > span { color: var(--ink-soft); opacity: .8; }
     .ab-slot { width: 18px; height: 18px; margin-top: 2px; fill: none; stroke: var(--ink-soft); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; opacity: .7; }
+    .ab-plus-chip { display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 980px; background: rgba(63,185,178,.16); color: #7fd6d0; font-size: .6875rem; font-weight: 600; line-height: 1.5; vertical-align: 1px; }
     .ab-pro-chip { display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 980px; background: rgba(212,175,55,.16); color: #e6c872; font-size: .6875rem; font-weight: 600; line-height: 1.5; vertical-align: 1px; }
     /* Pro: nieuwe onderdelen als eerste. */
     .ab-eerst { display: flex; align-items: center; gap: 8px; margin: 20px 0 0; color: var(--teal-tekst); font-size: .8125rem; font-weight: 500; line-height: 1.4; }
@@ -288,10 +290,10 @@
           </ul>
           <p class="ab-lijst-kop is-mist-kop">Niet in Free:</p>
           <ul class="ab-lijst is-mist">
-            <li><svg class="ab-slot" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Hard mode</span></li>
-            <li><svg class="ab-slot" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Onbeperkt simulaties met tijdklok</span></li>
-            <li><svg class="ab-slot" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Foutenlijst</span></li>
-            <li><svg class="ab-slot" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Weekoverzicht</span></li>
+            <li><svg class="ab-slot" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Hard mode<span class="ab-plus-chip">Plus</span></span></li>
+            <li><svg class="ab-slot" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Onbeperkt simulaties<span class="ab-plus-chip">Plus</span></span></li>
+            <li><svg class="ab-slot" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Foutenlijst<span class="ab-plus-chip">Plus</span></span></li>
+            <li><svg class="ab-slot" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Weekoverzicht<span class="ab-plus-chip">Plus</span></span></li>
             <li><svg class="ab-slot" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Examenplan tot je examen<span class="ab-pro-chip">Pro</span></span></li>
             <li><svg class="ab-slot" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Klaar-meter per vak<span class="ab-pro-chip">Pro</span></span></li>
             <li><svg class="ab-slot" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Waarom niet mijn antwoord?<span class="ab-pro-chip">Pro</span></span></li>
