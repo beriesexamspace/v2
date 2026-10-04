@@ -34,6 +34,7 @@
   <script src="assets/config.js?v=77" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
   <script src="assets/auth.js?v=77" defer></script>
+  <script src="assets/over-jezelf.js?v=77" defer></script>
   <script src="assets/plan.js?v=77" defer></script>
   <script src="assets/activiteit.js?v=77" defer></script>
   <style>
@@ -110,7 +111,7 @@
             </div>
             <p class="auth-error" id="signup-error" role="alert" hidden></p>
             <button class="knop" id="signup-submit" type="submit">Verder →</button>
-            <p class="auth-help auth-privacy">Met een account bewaren we je naam, e-mailadres en voortgang. Meer niet. <a class="tekstlink" href="privacy.html">Lees hoe we met je gegevens omgaan</a>.</p>
+            <p class="auth-help auth-privacy">Met een account bewaren we je naam, e-mailadres en voortgang, en wat je zelf over jezelf vertelt. Meer niet. <a class="tekstlink" href="privacy.html">Lees hoe we met je gegevens omgaan</a>.</p>
           </form>
           <div class="auth-google" id="signup-google">
             <p class="auth-of" aria-hidden="true"><span>of</span></p>
@@ -120,7 +121,8 @@
             </button>
           </div>
           <div class="auth-success" id="signup-success" hidden>
-            <a class="knop" href="hub.html">Verder →</a>
+            <p class="over-jezelf-intro"><strong>Vertel een beetje over jezelf.</strong> Berie vindt het leuk om te lezen wie zijn website allemaal gebruikt. Kies je Openbaar, dan leren ook de anderen je straks kennen. Alles is optioneel.</p>
+            <div id="signup-over"></div>
           </div>
         </div>
       </div>
@@ -235,8 +237,8 @@
           if (step === 0) back.setAttribute('data-terug', 'index.html');
           else back.removeAttribute('data-terug');
         } else {
-          heading.textContent = 'Klaar, ' + name + '. Je account staat.';
-          stepLabel.hidden = true;
+          heading.textContent = 'Je account staat, ' + name + '.';
+          stepLabel.textContent = 'Bijna klaar';
           back.hidden = true;
           form.hidden = true;
           document.getElementById('signup-check').removeAttribute('hidden');
@@ -252,6 +254,23 @@
         if (step < 3) fields[step].focus({ preventScroll: true });
         else heading.focus({ preventScroll: true });
         changing = false;
+      };
+
+      // Na Account maken: het optionele scherm Over jezelf. Opslaan of Overslaan gaat naar de hub.
+      const naarHub = () => window.location.assign('hub.html' + window.location.hash);
+      const toonOver = async name => {
+        const over = window.BES.overJezelf;
+        if (!over) { naarHub(); return; }
+        const { form: overForm } = over.formulier({
+          opslaanTekst: 'Opslaan →',
+          tweede: { tekst: 'Overslaan', href: 'hub.html' + window.location.hash },
+          opslaan: async gegevens => {
+            await auth.profielBijwerken({ over: gegevens });
+            naarHub();
+          }
+        });
+        document.getElementById('signup-over').replaceChildren(overForm);
+        await changeStep(3, name);
       };
 
       nameFields.forEach(field => {
@@ -314,7 +333,7 @@
           await auth.aanmelden(names, fields[1].value.trim(), fields[2].value);
           fields[2].value = '';
           fields[2].type = 'password';
-          window.location.assign('hub.html' + window.location.hash);
+          await toonOver(names.bijnaam || names.voornaam);
         } catch (failure) {
           if (failure.code === 'duplicate') {
             fields[2].value = '';

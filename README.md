@@ -113,6 +113,8 @@ Nieuwe accounts bewaren `voornaam`, `achternaam` en de optionele `bijnaam` in Su
 
 De client wordt na `app.js` en `config.js` geladen; `auth.js` regelt de sessie en de inloglink centraal. `BES.auth.client` geeft de bestaande Supabase-client door aan de vakpagina. Voortgang tussen toestellen werkt voor ingelogde gebruikers na het aanmaken van de tabel en toegangsregels onder "Vakpagina".
 
+Sinds 04-10-2026 komt na Account maken een optioneel scherm "Vertel een beetje over jezelf" (studie, jaar, een vrije tekst van hoogstens 300 tekens en de keuze Alleen Berie of Openbaar), met Opslaan of Overslaan. Het formulier en de weergave staan in `assets/over-jezelf.js` (`BES.overJezelf`), de gegevens in `user_metadata.over` via `BES.auth.profielBijwerken({ over })`; `auth.js` maakt ze schoon en `BES.auth.overGegevens(user)` leest ze. Op `profiel.html` staat het blok Over jezelf met Bewerken en Alles weghalen. `beheer.html` toont het per account zodra `supabase/beheer-overzicht.sql` opnieuw is uitgevoerd. Openbare profielen zijn voor anderen nog nergens te lezen; dat is de volgende stap. Cachenummer: 77.
+
 ### Inloggen met Google
 
 `aanmelden.html` en `inloggen.html` hebben de knop "Verder met Google" (`BES.auth.metGoogle()`). De knop controleert eerst of de provider aanstaat; zolang dat niet zo is, toont hij de rode regel "Inloggen met Google is nog niet ingeschakeld." en blijft de gebruiker op de pagina. Na een geslaagde login komt de gebruiker terug op `inloggen.html?google=terug`, waarna de bestaande logica hem naar de hub stuurt (en dus eerst langs `nieuw.html`). Ontbreken voornaam en achternaam, dan neemt `auth.js` ze één keer over uit de naam die Google meegeeft. De profielfoto van Google wordt niet overgenomen.

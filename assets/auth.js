@@ -71,6 +71,25 @@
     return { voornaam, achternaam, bijnaam, volledig, gesplitst, aanspreeknaam: bijnaam || voornaam || volledig };
   }
 
+  // Over jezelf (optioneel): studie, jaar, een korte tekst en of het openbaar is. Altijd platte tekst, nooit HTML.
+  const overJaren = ['1ba', '2ba', '3ba', 'master', 'anders'];
+  const cleanText = (value, limit, regels = false) => typeof value === 'string'
+    ? Array.from(value.normalize('NFC')
+      .replace(regels ? /\r\n?/g : /\s+/g, regels ? '\n' : ' ')
+      .replace(/[\u0000-\u0009\u000b-\u001f\u007f-\u009f\u200b-\u200f\u2028-\u202e\u2066-\u2069]/g, '')
+      .replace(/\n{3,}/g, '\n\n')).slice(0, limit).join('').trim()
+    : '';
+
+  function overDetails(value) {
+    const over = value && typeof value === 'object' ? value : {};
+    return {
+      studie: cleanText(over.studie, 60),
+      jaar: overJaren.includes(over.jaar) ? over.jaar : '',
+      tekst: cleanText(over.tekst, 300, true),
+      openbaar: over.openbaar === true
+    };
+  }
+
   const callbackUrl = new URL(window.location.href);
   const callbackHash = new URLSearchParams(callbackUrl.hash.slice(1));
   const emailCallback = callbackUrl.searchParams.get('email') === 'bevestigen';
@@ -313,6 +332,7 @@
     get versieGezien() { return Number(currentUser?.user_metadata?.versie_gezien) || 0; },
     avatarVullen: fillAvatar,
     naamGegevens: nameDetails,
+    overGegevens: user => overDetails(user?.user_metadata?.over),
     get googleFout() { return googleError; },
     get emailBevestiging() { return { teruggekeerd: emailCallback, fout: emailCallbackError || (emailCallback && initializationError?.code === 'recovery_invalid') }; },
 
@@ -426,6 +446,10 @@
       if (Object.hasOwn(patch, 'naam')) {
         metadata.naam = cleanName(patch.naam, 121);
         if (!metadata.naam) throw failure('invalid_name');
+      }
+      if (Object.hasOwn(patch, 'over')) {
+        const over = overDetails(patch.over);
+        metadata.over = over.studie || over.jaar || over.tekst ? { ...over, bijgewerkt: new Date().toISOString() } : null;
       }
       if (Object.hasOwn(patch, 'versieGezien')) metadata.versie_gezien = Math.max(0, Math.floor(Number(patch.versieGezien) || 0));
       if (Object.hasOwn(patch, 'thema')) {

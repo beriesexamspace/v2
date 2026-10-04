@@ -966,6 +966,66 @@ html.page-fade.page-ready body { animation: page-in 250ms var(--ease) both; }
 .auth-success { text-align: center; }
 .auth-success .knop { margin-top: 28px; }
 .auth-success .vinkje { margin-bottom: 24px; }
+
+/* Over jezelf (na het aanmelden en op het profiel): optionele vragen, alles platte tekst. */
+.over-jezelf-intro { max-width: 34rem; margin: 16px auto 0; color: var(--ink-soft); font-size: 1.0625rem; line-height: 1.55; text-wrap: pretty; }
+.over-jezelf-intro strong { display: block; margin-bottom: 6px; color: var(--ink); font-size: 1.1875rem; }
+.over-form { display: grid; gap: 24px; width: min(440px, 100%); margin: 28px auto 0; text-align: left; }
+.over-veld label, .over-groep legend { display: block; margin: 0 0 8px; padding: 0; font-size: .875rem; font-weight: 500; }
+.over-groep { min-width: 0; margin: 0; padding: 0; border: 0; }
+.over-keuzes { display: flex; flex-wrap: wrap; gap: 12px; }
+.over-keuze { position: relative; display: block; margin: 0; cursor: pointer; }
+.over-keuze input { position: absolute; top: 0; left: 0; width: 1px; height: 1px; margin: 0; opacity: 0; }
+.over-keuze-tekst {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--input-bg);
+  color: var(--ink);
+  font-size: .9375rem;
+  font-weight: 500;
+  line-height: 1.3;
+  transition: border-color .15s ease, background-color .15s ease, box-shadow .15s ease;
+}
+.over-keuze:hover .over-keuze-tekst { border-color: var(--ink-soft); }
+.over-keuze input:checked + .over-keuze-tekst { border-color: var(--accent); background: var(--accent-zacht); box-shadow: inset 0 0 0 1px var(--accent); }
+.over-keuze input:focus-visible + .over-keuze-tekst { outline: 2px solid var(--accent); outline-offset: 3px; }
+.over-groep.is-wie .over-keuzes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.over-groep.is-wie .over-keuze-tekst { height: 100%; justify-content: flex-start; padding: 14px 16px; border-radius: 16px; }
+.over-keuze-kop { font-weight: 600; }
+.over-keuze-uitleg { color: var(--ink-soft); font-size: .8125rem; font-weight: 400; line-height: 1.4; }
+.over-tekst { min-height: 128px; resize: vertical; }
+.over-teller { margin-top: 8px; }
+.over-form .auth-error { margin: 0; }
+.over-wissen { justify-self: start; min-height: 44px; padding: 10px 0; border: 0; background: none; color: var(--ink-soft); font: inherit; font-size: .875rem; cursor: pointer; }
+.over-wissen:disabled { opacity: .5; cursor: default; }
+:where(html.has-hover) .over-wissen:not(:disabled):hover { color: var(--fout); }
+.over-knoppen { display: flex; flex-wrap: wrap; gap: 12px; }
+.over-knoppen .knop, .over-knoppen .knop-secundair { flex: 1 1 160px; justify-content: center; margin: 0; text-align: center; }
+@media (max-width: 420px) {
+  .over-groep.is-wie .over-keuzes { grid-template-columns: 1fr; }
+}
+/* Contrastmodus van Windows: de gekozen optie krijgt een echte rand. */
+@media (forced-colors: active) {
+  .over-keuze input:checked + .over-keuze-tekst { outline: 3px solid Highlight; outline-offset: 2px; }
+}
+.over-kaart { display: grid; justify-items: start; gap: 20px; }
+.over-inhoud { width: 100%; }
+.over-kaart .over-form { width: min(440px, 100%); margin: 0; }
+.over-kaart > .knop-secundair { margin-inline: 0; }
+.over-status:empty { display: none; }
+.over-status { margin: 0; color: var(--teal-tekst); font-size: .9375rem; font-weight: 500; }
+.over-leeg { margin: 0; color: var(--ink-soft); line-height: 1.55; }
+.over-weergave { display: grid; justify-items: start; gap: 10px; }
+.over-regel { margin: 0; font-weight: 600; }
+.over-lees { margin: 0; color: var(--ink-soft); line-height: 1.55; white-space: pre-line; overflow-wrap: anywhere; }
+.over-label { display: inline-block; padding: 3px 10px; border-radius: var(--radius-pill); background: var(--surface); color: var(--ink-soft); font-size: .75rem; font-weight: 600; line-height: 1.5; }
+.over-label.is-openbaar { background: var(--teal-zacht); color: var(--teal-tekst); }
 .vinkje { display: block; width: 64px; height: 64px; margin: 0 auto 24px; fill: none; }
 .vinkje circle {
   stroke: var(--teal);
