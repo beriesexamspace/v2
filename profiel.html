@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="assets/deur.js?v=78"></script>
+  <script src="assets/deur.js?v=79"></script>
   <link rel="apple-touch-icon" href="/v2/assets/icoon-180.png">
   <link rel="manifest" href="/v2/manifest.webmanifest">
   <meta property="og:type" content="website">
@@ -31,17 +31,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=78">
-  <link rel="stylesheet" href="assets/kalender.css?v=78">
-  <script src="assets/app.js?v=78" defer></script>
-  <script src="assets/config.js?v=78" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=79">
+  <link rel="stylesheet" href="assets/kalender.css?v=79">
+  <script src="assets/app.js?v=79" defer></script>
+  <script src="assets/config.js?v=79" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=78" defer></script>
-  <script src="assets/over-jezelf.js?v=78" defer></script>
-  <script src="assets/plan.js?v=78" defer></script>
-  <script src="assets/activiteit.js?v=78" defer></script>
-  <script src="assets/vakken.js?v=78"></script>
-  <script src="assets/inzichten.js?v=78" defer></script>
+  <script src="assets/auth.js?v=79" defer></script>
+  <script src="assets/over-jezelf.js?v=79" defer></script>
+  <script src="assets/plan.js?v=79" defer></script>
+  <script src="assets/activiteit.js?v=79" defer></script>
+  <script src="assets/vakken.js?v=79"></script>
+  <script src="assets/inzichten.js?v=79" defer></script>
   <style>
     .profiel-wrap { max-width: 640px; }
     /* Bovenaan alleen foto, naam en e-mail met één knop Bewerken; de velden komen pas na die klik. */
@@ -705,6 +705,7 @@
   </script>
   <script>
     // Jouw abonnement: plan en einddatum uit Supabase (BES.plan, assets/plan.js), opzeggen via zeg_op (supabase/abonnementen.sql).
+    // Staat betalen met Mollie aan (BES.betalen), dan lopen opzeggen en herroepen via de Edge Function mollie.
     // Na DOMContentLoaded, want plan.js wordt met defer geladen en staat pas dan klaar.
     document.addEventListener("DOMContentLoaded", () => {
       const BES = window.BES || {};
@@ -733,6 +734,8 @@
           if (p.status === 'opgezegd') tijd = ' Je houdt ' + naam + ' tot ' + datum + '. Daarna ga je terug naar ' + (daarna || 'Free') + '.';
           else if (p.status === 'proef') tijd = ' Je proefmaand loopt tot ' + datum + '.' + (daarna ? ' Daarna heb je weer ' + daarna + '.' : '');
           else tijd = ' Loopt tot ' + datum + '.';
+          // Einddatum net voorbij maar het plan loopt nog (marge van mollie_marge): de maandbetaling is onderweg.
+          if (new Date(p.geldig_tot).getTime() < Date.now()) tijd = ' Je volgende betaling wordt nog verwerkt.';
         }
         const bedenktijd = p.kan_herroepen && p.herroep_tot ? ' Je bedenktijd loopt tot ' + BES.planDatum(p.herroep_tot) + '.' : '';
         $('sub').textContent = inhoud[p.plan] + tijd + bedenktijd;
@@ -743,6 +746,9 @@
       };
 
       let huidig = null;
+      // Via de Edge Function mollie als betalen aanstaat, of als dit account ooit via Mollie betaalde (via_mollie uit
+      // mijn_abonnement, supabase/mollie.sql). Anders blijft Mollie afschrijven als de schakelaar later uit staat.
+      const viaMollie = async () => (huidig && huidig.via_mollie === true) || Boolean(BES.betalen && await BES.betalen());
       $('opzeggen').addEventListener('click', () => {
         if (!huidig) return;
         $('herroep-zeker').hidden = true;
@@ -764,6 +770,32 @@
       $('herroep-ja').addEventListener('click', async () => {
         const knop = $('herroep-ja');
         knop.disabled = true;
+        // Met Mollie (BES.betalen): de Edge Function mollie stopt het abonnement bij Mollie, betaalt terug en herroept.
+        if (await viaMollie()) {
+          try {
+            const data = await BES.mollie({ actie: 'herroepen' });
+            if (!data.ok) throw new Error('niet gelukt');
+            let wanneer = '';
+            try { wanneer = new Intl.DateTimeFormat('nl-BE', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(data.herroepen_op || Date.now())); } catch {}
+            const terug = Number(data.terug) || 0;
+            huidig = await BES.plan(true);
+            toon(huidig);
+            $('melding').textContent = 'Herroepen op ' + wanneer + '. Je plan is gestopt.'
+              + (terug > 0 ? ' Je krijgt ' + BES.planBedrag(terug) + ' terug op dezelfde manier als je betaalde.' : '')
+              // Stoppen of terugbetalen bij Mollie lukte niet helemaal: de student moet dat weten en kan mailen.
+              + (data.onvolledig ? ' Het stoppen of terugbetalen bij Mollie is nog niet helemaal gelukt. Mail naar berie007yldrm@gmail.com, dan regelen we het.' : '')
+              + ' Bewaar dit bericht als bevestiging.';
+          } catch (fout) {
+            if (fout && fout.fout) {
+              $('herroep-zeker').hidden = true;
+              huidig = await BES.plan(true);
+              toon(huidig);
+            }
+            $('melding').textContent = (fout && fout.fout) || 'Herroepen lukte niet. Probeer het zo opnieuw, of mail naar berie007yldrm@gmail.com.';
+          }
+          knop.disabled = false;
+          return;
+        }
         try {
           const { data, error } = await BES.auth.client.rpc('herroep');
           if (error || !data) throw error || new Error('niet gelukt');
@@ -792,13 +824,19 @@
         const knop = $('ja');
         knop.disabled = true;
         try {
-          const { data, error } = await BES.auth.client.rpc('zeg_op');
-          if (error || !data || !data.ok) throw error || new Error('niet gelukt');
+          // Met Mollie (BES.betalen): de Edge Function mollie stopt eerst het abonnement bij Mollie en zegt dan op.
+          if (await viaMollie()) {
+            const data = await BES.mollie({ actie: 'opzeggen' });
+            if (!data.ok) throw new Error('niet gelukt');
+          } else {
+            const { data, error } = await BES.auth.client.rpc('zeg_op');
+            if (error || !data || !data.ok) throw error || new Error('niet gelukt');
+          }
           huidig = await BES.plan(true);
           toon(huidig);
           $('melding').textContent = 'Opgezegd. Je betaalt niets meer.';
-        } catch {
-          $('melding').textContent = 'Opzeggen lukte niet. Probeer het zo opnieuw.';
+        } catch (fout) {
+          $('melding').textContent = (fout && fout.fout) || 'Opzeggen lukte niet. Probeer het zo opnieuw.';
         }
         knop.disabled = false;
       });
@@ -809,6 +847,8 @@
         let proef = '';
         try { proef = new URLSearchParams(window.location.search).get('proef') || ''; } catch {}
         if (p.status === 'proef' && proef === p.plan) $('melding').textContent = 'Je proefmaand van ' + BES.planNaam(p.plan) + ' is gestart.';
+        // Terug van Mollie na een betaalde eerste maand (proefmaand al gebruikt): dan is het abonnement meteen actief.
+        else if (p.status === 'actief' && proef === p.plan) $('melding').textContent = 'Je abonnement op ' + BES.planNaam(p.plan) + ' is gestart.';
       });
     });
   </script>

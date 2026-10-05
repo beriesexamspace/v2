@@ -30,13 +30,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=78">
-  <script src="assets/app.js?v=78" defer></script>
-  <script src="assets/config.js?v=78" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=79">
+  <script src="assets/app.js?v=79" defer></script>
+  <script src="assets/config.js?v=79" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-  <script src="assets/auth.js?v=78" defer></script>
-  <script src="assets/plan.js?v=78" defer></script>
-  <script src="assets/activiteit.js?v=78" defer></script>
+  <script src="assets/auth.js?v=79" defer></script>
+  <script src="assets/plan.js?v=79" defer></script>
+  <script src="assets/activiteit.js?v=79" defer></script>
   <style>
     .ab-plannen {
       display: grid;
@@ -99,7 +99,10 @@
     .ab-eerst { display: flex; align-items: flex-start; gap: 10px; margin: 24px 0 0; padding: 12px 14px; border: 1px solid rgba(212,175,55,.35); border-radius: 12px; background: rgba(212,175,55,.08); color: var(--ink); font-size: .8125rem; line-height: 1.5; }
     .ab-eerst svg { flex: 0 0 16px; width: 16px; height: 16px; margin-top: 1px; fill: var(--teal-tekst); }
     .ab-eerst strong { display: block; color: var(--teal-tekst); font-size: .8125rem; font-weight: 700; letter-spacing: .02em; }
-    .ab-plan-voet { display: grid; margin-top: auto; padding-top: 28px; }
+    .ab-plan-voet { display: grid; gap: 12px; margin-top: auto; padding-top: 28px; }
+    /* Betalen met Mollie aan: korte uitleg boven de knop (wat je betaalt en wanneer). Zonder Mollie verborgen. */
+    .ab-betaal-uitleg { margin: 0; color: var(--ink-soft); font-size: .8125rem; line-height: 1.5; }
+    .ab-betaal-uitleg[hidden] { display: none; }
     .ab-plan .knop, .ab-plan .knop-secundair { width: 100%; min-width: 0; max-width: none; margin-inline: 0; }
     .ab-plan .knop-secundair:disabled { opacity: .6; cursor: default; transform: none; }
     .ab-sectie { margin-top: 56px; max-width: 760px; }
@@ -156,6 +159,8 @@
     .ab-plan .knop.is-huidig:disabled { opacity: 1; background: var(--surface); color: var(--ink-soft); box-shadow: none; }
     .ab-melding { max-width: 560px; margin: 20px 0 0; color: var(--ink); font-size: .9375rem; line-height: 1.5; }
     .ab-melding:empty { display: none; }
+    /* Terug van Mollie: de stand van je betaling bovenaan, boven de kaarten. */
+    .ab-melding.ab-betaling { margin: 0 0 24px; font-weight: 500; }
     /* Vinkje Laat mijn plan meteen starten: nodig voor elke proefmaand (start_proef, supabase/herroepen.sql). */
     .ab-meteen { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 12px; align-items: start; max-width: 640px; margin: 24px 0 0; padding: 16px 18px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); font-size: .9375rem; line-height: 1.55; cursor: pointer; transition: border-color 180ms var(--ease), box-shadow 180ms var(--ease); }
     .ab-meteen input { width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--accent); cursor: pointer; }
@@ -271,6 +276,7 @@
         <h1 id="ab-titel">Kies je plan</h1>
         <p class="pagina-sub">Met Free oefen je alle vakken. Plus en Pro geven je extra hulp richting je examen.</p>
       </header>
+      <p class="ab-melding ab-betaling" id="ab-betaling" role="status" aria-live="polite"></p>
 
       <div class="ab-plannen">
         <section class="kaart ab-plan" data-plan="free" aria-labelledby="plan-free">
@@ -334,6 +340,7 @@
             <li><svg class="ab-slot" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Hacks voor je zwakste hoofdstukken<span class="ab-pro-chip">Pro</span></span></li>
           </ul>
           <div class="ab-plan-voet">
+            <p class="ab-betaal-uitleg" data-betaal-uitleg="plus" hidden></p>
             <button class="knop" type="button" data-proef="plus">Probeer 1 maand</button>
           </div>
         </section>
@@ -370,6 +377,7 @@
           </ul>
           <p class="ab-eerst"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c.5 4.9 2.6 7 7.5 7.5-4.9.5-7 2.6-7.5 7.5-.5-4.9-2.6-7-7.5-7.5 4.9-.5 7-2.6 7.5-7.5Z"/></svg><span><strong>Vroege toegang</strong>Nieuwe onderdelen krijg je met Pro als eerste, nog voordat Free en Plus ze krijgen.</span></p>
           <div class="ab-plan-voet">
+            <p class="ab-betaal-uitleg" data-betaal-uitleg="pro" hidden></p>
             <button class="knop" type="button" data-proef="pro">Probeer 1 maand</button>
           </div>
         </section>
@@ -568,8 +576,8 @@
         <div class="kaart ab-weten">
           <ul class="ab-weten-lijst">
             <li><span>Prijzen in euro, inclusief btw.</span></li>
-            <li><span>De eerste maand van Plus en Pro kost niets. Je proefmaand start meteen, zonder betaalgegevens. Elke proefmaand kan je één keer gebruiken.</span></li>
-            <li><span>Na je proefmaand ga je vanzelf terug naar Free. Wil je verder, dan betaal je per maand met Bancontact, iDEAL of kaart.</span></li>
+            <li><span data-weten="proef">De eerste maand van Plus en Pro kost niets. Je proefmaand start meteen, zonder betaalgegevens. Elke proefmaand kan je één keer gebruiken.</span></li>
+            <li><span data-weten="daarna">Na je proefmaand ga je vanzelf terug naar Free. Wil je verder, dan betaal je per maand met Bancontact, iDEAL of kaart.</span></li>
             <li><span>Opzeggen kan altijd, met één knop op je profiel. Je houdt je plan tot het einde van je proefmaand of van de maand die je al betaalde.</span></li>
             <li><span>Bedenktijd, opzeggen en de rest van de afspraken lees je in de <a href="voorwaarden.html">voorwaarden</a>.</span></li>
             <li><span>Vragen? Stuur ze via de <a href="feedback.html">feedbackpagina</a>.</span></li>
@@ -581,18 +589,32 @@
 
   <script>
     // Knoppen Probeer 1 maand: proefmaand starten via start_proef (supabase/abonnementen.sql), daarna naar je profiel.
+    // Staat betalen met Mollie aan (BES.betalen, supabase/mollie.sql), dan gaat de knop via de Edge Function mollie naar Mollie:
+    // daar geef je je betaalgegevens op, daarna kom je terug op abonnement.html?betaling=terug&plan=plus of pro.
     // De knoppen tonen ook je huidige stand: je plan, Plus zit in Pro, of je proefmaand is al gebruikt.
     // Na DOMContentLoaded, want plan.js wordt met defer geladen en staat pas dan klaar.
     document.addEventListener('DOMContentLoaded', () => {
       const BES = window.BES || {};
       const melding = document.getElementById('ab-melding');
+      const betaling = document.getElementById('ab-betaling');
       const knoppen = [...document.querySelectorAll('[data-proef]')];
       const meteen = document.getElementById('ab-meteen');
       const meteenBlok = document.getElementById('ab-meteen-blok');
+      const zacht = () => (window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth');
+      const prijs = { plus: '2,99 euro', pro: '9,99 euro' };
+      let betalen = false;
       meteen.addEventListener('change', () => {
         meteenBlok.classList.remove('is-nodig');
         if (meteen.checked && melding.dataset.soort === 'meteen') { melding.textContent = ''; delete melding.dataset.soort; }
       });
+
+      // Met Mollie: de teksten bij Goed om te weten over betaalgegevens en wat er na je proefmaand gebeurt.
+      const zetWeten = () => {
+        const proef = document.querySelector('[data-weten="proef"]');
+        const daarna = document.querySelector('[data-weten="daarna"]');
+        if (proef) proef.textContent = 'De eerste maand van Plus en Pro kost niets. Je geeft wel je betaalgegevens op bij Mollie, met een betaling van 2 cent om je betaalmethode te bevestigen. Elke proefmaand kan je één keer gebruiken.';
+        if (daarna) daarna.textContent = 'Na je proefmaand loopt je plan vanzelf door en betaal je automatisch 2,99 euro (Plus) of 9,99 euro (Pro) per maand. Zeg je op tijdens je proefmaand, dan betaal je niets.';
+      };
 
       const zetStand = (p) => {
         document.querySelectorAll('.ab-jouw').forEach((label) => label.remove());
@@ -608,14 +630,24 @@
         }
         knoppen.forEach((knop) => {
           const plan = knop.dataset.proef;
+          const gebruikt = Boolean(p['proef_' + plan]);
           let tekst = 'Probeer 1 maand';
           let uit = false;
           if (p.plan === plan) { tekst = 'Je hebt ' + BES.planNaam(plan); uit = true; }
           else if (p.plan === 'pro' && plan === 'plus') { tekst = 'Zit in je Pro'; uit = true; }
-          else if (p['proef_' + plan]) { tekst = 'Proefmaand gebruikt'; uit = true; }
+          else if (gebruikt && !betalen) { tekst = 'Proefmaand gebruikt'; uit = true; }
+          // Met Mollie kan je na een gebruikte proefmaand meteen een betaald abonnement nemen.
+          else if (gebruikt) tekst = 'Neem ' + BES.planNaam(plan);
           knop.textContent = tekst;
           knop.disabled = uit;
           knop.classList.toggle('is-huidig', uit);
+          const uitleg = document.querySelector('[data-betaal-uitleg="' + plan + '"]');
+          if (uitleg) {
+            uitleg.hidden = !betalen || uit;
+            uitleg.textContent = gebruikt
+              ? 'Je proefmaand is al gebruikt. Je betaalt bij Mollie meteen ' + prijs[plan] + ' voor de eerste maand, daarna automatisch ' + prijs[plan] + ' per maand. Opzeggen kan altijd op je profiel.'
+              : 'Je geeft je betaalgegevens op bij Mollie. De eerste maand kost niets, alleen 2 cent om je betaalmethode te bevestigen. Daarna betaal je automatisch ' + prijs[plan] + ' per maand. Opzeggen kan altijd op je profiel.';
+          }
         });
       };
 
@@ -628,7 +660,7 @@
           melding.textContent = 'Zet eerst het vinkje "Laat mijn plan meteen starten" aan.';
           melding.dataset.soort = 'meteen';
           meteenBlok.classList.add('is-nodig');
-          meteenBlok.scrollIntoView({ block: 'center', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+          meteenBlok.scrollIntoView({ block: 'center', behavior: zacht() });
           meteen.focus({ preventScroll: true });
           return;
         }
@@ -637,6 +669,25 @@
         knop.textContent = 'Even geduld';
         melding.textContent = '';
         delete melding.dataset.soort;
+        betaling.textContent = '';
+
+        // Mollie: betaling met machtiging aanmaken en doorsturen naar de betaalpagina van Mollie.
+        if (BES.betalen && await BES.betalen()) {
+          knop.textContent = 'Even geduld…';
+          try {
+            const data = await BES.mollie({ actie: 'start', plan, meteen: meteen.checked });
+            if (typeof data.url !== 'string' || !/^https:\/\//.test(data.url)) throw new Error('geen url');
+            window.location.assign(data.url);
+            return;
+          } catch (fout) {
+            knop.disabled = false;
+            knop.textContent = oud;
+            melding.textContent = (fout && fout.fout) || 'Naar de betaalpagina gaan lukte niet. Probeer het zo opnieuw.';
+            melding.scrollIntoView({ block: 'center', behavior: zacht() });
+            return;
+          }
+        }
+
         try {
           // Tot supabase/herroepen.sql is uitgevoerd bestaat alleen start_proef(p_plan); dan zonder p_meteen opnieuw.
           let { data, error } = await auth.client.rpc('start_proef', { p_plan: plan, p_meteen: true });
@@ -649,6 +700,7 @@
             al_hoger: 'Je hebt Pro al, en daar zit alles van Plus in.',
             al_gebruikt: 'Je hebt je proefmaand van ' + naam + ' al gebruikt.',
             meteen_nodig: 'Zet eerst het vinkje "Laat mijn plan meteen starten" aan.',
+            betalen_aan: 'Er ging iets mis. Laad de pagina opnieuw en probeer het nog eens.',
           })[data && data.reden] || 'Dat lukte niet. Probeer het zo opnieuw.';
           zetStand(await BES.plan(true));
         } catch {
@@ -658,7 +710,49 @@
         }
       }));
 
-      if (BES.plan) BES.plan().then(zetStand);
+      // Terug van Mollie: elke 2 seconden het plan opnieuw ophalen, hoogstens 30 seconden. De webhook zet het plan aan
+      // zodra Mollie de betaling bevestigt; lukt dat, dan naar je profiel zoals na een gewone proefmaand.
+      let terug = false;
+      let terugPlan = '';
+      try {
+        const vraag = new URLSearchParams(window.location.search);
+        terug = vraag.get('betaling') === 'terug';
+        terugPlan = terug ? vraag.get('plan') || '' : '';
+      } catch {}
+      const ruimOp = () => { try { window.history.replaceState(window.history.state, '', window.location.pathname + window.location.hash); } catch {} };
+      const wacht = (ms) => new Promise((klaar) => { setTimeout(klaar, ms); });
+      const controleer = async (plan) => {
+        betaling.textContent = 'We controleren je betaling…';
+        const start = Date.now();
+        let p = await BES.plan(true);
+        // Geen sessie in deze browser (bijvoorbeeld de bank-app opende een andere browser): niet wachten, eerst inloggen.
+        if (!p.ingelogd) {
+          ruimOp();
+          betaling.textContent = 'Log in om te zien of je betaling gelukt is. ';
+          const link = document.createElement('a');
+          link.href = 'inloggen.html?terug=' + encodeURIComponent('profiel.html#abonnement');
+          link.textContent = 'Inloggen';
+          betaling.append(link);
+          return;
+        }
+        while (p.plan !== plan && Date.now() - start < 30000) {
+          await wacht(2000);
+          p = await BES.plan(true);
+        }
+        ruimOp();
+        if (p.plan === plan) { window.location.href = 'profiel.html?proef=' + plan + '#abonnement'; return; }
+        betaling.textContent = 'Je betaling is niet gelukt of nog niet bevestigd. Probeer het opnieuw of kijk later op je profiel.';
+        zetStand(p);
+      };
+
+      if (!BES.plan) return;
+      Promise.all([BES.plan(), BES.betalen ? BES.betalen() : false]).then(([p, aan]) => {
+        betalen = aan === true;
+        if (betalen) zetWeten();
+        zetStand(p);
+        if (terugPlan === 'plus' || terugPlan === 'pro') controleer(terugPlan);
+        else if (terug) ruimOp();
+      });
     });
 
     // Vergelijk abonnementen: de knop klapt de tabel open of dicht. Open schuift de tabel in beeld (zonder beweging bij reduced motion).
