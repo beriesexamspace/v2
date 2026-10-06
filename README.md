@@ -73,7 +73,7 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 79), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 80), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.
@@ -224,7 +224,7 @@ Sinds 21-09-2026 bewaart `vak.js` na elke afgeronde ronde één rij in de tabel 
 
 Met de muis over een dag komt er een blauwe rand die weer weggaat zodra je hem wegneemt, en verschijnt de regel eronder; de gekozen dag houdt een blauwe rand met een zachte ring (`previewDay` en `previewOff` in `activiteit.js`, sinds 22-09-2026).
 
-De kalender loopt tot en met de zondag van de huidige week; dagen die nog komen staan er gestippeld en lichter bij, de rest van de maand verschijnt pas als de week voorbij is.
+Sinds 07-10-2026 toont de studiekalender meteen alle dagen van de gekozen maand, ook de dagen die nog komen. Toekomstige dagen blijven gestippeld en lichter en tonen bij aanwijzen of kiezen "Deze dag moet nog komen". De bestaande leertijd, bezoeken en maandnavigatie blijven gelijk. Cachenummer: 80.
 
 `assets/activiteit.js` wordt na `auth.js` geladen. Alleen ingelogde accounts worden gemeten. Lokale dagsamenvattingen staan onder `bes_studieactiviteit_<account-id>`. De willekeurige browser-ID in `bes_studieapparaat` bevat geen persoonsgegevens. Alleen leertijd en bezoeken per dag worden gesynchroniseerd, geen antwoorden of bezochte pagina's.
 
