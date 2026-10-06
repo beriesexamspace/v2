@@ -149,6 +149,33 @@
     @media (max-width: 520px) { .inz-sessie { grid-template-columns: 56px minmax(0, 1fr) auto; } .inz-sessie-modus { display: none; } }
     @media (prefers-reduced-motion: reduce) { .inz-balk i { transition: none; } }
     @media (prefers-reduced-motion: reduce) { .profiel-opgeslagen { transition: none; } }
+    /* Profielacties: zacht optillen bij een muis en kort indrukken bij klikken of tikken. */
+    .profiel-wrap :is(button, a.knop, a.knop-secundair, a.tekstlink),
+    .profiel-wrap .over-keuze-tekst {
+      transition: transform 260ms var(--ease), color 180ms var(--ease), background-color 180ms var(--ease), border-color 180ms var(--ease), box-shadow 220ms var(--ease), opacity 180ms var(--ease);
+    }
+    :where(html.has-hover) .profiel-wrap :is(button, a.knop, a.knop-secundair, a.tekstlink):not(:disabled):not([aria-disabled="true"]):hover:not(:active),
+    :where(html.has-hover) .profiel-wrap .over-keuze:hover:not(:active) input:not(:disabled) + .over-keuze-tekst {
+      transform: translateY(-2px) scale(1.02);
+    }
+    :where(html.has-hover) .profiel-wrap :is(button.kalender-dag, button.abo-opzeggen, button.abo-herroepen):not(:disabled):not([aria-disabled="true"]):hover:not(:active) {
+      transform: translateY(-1px) scale(1.01);
+    }
+    .profiel-wrap :is(button, a.knop, a.knop-secundair, a.tekstlink):not(:disabled):not([aria-disabled="true"]):active,
+    .profiel-wrap .over-keuze:active input:not(:disabled) + .over-keuze-tekst {
+      transform: scale(.97);
+      transition-duration: 150ms;
+    }
+    .profiel-wrap :is(button, a.knop, a.knop-secundair, a.tekstlink):is(:disabled, [aria-disabled="true"]) {
+      transform: none;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .profiel-wrap :is(button, a.knop, a.knop-secundair, a.tekstlink),
+      .profiel-wrap .over-keuze-tekst {
+        transform: none !important;
+        transition: none !important;
+      }
+    }
   </style>
 </head>
 <body data-nav="vast">
