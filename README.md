@@ -105,6 +105,9 @@ Sinds 20-09-2026 zijn de hub, het welkomstscherm, de jaarpagina's, alle vakpagin
 ## Accounts (Supabase)
 
 Sinds 22-09-2026 opent `profiel.html` als één kaart met foto, naam en e-mailadres en de knop Bewerken (`#profiel-bewerken`); het formulier (`#profiel-form`) staat dicht tot je die knop gebruikt, met Opslaan en Annuleren, en sluit na het opslaan. Daaronder staan de studiekalender en Jouw voortgang, en onderaan een rij met Uitloggen en de link Account wissen die het bestaande blok opent.
+
+Sinds 07-10-2026 bewegen de knoppen en actielinks in de profielinhoud rustig omhoog en worden ze iets groter bij aanwijzen met de muis; bij klikken of tikken drukken ze kort in. Dit geldt ook voor abonnementsacties en de keuzes onder Over jezelf. Kalenderdagen en de dicht bij elkaar staande abonnementsacties bewegen minder ver zodat ze elkaar niet raken. Uitgeschakelde knoppen bewegen niet en bij verminderde beweging staan de effecten uit. Alleen de eigen stijlen in `profiel.html` zijn aangepast; gedeelde bestanden en het cachenummer blijven gelijk.
+
 1. De beheerder vult `assets/config.js` in met de project-URL en publieke anon key uit Supabase, via Settings → API. Vervang `[SUPABASE_URL]` en `[SUPABASE_ANON_KEY]`. De anon key mag publiek zijn; voeg nooit een geheime sleutel of service-role key toe.
 2. Zet onder Authentication → Providers → Email de instelling "Confirm email" uit. Een nieuw account krijgt dan direct een sessie.
 3. Stel in dezelfde e-mailinstellingen de minimale wachtwoordlengte in op 8 tekens en voeg geen extra tekenvereisten toe, zodat de server overeenkomt met de formulieren.
