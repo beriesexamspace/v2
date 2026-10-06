@@ -80,6 +80,8 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Relatieve links, zodat alles lokaal en op GitHub Pages werkt.
 - De live site (beriesexamspace.github.io) wordt niet aangeraakt tot v2 klaar is.
 
+Sinds 06-10-2026 vermeldt `voorwaarden.html` Berat Yildirim als eenmanszaak met KvK-nummer 42183029 bij Wie we zijn en in het modelformulier. Het telefoonnummer is +31 6 1568 5727; het adres en het btw-nummer blijven aangekondigd. De melding "Betalen kan nog niet." blijft staan. Alleen deze teksten zijn aangepast; het cachenummer blijft 79.
+
 Sinds 04-10-2026 toont de vakkaart Inleiding pedagogiek 145 vragen, waarvan 50 uit echte examens. Forensische Psychiatrie vermeldt 47 oefenvragen over 6 hoofdstukken, met uitleg. De verwijzingen naar examenreconstructies zijn verwijderd volgens de afspraak van 21-09-2026. De vakdata zijn gelijk gebleven. Cachenummer: 77.
 
 Elke regel in `assets/updates.js` heeft `soort: 'nieuw'` of `soort: 'verbeterd'`, een datum en tekst. De hub toont eerst vier regels; bij meer regels wisselt de knop tussen Alles bekijken en Minder tonen. Het updatescherm na inloggen toont altijd alle regels. Beide gebruiken dezelfde labels en veilige tekstweergave.
