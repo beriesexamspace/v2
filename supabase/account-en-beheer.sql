@@ -12,9 +12,29 @@ language plpgsql security definer set search_path = ''
 as $$
 declare
   eigenaar uuid := auth.uid();
+  mollie_abonnement text;
+  mollie_stopbewijs text;
+  mollie_aanmaak text;
 begin
   if eigenaar is null then
     raise exception 'Niet ingelogd' using errcode = '42501';
+  end if;
+  -- De user-lock voorkomt dat een eerste FK-gebonden Mollie-koppeling tussen
+  -- een lege controle hieronder en het wissen van dit account kan ontstaan.
+  perform 1 from auth.users where id = eigenaar for update;
+  if not found then raise exception 'Account bestaat niet.' using errcode = '42501'; end if;
+  -- Werkt ook vóór Mollie is ingericht. Zodra de koppeling bestaat is een
+  -- service-role stopbewijs voor precies het huidige abonnement verplicht.
+  -- Een lokale status (ook opgezegd of herroepen) is geen providerbevestiging.
+  if to_regclass('public.mollie_koppeling') is not null then
+    select abonnement_id, gestopt_abonnement_id, abonnement_in_aanmaak into mollie_abonnement, mollie_stopbewijs, mollie_aanmaak
+      from public.mollie_koppeling where user_id = eigenaar for update;
+    if mollie_aanmaak is not null then
+      raise exception 'Je betaling wordt nog verwerkt. Probeer het straks opnieuw.' using errcode = '23514';
+    end if;
+    if mollie_abonnement is not null and mollie_stopbewijs is distinct from mollie_abonnement then
+      raise exception 'Zeg eerst je abonnement op en probeer opnieuw.' using errcode = '23514';
+    end if;
   end if;
   -- Boekfoto's eerst via de Storage API wissen, inclusief losse uploads en
   -- foto's van eerder door beheer verwijderde advertenties. Een SQL DELETE

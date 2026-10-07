@@ -65,11 +65,18 @@ function datumPlusMaand(op: Date): string {
 // Abonnement bij Mollie stopzetten. Al gestopt of niet (meer) te vinden telt als gelukt.
 async function stopAbonnement(klant: string, abonnement: string): Promise<boolean> {
   const pad = `/customers/${encodeURIComponent(klant)}/subscriptions/${encodeURIComponent(abonnement)}`;
+  const afwezig = async () => {
+    const klantNu = await mollie(`/customers/${encodeURIComponent(klant)}`);
+    return klantNu.ok && klantNu.data?.id === klant;
+  };
+  const gestopt = (r: { ok: boolean; data: Obj | null }) => r.ok && r.data?.id === abonnement
+    && r.data?.customerId === klant && ['canceled', 'completed'].includes(String(r.data.status));
   const r = await mollie(pad, 'DELETE');
-  if (r.ok || r.status === 404 || r.status === 410) return true;
+  if (r.status === 204 || gestopt(r)) return true;
+  if (r.status === 404) return afwezig();
   if (r.status === 422) {
     const nu = await mollie(pad);
-    return nu.status === 404 || ['canceled', 'completed'].includes(String(nu.data?.status));
+    return nu.status === 404 ? afwezig() : gestopt(nu);
   }
   return false;
 }
@@ -128,13 +135,23 @@ Deno.serve(async (req) => {
   });
   if (error || !v) { console.error('mollie-webhook: verwerken mislukt'); return leeg(503); }
 
+  // De SQL houdt deze eerste betaling vast zolang een provider-aanmaak onderweg
+  // kan zijn. Ook na herroepen of een time-out moet precies die aanmaak afronden.
+  let aanmaak = false;
+  if (soort === 'eerste' && status === 'paid' && gebruiker) {
+    const { data: k, error: kFout } = await beheer.from('mollie_koppeling')
+      .select('abonnement_in_aanmaak').eq('user_id', gebruiker).maybeSingle();
+    if (kFout) { console.error('mollie-webhook: aanmaak niet gecontroleerd'); return leeg(503); }
+    aanmaak = k?.abonnement_in_aanmaak === id;
+  }
+
   // Teruggeboekt via de bank: het plan is gestopt (mollie_verwerk), nu ook het Mollie-abonnement stoppen.
   if (v.stop_abonnement === true) {
     const klant = String(p.customerId ?? v.klant_id ?? '');
     for (const sub of new Set([v.abonnement_id, p.subscriptionId].filter((s) => typeof s === 'string' && s))) {
       if (klant && !(await stopAbonnement(klant, sub))) { console.error('mollie-webhook: abonnement na terugboeking niet gestopt'); return leeg(503); }
     }
-    return leeg();
+    if (!aanmaak) return leeg();
   }
 
   // Maandbetaling die niets aanzette (na herroepen, van een oud abonnement, of zonder account): dat abonnement stoppen
@@ -175,7 +192,7 @@ Deno.serve(async (req) => {
   }
 
   // Geen abonnement (meer) als het plan intussen is opgezegd, herroepen of vervangen, of als er al iets terug is.
-  if (!v.mag_abonnement || Number(p.amountRefunded?.value ?? 0) > 0 || Number(p.amountChargedBack?.value ?? 0) > 0) return leeg();
+  if (!aanmaak && (!v.mag_abonnement || Number(p.amountRefunded?.value ?? 0) > 0 || Number(p.amountChargedBack?.value ?? 0) > 0)) return leeg();
   const klant = String(p.customerId ?? v.klant_id ?? '');
   if (!klant || !plan || !gebruiker) return leeg();
 
@@ -205,9 +222,15 @@ Deno.serve(async (req) => {
     sub = nieuw.data;
   }
 
-  const { error: kFout } = await beheer.from('mollie_koppeling')
-    .update({ abonnement_id: String(sub.id), mandaat_id: p.mandateId ?? undefined, plan, bijgewerkt: new Date().toISOString() })
-    .eq('user_id', gebruiker);
-  if (kFout) { console.error('mollie-webhook: koppeling niet bijgewerkt'); return leeg(503); }
+  const afronden = { p_user: gebruiker, p_betaling: id, p_klant: klant, p_abonnement: String(sub.id) };
+  const { data: klaar, error: kFout } = await beheer.rpc('mollie_abonnement_afmaken', afronden);
+  if (kFout || !klaar) { console.error('mollie-webhook: koppeling niet bijgewerkt'); return leeg(503); }
+  if (klaar.stoppen === true) {
+    if (!(await stopAbonnement(klant, String(sub.id)))) { console.error('mollie-webhook: overbodig abonnement niet gestopt'); return leeg(503); }
+    const { data: opgeruimd, error: stopFout } = await beheer.rpc('mollie_abonnement_afmaken', { ...afronden, p_gestopt: true });
+    if (stopFout || opgeruimd?.opgeruimd !== true) { console.error('mollie-webhook: stop niet vastgelegd'); return leeg(503); }
+    return leeg();
+  }
+  if (klaar.gekoppeld !== true) return leeg(503);
   return leeg();
 });

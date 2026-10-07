@@ -117,7 +117,7 @@
           <li><div>De feedback die je stuurde.</div></li>
           <li><div>Je boeken, de foto's en je WhatsApp-nummer bij je advertenties.</div></li>
         </ul>
-        <p>Heb je een betaald abonnement, dan stopt dat op hetzelfde moment. De maand die al betaald is wordt niet terugbetaald, behalve binnen de bedenktijd uit de <a href="voorwaarden.html">voorwaarden</a>. Wil je alleen stoppen met betalen, zeg dan je abonnement op en laat je account gewoon staan; je voortgang blijft dan bewaard.</p>
+        <p>Heb je een betaald abonnement, dan zetten we dat eerst stop. Pas als dat is bevestigd, wissen we je gegevens. Een betaling die al was ingezet kan nog doorkomen. De maand die al betaald is wordt niet terugbetaald, behalve binnen de bedenktijd uit de <a href="voorwaarden.html">voorwaarden</a>. Wil je alleen stoppen met betalen, zeg dan je abonnement op en laat je account gewoon staan; je voortgang blijft dan bewaard.</p>
         <p><strong>Dit kan niet ongedaan gemaakt worden.</strong> Je kan later een nieuw account maken, maar je oude voortgang komt niet terug.</p>
         <div class="wissen-knoppen">
           <button class="knop-secundair" type="button" data-volgende="2">Verder →</button>
@@ -259,6 +259,16 @@
           if (sessieGewijzigd || !user) throw sessieFout;
           eigenaar = user.id;
           await controleer();
+          fase = 'abonnement';
+          // Geen plan-cache of Free-fallback: een storing mag nooit het opzeggen overslaan.
+          const { data: abonnement, error: abonnementFout } = await auth.client.rpc('mijn_abonnement');
+          await controleer();
+          if (abonnementFout || !abonnement || typeof abonnement.plan !== 'string') throw new Error('abonnement-laden');
+          if (abonnement.via_mollie === true) {
+            const stop = await window.BES.mollie({ actie: 'opzeggen' });
+            await controleer();
+            if (stop?.ok !== true) throw new Error('abonnement-opzeggen');
+          }
           fase = 'fotos';
           await boekfotosWissen(eigenaar, controleer);
           await controleer();
@@ -285,6 +295,8 @@
           knop.textContent = 'Account verwijderen';
           fout.textContent = error === sessieFout
             ? 'Je account is gewijzigd of je bent uitgelogd. Laad de pagina opnieuw.'
+            : fase === 'abonnement'
+              ? 'Je abonnement kon niet veilig worden gecontroleerd of stopgezet. Er is niets gewist. Probeer het opnieuw of zeg eerst op via je profiel.'
             : fase === 'fotos'
               ? "Je boekfoto's konden niet allemaal worden gewist. Je account is nog niet gewist. Probeer het opnieuw."
               : 'Wissen is niet gelukt. Probeer het later opnieuw of mail naar berie007yldrm@gmail.com.';
