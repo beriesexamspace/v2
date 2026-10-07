@@ -80,7 +80,7 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Relatieve links, zodat alles lokaal en op GitHub Pages werkt.
 - De live site (beriesexamspace.github.io) wordt niet aangeraakt tot v2 klaar is.
 
-Op 07-10-2026 is de privacytekst voor Mollie en Resend voorbereid: welke gegevens meegaan, betalingsoverzichten voor de boekhouding en de bewaartermijn van 7 jaar. Bij Resend is Ierland de verzendregio, terwijl mailgegevens in de Verenigde Staten worden opgeslagen ([Resend](https://resend.com/security/gdpr)). Dit onderdeel blijft een concept tot de bedrijfsgegevens zijn aangeleverd en de maildienst is ingericht. Adres, btw-id en KOR-status ontbreken nog; de voorwaarden en de bestaande btw-zinnen zijn daarom niet gewijzigd. Cachenummer: 80.
+Op 07-10-2026 is het bedrijfsadres ingevuld bij Wie we zijn en in het modelformulier van `voorwaarden.html`. Berat gebruikt de KOR niet, dus de bestaande prijzen inclusief btw blijven gelijk. Het btw-id volgt later en blijft aangekondigd; dit onderdeel blijft een concept tot het nummer is ingevuld en de maildienst is ingericht. De privacytekst noemt Mollie en Resend, de gegevens die meegaan en de bewaartermijn van 7 jaar voor de betaaladministratie. Bij Resend is Ierland de verzendregio, terwijl mailgegevens in de Verenigde Staten worden opgeslagen ([Resend](https://resend.com/security/gdpr)). Cachenummer: 80.
 
 Sinds 06-10-2026 vermeldt `voorwaarden.html` Berat Yildirim als eenmanszaak met KvK-nummer 42183092 bij Wie we zijn en in het modelformulier. Het telefoonnummer is +31 6 1568 5727; het adres en het btw-nummer blijven aangekondigd. De melding "Betalen kan nog niet." blijft staan. Alleen deze teksten zijn aangepast; het cachenummer blijft 79.
 
