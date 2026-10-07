@@ -73,7 +73,7 @@ const MODELFORMULIER = `Modelformulier voor herroeping
 
 Vul dit formulier alleen in als je je abonnement wil herroepen. Mail het naar berie007yldrm@gmail.com.
 
-Aan Berie's Exam Space, berie007yldrm@gmail.com. Berat Yildirim, KvK-nummer 42183092. Het adres komt hier voordat je iets kan betalen.
+Aan Berie's Exam Space, berie007yldrm@gmail.com. Berat Yildirim, KvK-nummer 42183092. Adres: Koningin Regentesselaan 116, 6043 CP Roermond.
 Ik herroep hierbij mijn overeenkomst voor de volgende dienst: abonnement [Plus of Pro] op Berie's Exam Space.
 Afgesloten op [datum]
 Naam [je naam]
