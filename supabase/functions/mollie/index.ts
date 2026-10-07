@@ -58,13 +58,22 @@ async function mollie(pad: string, methode = 'GET', inhoud?: unknown, eenmalig?:
 const euro = (centen: number) => (Math.max(0, Math.round(centen)) / 100).toFixed(2);
 const centen = (waarde: unknown) => Math.round(Number(waarde ?? 0) * 100) || 0;
 
-// Abonnement bij Mollie stopzetten. Al gestopt of niet (meer) te vinden telt als gelukt.
+// Een 404 bewijst alleen afwezigheid binnen de huidige test/live-omgeving.
+// Controleer daarom ook de klant, zodat een verkeerde sleutel geen stopbewijs oplevert.
 async function stopAbonnement(klant: string, abonnement: string): Promise<boolean> {
-  const r = await mollie(`/customers/${encodeURIComponent(klant)}/subscriptions/${encodeURIComponent(abonnement)}`, 'DELETE');
-  if (r.ok || r.status === 404 || r.status === 410) return true;
+  const pad = `/customers/${encodeURIComponent(klant)}/subscriptions/${encodeURIComponent(abonnement)}`;
+  const afwezig = async () => {
+    const klantNu = await mollie(`/customers/${encodeURIComponent(klant)}`);
+    return klantNu.ok && klantNu.data?.id === klant;
+  };
+  const gestopt = (r: { ok: boolean; data: Obj | null }) => r.ok && r.data?.id === abonnement
+    && r.data?.customerId === klant && ['canceled', 'completed'].includes(String(r.data.status));
+  const r = await mollie(pad, 'DELETE');
+  if (r.status === 204 || gestopt(r)) return true;
+  if (r.status === 404) return afwezig();
   if (r.status === 422) {
-    const nu = await mollie(`/customers/${encodeURIComponent(klant)}/subscriptions/${encodeURIComponent(abonnement)}`);
-    return nu.status === 404 || ['canceled', 'completed'].includes(String(nu.data?.status));
+    const nu = await mollie(pad);
+    return nu.status === 404 ? afwezig() : gestopt(nu);
   }
   console.error('mollie: abonnement stoppen mislukt', r.status);
   return false;
@@ -175,7 +184,9 @@ Deno.serve(async (req) => {
 
   // ---- Opzeggen: eerst het abonnement bij Mollie stoppen, dan opzeggen (mollie_zeg_op). Je houdt je plan tot de einddatum. ----
   if (actie === 'opzeggen') {
-    const { data: k } = await beheer.from('mollie_koppeling').select('klant_id, abonnement_id').eq('user_id', user.id).maybeSingle();
+    const { data: k, error: kFout } = await beheer.from('mollie_koppeling').select('klant_id, abonnement_id, abonnement_in_aanmaak').eq('user_id', user.id).maybeSingle();
+    if (kFout || (k?.abonnement_id && !k?.klant_id)) return fout(500, 'Je abonnement kon niet worden gecontroleerd. Probeer het zo opnieuw.', 'database');
+    if (k?.abonnement_in_aanmaak) return fout(409, 'Je betaling wordt nog verwerkt. Probeer het straks opnieuw.', 'betaling_bezig');
     let gestopt = false;
     if (k?.klant_id && k?.abonnement_id) {
       if (!(await stopAbonnement(k.klant_id, k.abonnement_id))) {
@@ -183,8 +194,11 @@ Deno.serve(async (req) => {
       }
       gestopt = true;
     }
-    const { data, error } = await beheer.rpc('mollie_zeg_op', { p_user: user.id });
+    const { data, error } = gestopt && k?.klant_id && k?.abonnement_id
+      ? await beheer.rpc('mollie_stop_bevestigen', { p_user: user.id, p_klant: k.klant_id, p_abonnement: k.abonnement_id })
+      : await beheer.rpc('mollie_zeg_op', { p_user: user.id });
     if (error || !data) return fout(500, 'Opzeggen lukte niet. Probeer het zo opnieuw.', 'database');
+    if (gestopt && data.stop_bevestigd !== true) return fout(409, 'Je abonnement is intussen gewijzigd. Laad de pagina opnieuw en probeer het nog eens.', 'abonnement_gewijzigd');
     if (data.ok) return antwoord({ ok: true, geldig_tot: data.geldig_tot ?? null });
     if (gestopt) {
       const { data: nu } = await student.rpc('mijn_abonnement');

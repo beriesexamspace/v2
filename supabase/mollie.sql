@@ -47,6 +47,10 @@ create table if not exists public.mollie_koppeling (
   plan text check (plan in ('plus', 'pro')),
   bijgewerkt timestamptz default now()
 );
+-- Alleen de service role kan een provider-bevestigde stop vastleggen. Het bewijs
+-- geldt uitsluitend voor dit abonnement; een nieuw abonnement heeft een ander id.
+alter table public.mollie_koppeling add column if not exists gestopt_abonnement_id text;
+alter table public.mollie_koppeling add column if not exists abonnement_in_aanmaak text;
 create index if not exists mollie_koppeling_klant on public.mollie_koppeling (klant_id);
 alter table public.mollie_koppeling enable row level security;
 revoke all on public.mollie_koppeling from anon, authenticated;
@@ -248,6 +252,81 @@ begin
 end;
 $$;
 
+-- De Edge Function roept dit pas aan nadat Mollie de stop heeft bevestigd.
+-- Controle en statuswijziging delen één lock: een intussen vervangen abonnement
+-- mag niet met het stopbewijs van zijn voorganger worden opgezegd of gewist.
+create or replace function public.mollie_stop_bevestigen(p_user uuid, p_klant text, p_abonnement text)
+returns json
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_k public.mollie_koppeling%rowtype;
+  v_opzeg json;
+begin
+  select * into v_k from public.mollie_koppeling where user_id = p_user for update;
+  if not found or p_klant is null or p_abonnement is null
+     or v_k.abonnement_in_aanmaak is not null
+     or v_k.klant_id is distinct from p_klant or v_k.abonnement_id is distinct from p_abonnement then
+    return json_build_object('ok', false, 'stop_bevestigd', false);
+  end if;
+  update public.mollie_koppeling set gestopt_abonnement_id = p_abonnement where user_id = p_user;
+  v_opzeg := public.mollie_zeg_op(p_user);
+  return json_build_object('ok', coalesce((v_opzeg->>'ok')::boolean, false),
+    'geldig_tot', v_opzeg->'geldig_tot', 'stop_bevestigd', true);
+end;
+$$;
+revoke all on function public.mollie_stop_bevestigen(uuid, text, text) from public, anon, authenticated;
+grant execute on function public.mollie_stop_bevestigen(uuid, text, text) to service_role;
+
+-- Houd de aanmaak vast totdat de provider-id veilig is gekoppeld, of een
+-- inmiddels overbodig abonnement aantoonbaar bij Mollie is gestopt.
+create or replace function public.mollie_abonnement_afmaken(
+  p_user uuid, p_betaling text, p_klant text, p_abonnement text, p_gestopt boolean default false)
+returns json
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_k public.mollie_koppeling%rowtype;
+  v_status text;
+  v_laatste text;
+  v_betaald boolean;
+begin
+  select * into v_k from public.mollie_koppeling where user_id = p_user for update;
+  if not found or v_k.klant_id is distinct from p_klant
+     or (v_k.abonnement_in_aanmaak is not null and v_k.abonnement_in_aanmaak is distinct from p_betaling)
+     or (v_k.abonnement_in_aanmaak is null and v_k.abonnement_id is distinct from p_abonnement) then
+    return json_build_object('gekoppeld', false, 'stoppen', not p_gestopt, 'opgeruimd', p_gestopt);
+  end if;
+  if p_gestopt then
+    update public.mollie_koppeling
+      set abonnement_id = p_abonnement, gestopt_abonnement_id = p_abonnement,
+          abonnement_in_aanmaak = null, bijgewerkt = now()
+      where user_id = p_user;
+    return json_build_object('gekoppeld', false, 'opgeruimd', true);
+  end if;
+  select status into v_status from public.abonnementen where user_id = p_user for update;
+  select id into v_laatste from public.betalingen
+    where user_id = p_user and soort = 'eerste' and status = 'paid' and uitkomst in ('proef', 'actief')
+    order by betaald_op desc nulls last, gemaakt_op desc, id desc limit 1;
+  select status = 'paid' and coalesce(terugbetaald, 0) = 0 and coalesce(teruggeboekt, 0) = 0
+    into v_betaald from public.betalingen where id = p_betaling and user_id = p_user;
+  if v_status is null or v_status not in ('proef', 'actief')
+     or v_laatste is distinct from p_betaling or v_betaald is distinct from true then
+    return json_build_object('gekoppeld', false, 'stoppen', true);
+  end if;
+  update public.mollie_koppeling
+    set abonnement_id = p_abonnement, abonnement_in_aanmaak = null, bijgewerkt = now()
+    where user_id = p_user;
+  return json_build_object('gekoppeld', true);
+end;
+$$;
+revoke all on function public.mollie_abonnement_afmaken(uuid, text, text, text, boolean) from public, anon, authenticated;
+grant execute on function public.mollie_abonnement_afmaken(uuid, text, text, text, boolean) to service_role;
+
 -- zeg_op en herroep van de pagina zelf: weigeren als het account via Mollie betaalt (reden 'via_mollie'). Anders zegt de
 -- database "opgezegd" terwijl Mollie blijft afschrijven. Verder gelijk aan herroepen.sql.
 create or replace function public.zeg_op()
@@ -430,12 +509,12 @@ begin
       end if;
 
       if v_uitkomst in ('proef', 'actief') then
-        insert into public.mollie_koppeling (user_id, klant_id, mandaat_id, plan, bijgewerkt)
-        values (v_user, p_klant, p_mandaat, p_plan, now())
+        insert into public.mollie_koppeling (user_id, klant_id, mandaat_id, plan, bijgewerkt, abonnement_in_aanmaak)
+        values (v_user, p_klant, p_mandaat, p_plan, now(), p_id)
         on conflict (user_id) do update
           set klant_id = coalesce(excluded.klant_id, mollie_koppeling.klant_id),
               mandaat_id = coalesce(excluded.mandaat_id, mollie_koppeling.mandaat_id),
-              plan = excluded.plan, bijgewerkt = now();
+              plan = excluded.plan, bijgewerkt = now(), abonnement_in_aanmaak = p_id;
       end if;
     else
       -- Maandbetaling: alleen van het abonnement dat nu bij het account hoort, en niet na herroepen.
