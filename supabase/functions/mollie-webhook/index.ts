@@ -21,6 +21,78 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 // deno-lint-ignore no-explicit-any
 type Obj = Record<string, any>;
 
+type MailBijlage = { filename: string; content: string };
+
+// Beide functies worden los geplakt in de Supabase-editor, daarom staat deze mailhulp in beide bestanden.
+// Een mailfout verandert nooit het resultaat van de abonnementsactie. Status 0 betekent een lokale fout of time-out.
+async function stuurMail({ aan, onderwerp, tekst, html, sleutel, bijlagen }: {
+  aan: string; onderwerp: string; tekst: string; html: string; sleutel: string; bijlagen?: MailBijlage[];
+}): Promise<void> {
+  try {
+    const api = Deno.env.get('RESEND_API_KEY');
+    const van = Deno.env.get('MAIL_VAN');
+    if (!api || !van) { console.info('mail: niet ingesteld'); return; }
+    if (!aan) { console.error('mail:', 0); return; }
+    const antwoord = Deno.env.get('MAIL_ANTWOORD');
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${api}`, 'Content-Type': 'application/json', 'Idempotency-Key': sleutel },
+      body: JSON.stringify({
+        from: van, to: [aan], ...(antwoord ? { reply_to: antwoord } : {}), subject: onderwerp, text: tekst, html,
+        ...(bijlagen?.length ? { attachments: bijlagen } : {}),
+      }),
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!r.ok) console.error('mail:', r.status);
+  } catch { console.error('mail:', 0); }
+}
+
+const mailDatum = (op: string | Date) => new Intl.DateTimeFormat('nl-BE', {
+  timeZone: 'Europe/Amsterdam', day: 'numeric', month: 'long', year: 'numeric',
+}).format(new Date(op));
+const mailAanhef = (user: Obj) => typeof user.user_metadata?.voornaam === 'string' && user.user_metadata.voornaam.trim()
+  ? `Hallo ${user.user_metadata.voornaam.trim()},` : 'Hallo,';
+const mailVeilig = (tekst: string) => tekst.replace(/[&<>"']/g, (teken) => ({
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+})[teken]!);
+const mailHtml = (tekst: string) => '<!doctype html><html lang="nl"><body>' + tekst.split('\n\n')
+  .map((alinea) => `<p>${mailVeilig(alinea).replace(/\n/g, '<br>')}</p>`).join('') + '</body></html>';
+
+// herroep_tot sluit af bij Amsterdamse middernacht, 15 kalenderdagen na de contractdag.
+// "Tot en met" is dus die dag + 14, ook over zomer-/wintertijd heen.
+function mailHerroepTot(op: Date): string {
+  const delen = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Amsterdam', year: 'numeric', month: '2-digit', day: '2-digit',
+  }).formatToParts(op);
+  const deel = (soort: string) => Number(delen.find((d) => d.type === soort)?.value);
+  return mailDatum(new Date(Date.UTC(deel('year'), deel('month') - 1, deel('day') + 14, 12)));
+}
+
+// Letterlijke tekst uit voorwaarden.html. Bij wijzigingen beide exemplaren samen bijwerken.
+const MODELFORMULIER = `Modelformulier voor herroeping
+
+Vul dit formulier alleen in als je je abonnement wil herroepen. Mail het naar berie007yldrm@gmail.com.
+
+Aan Berie's Exam Space, berie007yldrm@gmail.com. Berat Yildirim, KvK-nummer 42183092. Adres: Koningin Regentesselaan 116, 6043 CP Roermond.
+Ik herroep hierbij mijn overeenkomst voor de volgende dienst: abonnement [Plus of Pro] op Berie's Exam Space.
+Afgesloten op [datum]
+Naam [je naam]
+Adres [je adres]
+E-mailadres van je account [e-mailadres]
+Handtekening [alleen als je dit formulier op papier stuurt]
+Datum [datum]`;
+
+async function voorwaardenBijlage(site: string): Promise<MailBijlage[]> {
+  try {
+    const r = await fetch(`${site}voorwaarden.html`, { signal: AbortSignal.timeout(5000) });
+    if (!r.ok) { console.error('mail: voorwaarden', r.status); return []; }
+    const bytes = new Uint8Array(await r.arrayBuffer());
+    let inhoud = '';
+    for (let i = 0; i < bytes.length; i += 8192) inhoud += String.fromCharCode(...bytes.subarray(i, i + 8192));
+    return [{ filename: 'voorwaarden.html', content: btoa(inhoud) }];
+  } catch { console.error('mail: voorwaarden', 0); return []; }
+}
+
 // eenmalig: Idempotency-Key bij een POST. Dezelfde aanvraag met dezelfde sleutel binnen een uur doet Mollie maar één keer
 // (twee meldingen tegelijk: de tweede krijgt 409 en Mollie probeert die melding later opnieuw).
 async function mollie(pad: string, methode = 'GET', inhoud?: unknown, eenmalig?: string): Promise<{ status: number; ok: boolean; data: Obj | null }> {
@@ -209,5 +281,41 @@ Deno.serve(async (req) => {
     .update({ abonnement_id: String(sub.id), mandaat_id: p.mandateId ?? undefined, plan, bijgewerkt: new Date().toISOString() })
     .eq('user_id', gebruiker);
   if (kFout) { console.error('mollie-webhook: koppeling niet bijgewerkt'); return leeg(503); }
+  if (v.uitkomst === 'proef' || v.uitkomst === 'actief') {
+    // Pas mailen als betaling, abonnement en koppeling klaar zijn. Ook fouten bij de mailvoorbereiding mogen
+    // geen nieuwe betaalpoging veroorzaken. Een herhaalde webhook gebruikt dezelfde Resend-sleutel.
+    try {
+      if (!Deno.env.get('RESEND_API_KEY') || !Deno.env.get('MAIL_VAN')) {
+        console.info('mail: niet ingesteld');
+      } else {
+        const { data: account, error: accountFout } = await beheer.auth.admin.getUserById(gebruiker);
+        if (accountFout || !account?.user?.email) {
+          console.error('mail:', 0);
+        } else {
+          const site = (Deno.env.get('SITE_URL') || 'https://beriesexamspace.com/v2/').replace(/\/?$/, '/');
+          const prijs = `${PRIJS[plan].replace('.', ',')} euro`;
+          const { data: abonnement, error: abonnementFout } = await beheer.from('abonnementen')
+            .select('proef_tot, overeenkomst_op').eq('user_id', gebruiker).maybeSingle();
+          if (abonnementFout || !abonnement) throw new Error('maildatum');
+          // mollie_verwerk bewaart overeenkomst_op bij verwerking, mogelijk later dan paidAt.
+          // Gebruik net als Profiel die bewaarde contractstart; alleen zonder die datum geldt de betaaldatum.
+          const overeenkomstOp = new Date(abonnement.overeenkomst_op ?? p.paidAt);
+          const eersteDatum = mailDatum(`${sub.startDate}T12:00:00Z`);
+          let maand = 'Je eerste maand is betaald.';
+          if (v.uitkomst === 'proef') {
+            if (!abonnement.proef_tot) throw new Error('maildatum');
+            maand = `Je proefmaand loopt tot ${mailDatum(abonnement.proef_tot)}.`;
+          }
+          const bijlagen = await voorwaardenBijlage(site);
+          const tekst = `${mailAanhef(account.user)}\n\nJe abonnement op Berie's Exam Space is ${NAAM[plan]}. De prijs is ${prijs} per maand, inclusief btw.\n\n${maand} Daarna betaal je automatisch ${prijs} per maand, voor het eerst op ${eersteDatum}.\n\nOpzeggen kan altijd met één knop op je profiel: ${site}profiel.html#abonnement\n\nJe hebt 14 dagen bedenktijd, tot en met ${mailHerroepTot(overeenkomstOp)}. Herroepen kan met de knop "Hier de overeenkomst herroepen" op je profiel, of met het modelformulier hieronder.\n\n${MODELFORMULIER}\n\nAlle gegevens van Berie's Exam Space en de volledige voorwaarden staan ${bijlagen.length ? 'in de bijlage en ' : ''}op ${site}voorwaarden.html.`;
+          const html = mailHtml(tekst).replace('</body>', `<p><a href="${mailVeilig(site + 'profiel.html#abonnement')}">Naar je profiel</a><br><a href="${mailVeilig(site + 'voorwaarden.html')}">Volledige voorwaarden</a></p></body>`);
+          await stuurMail({
+            aan: account.user.email, onderwerp: `Je abonnement op Berie's Exam Space: ${NAAM[plan]}`,
+            tekst, html, sleutel: `mail-eerste-${id}`, bijlagen,
+          });
+        }
+      }
+    } catch { console.error('mail:', 0); }
+  }
   return leeg();
 });

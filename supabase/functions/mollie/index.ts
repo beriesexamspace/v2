@@ -22,6 +22,43 @@ const DAG = 24 * 60 * 60 * 1000;
 // deno-lint-ignore no-explicit-any
 type Obj = Record<string, any>;
 
+type MailBijlage = { filename: string; content: string };
+
+// Beide functies worden los geplakt in de Supabase-editor, daarom staat deze mailhulp in beide bestanden.
+// Een mailfout verandert nooit het resultaat van de abonnementsactie. Status 0 betekent een lokale fout of time-out.
+async function stuurMail({ aan, onderwerp, tekst, html, sleutel, bijlagen }: {
+  aan: string; onderwerp: string; tekst: string; html: string; sleutel: string; bijlagen?: MailBijlage[];
+}): Promise<void> {
+  try {
+    const api = Deno.env.get('RESEND_API_KEY');
+    const van = Deno.env.get('MAIL_VAN');
+    if (!api || !van) { console.info('mail: niet ingesteld'); return; }
+    if (!aan) { console.error('mail:', 0); return; }
+    const antwoord = Deno.env.get('MAIL_ANTWOORD');
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${api}`, 'Content-Type': 'application/json', 'Idempotency-Key': sleutel },
+      body: JSON.stringify({
+        from: van, to: [aan], ...(antwoord ? { reply_to: antwoord } : {}), subject: onderwerp, text: tekst, html,
+        ...(bijlagen?.length ? { attachments: bijlagen } : {}),
+      }),
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!r.ok) console.error('mail:', r.status);
+  } catch { console.error('mail:', 0); }
+}
+
+const mailDatum = (op: string | Date) => new Intl.DateTimeFormat('nl-BE', {
+  timeZone: 'Europe/Amsterdam', day: 'numeric', month: 'long', year: 'numeric',
+}).format(new Date(op));
+const mailAanhef = (user: Obj) => typeof user.user_metadata?.voornaam === 'string' && user.user_metadata.voornaam.trim()
+  ? `Hallo ${user.user_metadata.voornaam.trim()},` : 'Hallo,';
+const mailVeilig = (tekst: string) => tekst.replace(/[&<>"']/g, (teken) => ({
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+})[teken]!);
+const mailHtml = (tekst: string) => '<!doctype html><html lang="nl"><body>' + tekst.split('\n\n')
+  .map((alinea) => `<p>${mailVeilig(alinea).replace(/\n/g, '<br>')}</p>`).join('') + '</body></html>';
+
 const kop = (origin: string | null) => ({
   'Access-Control-Allow-Origin': origin && TOEGESTAAN.includes(origin) ? origin : TOEGESTAAN[0],
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -175,7 +212,7 @@ Deno.serve(async (req) => {
 
   // ---- Opzeggen: eerst het abonnement bij Mollie stoppen, dan opzeggen (mollie_zeg_op). Je houdt je plan tot de einddatum. ----
   if (actie === 'opzeggen') {
-    const { data: k } = await beheer.from('mollie_koppeling').select('klant_id, abonnement_id').eq('user_id', user.id).maybeSingle();
+    const { data: k } = await beheer.from('mollie_koppeling').select('klant_id, abonnement_id, plan').eq('user_id', user.id).maybeSingle();
     let gestopt = false;
     if (k?.klant_id && k?.abonnement_id) {
       if (!(await stopAbonnement(k.klant_id, k.abonnement_id))) {
@@ -185,7 +222,17 @@ Deno.serve(async (req) => {
     }
     const { data, error } = await beheer.rpc('mollie_zeg_op', { p_user: user.id });
     if (error || !data) return fout(500, 'Opzeggen lukte niet. Probeer het zo opnieuw.', 'database');
-    if (data.ok) return antwoord({ ok: true, geldig_tot: data.geldig_tot ?? null });
+    if (data.ok) {
+      try {
+        const planNaam = NAAM[String(k?.plan)] ?? 'je huidige plan';
+        const tekst = `${mailAanhef(user)}\n\nJe abonnement is opgezegd. Je houdt ${planNaam} tot en met ${mailDatum(data.geldig_tot)}. Er worden geen nieuwe maandbetalingen gestart. Een betaling die al in verwerking is, kan nog doorkomen.`;
+        await stuurMail({
+          aan: user.email ?? '', onderwerp: 'Je abonnement is opgezegd', tekst, html: mailHtml(tekst),
+          sleutel: `mail-opzeg-${user.id}-${data.geldig_tot}`,
+        });
+      } catch { console.error('mail:', 0); }
+      return antwoord({ ok: true, geldig_tot: data.geldig_tot ?? null });
+    }
     if (gestopt) {
       const { data: nu } = await student.rpc('mijn_abonnement');
       return antwoord({ ok: true, geldig_tot: nu?.geldig_tot ?? null });
@@ -269,6 +316,22 @@ Deno.serve(async (req) => {
       terugCenten += terug;
     }
     if (onvolledig) console.error('mollie: herroepen bij Mollie onvolledig');
+
+    if (!opnieuwProberen) {
+      try {
+        const tijd = new Intl.DateTimeFormat('nl-BE', {
+          timeZone: 'Europe/Amsterdam', hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
+        }).format(new Date(herroepenOp!));
+        const terugTekst = onvolledig
+          ? 'Bij de terugbetaling ging iets mis. We kijken het na en laten het je weten.'
+          : `${euro(terugCenten).replace('.', ',')} euro komt binnen 14 dagen terug op de rekening waarmee je betaalde.`;
+        const tekst = `${mailAanhef(user)}\n\nJe hebt de overeenkomst herroepen op ${mailDatum(herroepenOp!)} om ${tijd}.\n\nJe plan is meteen gestopt.\n\n${terugTekst}`;
+        await stuurMail({
+          aan: user.email ?? '', onderwerp: 'Bevestiging van je herroeping', tekst, html: mailHtml(tekst),
+          sleutel: `mail-herroep-${user.id}-${herroepenOp}`,
+        });
+      } catch { console.error('mail:', 0); }
+    }
 
     return antwoord({
       ok: true,
