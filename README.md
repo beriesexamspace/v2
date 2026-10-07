@@ -281,6 +281,8 @@ Stap 2 (AI, 23-09-2026): de Edge Function `comit` (`supabase/functions/comit/ind
 
 ## Vakpagina
 
+De abonnement-pop-up op de vakpagina wacht op de basis van `vragen-per-plan`. Op de gecontroleerde main van 04-10-2026 ontbreekt de link Bekijk abonnementen bij de vraagtotalen nog. De concept-PR vraagt ook hoe de goudkleur van Pro binnen de toegestane kleurregels moet worden gedeeld; de pop-up en het cachenummer zijn daarom nog niet aangepast.
+
 ### Leeg scherm tijdens het oefenen (21-09-2026)
 
 Zodra een ronde start zet `showScreen` de klasse `is-oefenen` op `<html>` (vaktitel, terugknop, tabbladen en voettekst verborgen) en bij een simulatie ook `is-examen` (navigatiebalk en losse themaknop verborgen). Alleen de vraag, de opties en Stop blijven; weg willen betekent eerst Stop. Na Stop of het eindscherm komt alles terug.
