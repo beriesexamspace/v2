@@ -80,7 +80,7 @@ Deno.serve(async (req) => {
   const url = Deno.env.get('SUPABASE_URL');
   const dienstSleutel = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? Deno.env.get('SUPABASE_SECRET_KEY');
   const anonSleutel = Deno.env.get('SUPABASE_ANON_KEY');
-  const site = (Deno.env.get('SITE_URL') || 'https://beriesexamspace.com/v2/').replace(/\/?$/, '/');
+  const site = (Deno.env.get('SITE_URL') || 'https://beriesexamspace.com/').replace(/\/?$/, '/');
   if (!url || !dienstSleutel || !anonSleutel) return fout(500, 'De betaling is nog niet goed ingesteld.', 'config');
   if (!Deno.env.get('MOLLIE_API_KEY')) return fout(500, 'De betaling is nog niet goed ingesteld.', 'geen-sleutel');
 

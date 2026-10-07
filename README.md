@@ -1,6 +1,8 @@
 # Berie's Exam Space v2
 
-Nieuwe versie van beriesexamspace.com, in opbouw. Live voorbeeld (niet delen tot het af is): https://beriesexamspace.com/v2/
+Nieuwe versie van beriesexamspace.com. Live-adres na de lancering: https://beriesexamspace.com/
+
+De branch `lancering-hoofddomein` bereidt de verhuizing naar https://beriesexamspace.com/ voor: absolute sitepaden, deelvoorbeelden, iconen, het manifest en de standaardwaarde van `SITE_URL` voor Mollie gebruiken het hoofddomein. Deze concept-PR mag pas op de lanceringsdag worden samengevoegd. Pas dan ook de externe URL-instellingen uit de PR-controlelijst aan en zet de bijgewerkte Mollie-functie in Supabase. Relatieve links en het cachenummer blijven gelijk; de oude site en de hostinginstellingen zijn niet aangepast.
 
 ## Hoe we hieraan werken
 
@@ -32,7 +34,7 @@ voortgang.html        Jouw voortgang: per vak en per hoofdstuk wat je kent (tabe
 privacy.html          wat we bewaren, waar, cookies, rechten en contact; gelinkt in elke voettekst en onder het aanmeldformulier
 abonnement.html       Free, Plus (2,99 euro per maand) en Pro (9,99 euro per maand, nog bezig): drie kaarten plus "Goed om te weten"; openbaar (geen deur) zodat Mollie hem kan keuren; nog nergens gelinkt, betaalknop staat uit; geen kaart staat standaard blauw, alleen de kaart onder de muis wordt blauw en komt iets naar voren; Probeer 1 maand start de proefmaand (start_proef) en stuurt naar profiel.html#abonnement, de knoppen tonen je huidige plan; Profiel toont plan, einddatum en Opzeggen (zeg_op)
 beheer.html           alleen voor de beheerder (link Beheer in het profielmenu, via is_beheerder): accounts, nieuwste accounts (e-mail afgeschermd), abonnementen, oefenen, Comit, feedback, vertrekredenen en per dag; data uit beheer_overzicht() (supabase/beheer-overzicht.sql, uitgevoerd 26-09-2026) en studie_dagcijfers()
-404.html              nette foutpagina van GitHub Pages; gebruikt absolute paden /v2/ (bij de lancering aanpassen)
+404.html              nette foutpagina van GitHub Pages; gebruikt absolute paden vanaf het hoofddomein (/)
 manifest.webmanifest  naam, kleuren en iconen voor "Zet op beginscherm" (Android); Safari gebruikt de apple-touch-icon
 vak/voorbeeld/        vak-template (index.html + data.js)
 assets/style.css      gedeelde stijl
@@ -111,7 +113,7 @@ Sinds 07-10-2026 bewegen de knoppen en actielinks in de profielinhoud rustig omh
 1. De beheerder vult `assets/config.js` in met de project-URL en publieke anon key uit Supabase, via Settings → API. Vervang `[SUPABASE_URL]` en `[SUPABASE_ANON_KEY]`. De anon key mag publiek zijn; voeg nooit een geheime sleutel of service-role key toe.
 2. Zet onder Authentication → Providers → Email de instelling "Confirm email" uit. Een nieuw account krijgt dan direct een sessie.
 3. Stel in dezelfde e-mailinstellingen de minimale wachtwoordlengte in op 8 tekens en voeg geen extra tekenvereisten toe, zodat de server overeenkomt met de formulieren.
-4. Stel onder Authentication → URL Configuration de Site URL in op `https://beriesexamspace.com/v2/` en voeg `https://beriesexamspace.com/v2/wachtwoord.html` toe als Redirect URL.
+4. Stel onder Authentication → URL Configuration de Site URL in op `https://beriesexamspace.com/` en voeg `https://beriesexamspace.com/wachtwoord.html` toe als Redirect URL.
 5. Test na het invullen aanmelden, inloggen, herstelmail, het nieuwe wachtwoord en uitloggen. Zonder ingevulde instellingen blijven accounts uitgeschakeld en kan iedereen wel oefenen. Voor herstelmail in een lokale preview moet ook de exacte lokale `wachtwoord.html`-URL in Supabase als Redirect URL zijn toegestaan.
 
 Nieuwe accounts bewaren `voornaam`, `achternaam` en de optionele `bijnaam` in Supabase user metadata. `naam` blijft de volledige naam voor bestaande koppelingen. `BES.auth.naamGegevens(user)` geeft de volledige naam en aanspreeknaam terug; `BES.naamOpslaan` bewaart de bijnaam of voornaam. Alleen Profiel toont de volledige naam. Een oude, ongesplitste naam wordt niet automatisch verdeeld en blijft op Profiel behouden; de hub gebruikt daarvoor een algemene begroeting totdat de gebruiker de losse velden invult. Bestaande gebruikers hoeven naamvelden niet opnieuw in te vullen om hun wachtwoord of e-mailadres te wijzigen.
@@ -128,14 +130,14 @@ Eenmalig inrichten door de eigenaar:
 1. Google Cloud Console (console.cloud.google.com): nieuw project, "APIs & Services" → "OAuth consent screen" (extern, app-naam Berie's Exam Space, je e-mailadres), daarna "Credentials" → "Create credentials" → "OAuth client ID", type "Web application".
 2. Bij "Authorized redirect URIs" de callback-URL plakken die Supabase toont onder Authentication → Providers → Google (eindigt op `/auth/v1/callback`).
 3. Client ID en Client Secret in Supabase bij de Google-provider plakken, de provider aanzetten, Save.
-4. Supabase → Authentication → URL Configuration → Redirect URLs: `https://beriesexamspace.com/v2/inloggen.html?google=terug` toevoegen (en voor de zekerheid `https://beriesexamspace.com/v2/**`).
+4. Supabase → Authentication → URL Configuration → Redirect URLs: `https://beriesexamspace.com/inloggen.html?google=terug` toevoegen (en voor de zekerheid `https://beriesexamspace.com/**`).
 5. Testen met een Google-account dat nog geen Berie-account heeft: knop, Google-scherm, terug op de site, "Wat is nieuw", hub met voornaam, en op Profiel de naam.
 
 ### E-mailadres wijzigen
 
 Profiel gebruikt de bestaande `auth.updateUser`-functie. De gebruikers-ID blijft gelijk. De bevestiging volgt de huidige Supabase-instellingen; schakel beveiligde e-mailwijziging niet uit. Zolang de provider een `new_email` teruggeeft, meldt Profiel dat bevestiging nodig is. Alleen `user.email` geldt als het bevestigde adres.
 
-Voeg voor deze flow `https://beriesexamspace.com/v2/profiel.html?email=bevestigen` toe aan de toegestane redirect-URL's in Supabase. Voor een echte lokale test is ook de exacte lokale URL nodig. De wijziging in deze PR voert geen configuratie-aanpassing of e-mailverzending uit. Browsercontroles gebruiken een nagebootste auth-provider; een echte bevestigingsmail, inclusief eventuele bevestiging via het oude adres, moet na inrichting met een testaccount worden gecontroleerd.
+Voeg voor deze flow `https://beriesexamspace.com/profiel.html?email=bevestigen` toe aan de toegestane redirect-URL's in Supabase. Voor een echte lokale test is ook de exacte lokale URL nodig. De wijziging in deze PR voert geen configuratie-aanpassing of e-mailverzending uit. Browsercontroles gebruiken een nagebootste auth-provider; een echte bevestigingsmail, inclusief eventuele bevestiging via het oude adres, moet na inrichting met een testaccount worden gecontroleerd.
 
 Een project op het instapplan kan na een week zonder voldoende gebruik pauzeren. Open dan het project in het Supabase-dashboard en kies "Resume project". Zie de [Supabase-uitleg over projectpauzes](https://supabase.com/docs/guides/platform/free-project-pausing).
 
@@ -180,7 +182,7 @@ Sinds 22-09-2026 is account wissen een eigen pagina, `account-wissen.html` (acht
 
 ## Deelvoorbeeld, iconen en toegankelijkheid
 
-- Elke pagina heeft og-tags (titel, omschrijving, `assets/deel.png`, url), een `apple-touch-icon` en een link naar `manifest.webmanifest`. De paden zijn absoluut (`/v2/...`) omdat vakpagina's twee mappen diep staan. **Bij de lancering op het hoofddomein:** `/v2/` vervangen door `/` in alle pagina's, in het manifest en in `404.html`.
+- Elke pagina heeft og-tags (titel, omschrijving, `assets/deel.png`, url), een `apple-touch-icon` en een link naar `manifest.webmanifest`. De paden zijn absoluut vanaf het hoofddomein (`/...`) omdat vakpagina's twee mappen diep staan. Dat geldt ook voor het manifest, `404.html` en `gesloten.html`.
 - Elke pagina begint met een `.skip-link` ("Ga naar inhoud") naar `<main id="inhoud">`; alleen zichtbaar met de tab-toets.
 - De muisbol heeft sinds 20-09-2026 één vaste kleur per thema (zwart in licht, wit in donker, token --cursor-tone); de oude logica die de kleur per element en per letter aanpaste is verwijderd op verzoek van Berat.
 - Teal als tekstkleur is te licht voor kleine tekst. Gebruik daarvoor `--teal-tekst` (licht #15756f, donker #5fd0c9); `--teal` blijft voor balken, randen en vinkjes.
@@ -430,7 +432,7 @@ Bestanden:
 
 Eenmalig inrichten door Berat:
 1. In de SQL-editor van Supabase `supabase/mollie.sql` uitvoeren (na `abonnementen.sql` en `herroepen.sql`).
-2. Mollie-dashboard, Developers, API-keys: de test-sleutel (begint met `test_`) kopiëren. In Supabase bij Edge Functions, Secrets: `MOLLIE_API_KEY` met die sleutel. Optioneel `SITE_URL` (standaard `https://beriesexamspace.com/v2/`). `SUPABASE_URL`, `SUPABASE_ANON_KEY` en `SUPABASE_SERVICE_ROLE_KEY` zet Supabase zelf.
+2. Mollie-dashboard, Developers, API-keys: de test-sleutel (begint met `test_`) kopiëren. In Supabase bij Edge Functions, Secrets: `MOLLIE_API_KEY` met die sleutel. Optioneel `SITE_URL` (standaard `https://beriesexamspace.com/`). `SUPABASE_URL`, `SUPABASE_ANON_KEY` en `SUPABASE_SERVICE_ROLE_KEY` zet Supabase zelf.
 3. Edge Functions, Deploy a new function, via de editor: `mollie` met de inhoud van `supabase/functions/mollie/index.ts`, met "Verify JWT" AAN. Daarna `mollie-webhook` met de inhoud van `supabase/functions/mollie-webhook/index.ts`, met "Verify JWT" UIT (Mollie stuurt geen sessie mee).
 4. Aanzetten: `update public.site_instellingen set waarde = true where sleutel = 'betalen';` Uitzetten: dezelfde regel met `false`.
 5. Testen met een testaccount: Probeer 1 maand, op de testpagina van Mollie "Paid" kiezen, terug op de site wordt de betaling gecontroleerd en ga je naar Profiel. In Supabase: `select * from public.betalingen order by gemaakt_op desc;` en in het Mollie-dashboard (testmodus) de klant met zijn abonnement. Ook "Failed" en "Expired" proberen (plan blijft Free), Opzeggen (abonnement bij Mollie op Canceled) en Herroepen (terugbetaling zichtbaar bij de betaling).
