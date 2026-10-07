@@ -1,6 +1,6 @@
 # Berie's Exam Space v2: context voor Codex
 
-Je werkt in de repo `beriesexamspace/v2` (GitHub Pages, live op https://beriesexamspace.com/v2/). Werk in een eigen branch en open een pull request; voeg NOOIT zelf samen naar `main`. Lees eerst `README.md` helemaal, daarna de bestanden die de opdracht noemt. De opdrachten staan in `codex/opdrachten/`; werk aan één opdracht per branch.
+Je werkt in de repo `beriesexamspace/v2` (GitHub Pages, live op https://beriesexamspace.com/). Werk in een eigen branch en open een pull request; voeg NOOIT zelf samen naar `main`. Lees eerst `README.md` helemaal, daarna de bestanden die de opdracht noemt. De opdrachten staan in `codex/opdrachten/`; werk aan één opdracht per branch.
 
 ## Stack
 
