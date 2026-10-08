@@ -73,7 +73,7 @@ referentie/comit-pixel/ Comit als pixel-poppetje: raster + palet in comit-pixel.
 - Kleurvariabelen: `--ink-soft`, `--grey-title`, `--accent-dark`, `--line` (#E9E7F3), `--pill`, `--font`, `--ease`; `--muted`, `--secondary`, `--radius-pill` en `--font-family` zijn aliassen daarvan.
 
 ## Regels
-- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 80), anders zien telefoons nog tien minuten de oude versie.
+- Verandert een gedeeld bestand in `assets`? Verhoog dan in alle pagina's het nummer achter `?v=` (nu 81), anders zien telefoons nog tien minuten de oude versie.
 - Alleen HTML, CSS en vanilla JavaScript. Geen framework, geen build-stap.
 - De Supabase-client is de enige externe JavaScript-bibliotheek, vastgezet op `2.45.4` via `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js`.
 - Kleurregel: blauw = doen (knoppen, links, balk), teal = bijzonder (logo, gelukt, afgerond, "Laatst gekozen"), grijs = rust. Rood is alleen voor de afgesproken foutmarkering bij een ongeldig veld of onjuist antwoord.
@@ -436,3 +436,5 @@ Eenmalig inrichten door Berat:
 5. Testen met een testaccount: Probeer 1 maand, op de testpagina van Mollie "Paid" kiezen, terug op de site wordt de betaling gecontroleerd en ga je naar Profiel. In Supabase: `select * from public.betalingen order by gemaakt_op desc;` en in het Mollie-dashboard (testmodus) de klant met zijn abonnement. Ook "Failed" en "Expired" proberen (plan blijft Free), Opzeggen (abonnement bij Mollie op Canceled) en Herroepen (terugbetaling zichtbaar bij de betaling).
 
 Naar echte betalingen: in Mollie de website laten keuren, de `live_`-sleutel in `MOLLIE_API_KEY` zetten en eenmalig `update public.mollie_koppeling set klant_id = null, mandaat_id = null, abonnement_id = null;` (nummers uit testmodus bestaan niet bij de echte sleutel). Nog open: een bevestigingsmail na betalen, opzeggen en herroepen; een student die meldt dat herroepen bij Mollie onvolledig was, met de hand in het Mollie-dashboard nakijken en terugbetalen.
+
+Sinds 08-10-2026 staat Denktest bij Tools op de hub. `iq-test.html`, `assets/iq-test.js`, `assets/iq-test.css` en `assets/iq-vragen.js` gebruiken de bestaande accountdeur voor 24 oorspronkelijke vragen, een doorlopende timer van 20 minuten en een uitslag met uitleg per vraag. Het IQ-bereik is een zelfgekozen, ongenormeerde spelomrekening, geen gevalideerde IQ-meting; antwoorden en scores blijven alleen in het werkgeheugen van de browser. Vraagschermen passen op mobiel in één scherm; alleen de uitslag kan scrollen. Cachenummer: 81.
