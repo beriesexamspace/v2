@@ -185,6 +185,55 @@
       .iq-footer { flex-direction: column; gap: 8px; }
       .iq-footer p:last-child { text-align: left; }
     }
+    body[data-screen="intro"] .iq-page { display: flex; padding: 76px 0 0; }
+    body[data-screen="intro"] .iq-wrap { display: flex; }
+    #intro { display: flex; flex-direction: column; width: 100%; }
+    body[data-screen="intro"] .iq-hero { flex: 1; gap: 40px; padding: clamp(12px, 2.5dvh, 28px) 0; }
+    body[data-screen="intro"] .iq-hero h1 { font-size: clamp(2.75rem, 6.6dvh, 3.75rem); }
+    body[data-screen="intro"] .iq-eyebrow { margin-bottom: 12px; }
+    body[data-screen="intro"] .iq-lead { max-width: 48ch; margin: 16px 0; font-size: 1.0625rem; line-height: 1.5; }
+    body[data-screen="intro"] .iq-meta { margin-bottom: 20px; }
+    body[data-screen="intro"] .iq-note { margin-top: 12px; line-height: 1.5; }
+    body[data-screen="intro"] .iq-topics { padding: 16px 0; gap: 20px; }
+    body[data-screen="intro"] .iq-footer { padding: 12px 0; }
+    @media (max-height: 760px) and (min-width: 768px) {
+      body[data-screen="intro"] .iq-page { padding-top: 68px; }
+      body[data-screen="intro"] .iq-hero h1 { font-size: 2.75rem; }
+      body[data-screen="intro"] .iq-preview { padding: 22px; }
+      body[data-screen="intro"] .iq-preview .iq-matrix { width: min(100%, 32dvh); margin-top: 16px; }
+      body[data-screen="intro"] .iq-topics p { display: none; }
+      body[data-screen="intro"] .iq-topic { align-items: center; }
+      body[data-screen="intro"] .iq-topic h2 { margin: 0; }
+    }
+    @media (max-width: 767px) {
+      body[data-screen="intro"] .iq-page { padding-top: 72px; }
+      body[data-screen="intro"] .iq-hero { display: flex; align-items: center; padding: 12px 0 16px; }
+      body[data-screen="intro"] .iq-hero > div:first-child { width: 100%; }
+      body[data-screen="intro"] .iq-hero h1 { font-size: clamp(1.875rem, 5.2dvh, 2.5rem); }
+      body[data-screen="intro"] .iq-eyebrow { font-size: .8125rem; }
+      body[data-screen="intro"] .iq-lead { margin: 12px 0 16px; font-size: .9375rem; }
+      body[data-screen="intro"] .iq-meta { gap: 8px 14px; margin-bottom: 18px; font-size: .75rem; }
+      body[data-screen="intro"] .iq-meta svg { display: none; }
+      body[data-screen="intro"] .iq-hero .knop { min-height: 48px; }
+      body[data-screen="intro"] .iq-note { font-size: .75rem; }
+      body[data-screen="intro"] .iq-preview { display: none; }
+      body[data-screen="intro"] .iq-topics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; padding: 14px 0; }
+      body[data-screen="intro"] .iq-topic { grid-template-columns: 26px 1fr; align-items: center; gap: 8px; }
+      body[data-screen="intro"] .iq-topic-icon { width: 26px; height: 26px; border-radius: 8px; font-size: .75rem; }
+      body[data-screen="intro"] .iq-topic h2 { margin: 0; font-size: .75rem; }
+      body[data-screen="intro"] .iq-topic p { display: none; }
+      body[data-screen="intro"] .iq-footer { padding: 8px 0 12px; font-size: .6875rem; }
+      body[data-screen="intro"] .iq-footer p:first-child { display: none; }
+    }
+    @media (max-width: 767px) and (max-height: 700px) {
+      body[data-screen="intro"] .iq-eyebrow { display: none; }
+      body[data-screen="intro"] .iq-hero h1 { font-size: 1.875rem; }
+      body[data-screen="intro"] .iq-hero h1 span br { display: none; }
+    }
+    @media (max-width: 767px) and (max-height: 600px) {
+      body[data-screen="intro"] .iq-page { padding-top: 64px; }
+      body[data-screen="intro"] .iq-hero { padding: 8px 0 12px; }
+    }
     @media (prefers-reduced-motion: reduce) {
       .iq-screen-enter { animation: none; }
       .iq-option, .iq-text-button, .iq-overview button, .iq-progress::-webkit-progress-value { transition: none; }
@@ -192,7 +241,7 @@
     }
   </style>
 </head>
-<body data-nav="vast">
+<body data-nav="vast" data-screen="intro">
   <a class="skip-link" href="#inhoud">Ga naar inhoud</a>
   <header class="site-header">
     <nav class="navigation iq-nav" aria-label="Hoofdnavigatie">
@@ -209,7 +258,7 @@
         <div class="iq-hero">
           <div>
             <p class="iq-eyebrow">Een nieuwe uitdaging in jouw space</p>
-            <h1 id="intro-title" tabindex="-1">IQ-test.<br><span>Daag je<br>denken uit.</span></h1>
+            <h1 id="intro-title" tabindex="-1">IQ-test.<br><span>Daag je<br> denken uit.</span></h1>
             <p class="iq-lead">Herken patronen, draai vormen in je hoofd en leg verbanden. 30 vragen die steeds uitdagender worden, op jouw tempo.</p>
             <ul class="iq-meta">
               <li><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="2" width="14" height="16" rx="3"/><path d="M6 7h8M6 11h8M6 15h5"/></svg><span data-total>30</span> vragen</li>
@@ -217,7 +266,7 @@
               <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m3 10 4 4L17 4"/></svg>Uitleg achteraf</li>
             </ul>
             <button class="knop" id="start" type="button">Begin de test →</button>
-            <p class="iq-note">Van opwarmen naar extra uitdaging. Je kunt vragen overslaan en later terugkomen. Je krijgt een oefenscore, geen IQ-getal. Je antwoorden blijven alleen in deze geopende pagina.</p>
+            <p class="iq-note">Je kunt overslaan en teruggaan. Je krijgt een oefenscore, geen IQ-getal. Antwoorden blijven alleen in deze geopende pagina.</p>
           </div>
           <div class="kaart iq-preview">
             <div class="iq-preview-top"><p>Zie jij het patroon?</p><span>Een voorproefje</span></div>
@@ -345,6 +394,7 @@
       let screen = 'intro';
       function show(id, focusId) {
         screen = id;
+        document.body.dataset.screen = id;
         ['intro','test','finish','results'].forEach(name => { $(name).hidden = name !== id; });
         const element = $(id);
         element.classList.remove('iq-screen-enter');
