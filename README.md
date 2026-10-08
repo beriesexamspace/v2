@@ -411,6 +411,10 @@ De accountkoppeling uit de sectie "Accounts" moet ook zijn ingesteld. Totdat de 
 
 Voeg het voorbeeldvak niet aan de 34 vakken toe. Het sjabloon maakt deze stap compleet; het overzetten van de echte vakinhoud is een volgende opdracht.
 
+## IQ-test, eerste opzet (08-10-2026)
+
+`referentie/iq-test.html` is een losse, interactieve oefenversie om de vormgeving te beoordelen: een startscherm, zes oorspronkelijke vragen over patronen, getallen en logica, en een uitslag met uitleg per antwoord. De pagina gebruikt de bestaande gedeelde stijl, muisaanwijzer en licht/donkerstand. Antwoorden blijven alleen in het geheugen van de pagina; er worden geen accountgegevens of voortgang opgeslagen. De uitslag is een oefenscore op zes vragen, geen gevalideerde IQ-score. Open de pagina rechtstreeks, lokaal via een server of door erop te dubbelklikken. Er staat nog geen verwijzing in de hub of navigatie. De gedeelde bestanden zijn ongewijzigd; cachenummer 80 blijft behouden.
+
 ## Animaties
 
 De knoppen, kaarten, menu's, themakeuze, vakkeuzes, meldingen en bevestigingen gebruiken dezelfde rustige bewegingen met `var(--ease)`: 150 tot 300 ms, 1 tot 2 px hover en een druk-effect van .97 voor knoppen of .99 voor kaarten. Openende lagen hergebruiken `appear` en `menu-open`. Een kleine haak in `app.js` laat pas na bediening nieuwe rekenrijen, zoekresultaten, meldingen en de terugkeer naar de eerste wisstap verschijnen. Hover werkt alleen met een muis; bij minder beweging staan animaties, overgangen en verplaatsingen uit. Bestaande pagina-introducties en voortgangsbalken blijven behouden. Cachenummer: 58.
