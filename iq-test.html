@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="assets/deur.js?v=81"></script>
+  <meta name="description" content="24 vragen over patronen, getallen, woorden en ruimtelijk inzicht. Een denktest voor het plezier en om te oefenen.">
+  <meta name="theme-color" content="#FFFFFF">
+  <meta name="robots" content="noindex">
+  <script>
+    (() => {
+      let keuze;
+      try { keuze = window.localStorage.getItem('bes_thema'); } catch {}
+      const donker = keuze === 'donker' || (keuze !== 'licht' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.dataset.theme = donker ? 'dark' : 'light';
+      document.querySelector('meta[name="theme-color"]').content = donker ? '#0B0B0C' : '#FFFFFF';
+    })();
+  </script>
+  <title>Denktest | Berie's Exam Space</title>
+  <link rel="icon" href="assets/icoon-192.png">
+  <link rel="apple-touch-icon" href="assets/icoon-180.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta property="og:title" content="Denktest | Berie's Exam Space">
+  <meta property="og:description" content="Even uit je leerstof. Ontdek patronen, getallen, woorden en vormen in 24 originele vragen.">
+  <meta property="og:image" content="https://beriesexamspace.com/v2/assets/deel.png">
+  <meta property="og:url" content="https://beriesexamspace.com/v2/iq-test.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css?v=81">
+  <link rel="stylesheet" href="assets/iq-test.css?v=81">
+  <script src="assets/app.js?v=81"></script>
+  <script src="assets/config.js?v=81" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
+  <script src="assets/auth.js?v=81" defer></script>
+  <script src="assets/iq-vragen.js?v=81" defer></script>
+  <script src="assets/iq-test.js?v=81" defer></script>
+</head>
+<body class="iq-page" data-nav="vast" data-iq-state="start">
+  <a class="skip-link" href="#inhoud">Ga naar inhoud</a>
+  <header class="site-header">
+    <nav class="navigation" aria-label="Hoofdnavigatie">
+      <a class="brand" href="index.html" aria-label="Berie's Exam Space, startpagina">
+        <span class="brand-symbol" aria-hidden="true">B</span>
+        <span class="brand-name"><span>Berie's</span> <span>Exam Space</span></span>
+      </a>
+      <a class="home-knop" href="hub.html" aria-label="Home" title="Home">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5M5 9v12h5v-7h4v7h5V9"/></svg>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu">Menu</button>
+      <ul class="navigation-links" id="site-menu">
+        <li><a href="hub.html#hoe-werkt-het">Hoe werkt het</a></li>
+        <li><a href="hub.html#wie-is-berie">Over mij</a></li>
+        <li><a href="whatsapp.html">WhatsApp-groep</a></li>
+      </ul>
+      <a class="pill login-button" href="inloggen.html">Inloggen&nbsp; →</a>
+    </nav>
+  </header>
+
+  <main id="inhoud" class="iq-main">
+    <section id="iq-start" class="iq-start" aria-labelledby="iq-start-title">
+      <div class="iq-start-inner">
+        <div class="iq-start-heading">
+          <span class="iq-eyebrow">Even uit je leerstof</span>
+          <h1 id="iq-start-title">De denktest.</h1>
+          <p class="iq-start-intro">Patronen zien. Verbanden leggen.</p>
+        </div>
+        <dl class="iq-facts" aria-label="Over de test">
+          <div><dt>Vragen</dt><dd>24</dd></div>
+          <div><dt>Onderdelen</dt><dd>4</dd></div>
+          <div><dt>Minuten</dt><dd>20</dd></div>
+        </dl>
+        <ol class="iq-parts" aria-label="De vier onderdelen">
+          <li><span aria-hidden="true">01</span> Figuurpatronen</li>
+          <li><span aria-hidden="true">02</span> Getalreeksen</li>
+          <li><span aria-hidden="true">03</span> Woordverbanden</li>
+          <li><span aria-hidden="true">04</span> Ruimtelijk inzicht</li>
+        </ol>
+        <p class="iq-start-rules">Kies één antwoord per vraag. Overslaan mag, teruggaan niet. De tijd loopt door, ook als je het tabblad verlaat. Onbeantwoord telt als fout.</p>
+        <div class="iq-start-action">
+          <button class="knop" id="iq-start-button" type="button" disabled>Start →</button>
+          <p class="iq-status" id="iq-status" role="status">Je account wordt gecontroleerd.</p>
+        </div>
+        <div class="iq-disclaimer">
+          <p>Een indicatie voor de lol en het oefenen, geen officiële IQ-test.</p>
+          <p><strong>Dit is een schatting, geen officieel IQ.</strong></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="iq-quiz" class="iq-quiz" aria-labelledby="iq-question-title" hidden>
+      <header class="iq-quiz-header">
+        <div class="iq-quiz-meta">
+          <p id="iq-section" class="iq-eyebrow"></p>
+          <p id="iq-progress">Vraag 1 van 24</p>
+        </div>
+        <div class="iq-clock" aria-label="Resterende tijd">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></svg>
+          <output id="iq-timer" aria-live="off">20:00</output>
+        </div>
+        <progress id="iq-progress-bar" max="24" value="0" aria-label="Afgeronde vragen"></progress>
+      </header>
+      <div class="iq-question-heading">
+        <h1 id="iq-question-title" tabindex="-1"></h1>
+        <p id="iq-instruction"></p>
+      </div>
+      <div class="iq-visual" id="iq-visual"></div>
+      <fieldset class="iq-options" id="iq-options">
+        <legend class="iq-sr-only">Kies één antwoord</legend>
+      </fieldset>
+      <footer class="iq-quiz-footer">
+        <p>Geen antwoord? Overslaan mag.<span class="iq-keyboard-hint">Toets 1 tot 6, dan Enter.</span></p>
+        <button class="knop" id="iq-next" type="button">Volgende →</button>
+      </footer>
+      <p class="iq-quiz-disclaimer">Dit is een schatting, geen officieel IQ.</p>
+    </section>
+
+    <section id="iq-results" class="iq-results" aria-labelledby="iq-estimate" hidden>
+      <header class="iq-result-heading">
+        <span class="iq-eyebrow">Je denktest is klaar</span>
+        <p class="iq-result-label">Geschat IQ-bereik · spelindicatie</p>
+        <h1 id="iq-estimate" tabindex="-1"></h1>
+        <p class="iq-result-disclaimer"><strong>Dit is een schatting, geen officieel IQ.</strong><br>Dit bereik komt uit een zelfgekozen spelomrekening van je aantal goede antwoorden. Er is geen vergelijking met een normgroep; de grenzen geven geen meetzekerheid aan. Je kunt hieruit je werkelijke IQ niet afleiden.</p>
+      </header>
+      <div class="iq-result-facts">
+        <div><span>Juiste antwoorden</span><strong id="iq-total-score"></strong></div>
+        <div><span>Tijd gebruikt</span><strong id="iq-time-used"></strong></div>
+      </div>
+      <p class="iq-result-message" id="iq-result-message" role="status"></p>
+      <section class="iq-section-summary" aria-labelledby="iq-section-title">
+        <h2 id="iq-section-title">Zo ging elk onderdeel</h2>
+        <div id="iq-section-results"></div>
+      </section>
+      <div class="iq-result-actions">
+        <button class="knop" id="iq-retry" type="button">Opnieuw doen →</button>
+        <a class="knop-secundair" href="hub.html">Terug naar je space</a>
+      </div>
+      <p class="iq-retry-note">De antwoordvolgorde wisselt. Je kent de vragen nu, dus een volgende score is niet vergelijkbaar.</p>
+      <section class="iq-review-section" aria-labelledby="iq-review-title">
+        <h2 id="iq-review-title">Bekijk de antwoorden</h2>
+        <p>Open een vraag voor het juiste antwoord en de uitleg.</p>
+        <div id="iq-review-list"></div>
+      </section>
+      <p class="iq-local-note">Je antwoorden en score blijven alleen in deze geopende pagina.</p>
+    </section>
+  </main>
+  <noscript><p class="iq-noscript">Zet JavaScript aan om de denktest te gebruiken.</p></noscript>
+</body>
+</html>
