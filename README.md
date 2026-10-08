@@ -411,9 +411,9 @@ De accountkoppeling uit de sectie "Accounts" moet ook zijn ingesteld. Totdat de 
 
 Voeg het voorbeeldvak niet aan de 34 vakken toe. Het sjabloon maakt deze stap compleet; het overzetten van de echte vakinhoud is een volgende opdracht.
 
-## IQ-test, eerste opzet (08-10-2026)
+## IQ-test, oefenversie (08-10-2026)
 
-`referentie/iq-test.html` is een losse, interactieve oefenversie om de vormgeving te beoordelen: een startscherm, zes oorspronkelijke vragen over patronen, getallen en logica, en een uitslag met uitleg per antwoord. De pagina gebruikt de bestaande gedeelde stijl, muisaanwijzer en licht/donkerstand. Antwoorden blijven alleen in het geheugen van de pagina; er worden geen accountgegevens of voortgang opgeslagen. De uitslag is een oefenscore op zes vragen, geen gevalideerde IQ-score. Open de pagina rechtstreeks, lokaal via een server of door erop te dubbelklikken. Er staat nog geen verwijzing in de hub of navigatie. De gedeelde bestanden zijn ongewijzigd; cachenummer 80 blijft behouden.
+`referentie/iq-test.html` bevat 30 oorspronkelijke denkvragen: 8 patronen, 8 getallenreeksen, 7 vragen over ruimtelijk inzicht en 7 over logica. De ronde heeft drie blokken van tien vragen, van opwarmen naar extra uitdaging. Die indeling is een redactionele inschatting, geen gemeten moeilijkheid. Vragen overslaan, teruggaan en antwoorden aanpassen kan via het vragenoverzicht; bij afronden is duidelijk hoeveel vragen openstaan. De uitslag toont goed, onjuist en overgeslagen, een score per onderdeel en uitleg met de juiste figuren. Open vragen blijven meetellen in het totaal en leveren geen punten op. De pagina gebruikt de bestaande gedeelde stijl, muisaanwijzer en licht/donkerstand. Antwoorden blijven alleen in het geheugen van de pagina en verdwijnen bij herladen of stoppen; er worden geen accountgegevens of voortgang opgeslagen. De uitslag is een oefenscore op 30 vragen, geen gevalideerde IQ-score. Open de pagina rechtstreeks, lokaal via een server of door erop te dubbelklikken. Er staat nog geen verwijzing in de hub of navigatie. De gedeelde bestanden zijn ongewijzigd; cachenummer 80 blijft behouden.
 
 ## Animaties
 
