@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#FFFFFF">
+  <meta name="description" content="30 denkvragen over patronen, getallen, ruimtelijk inzicht en logica, met uitleg bij elk antwoord.">
+  <script>
+    (() => {
+      let keuze;
+      try { keuze = localStorage.getItem('bes_thema'); } catch {}
+      const donker = keuze === 'donker' || (keuze !== 'licht' && matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.dataset.theme = donker ? 'dark' : 'light';
+      document.querySelector('meta[name="theme-color"]').content = donker ? '#0B0B0C' : '#FFFFFF';
+    })();
+  </script>
+  <title>IQ-test, oefenversie | Berie's Exam Space</title>
+  <link rel="icon" href="../assets/icoon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css?v=80">
+  <script src="../assets/app.js?v=80" defer></script>
+  <style>
+    .iq-nav { gap: 16px; }
+    .iq-nav .label { margin-left: auto; }
+    .iq-page { padding-bottom: 48px; }
+    .iq-wrap { max-width: 1160px; }
+    .iq-eyebrow { margin: 0 0 18px; color: var(--accent); font-size: .875rem; font-weight: 600; }
+    .iq-hero { display: grid; grid-template-columns: 1.2fr 1fr; gap: 64px; align-items: center; padding: 48px 0 64px; }
+    .iq-hero h1 { margin: 0; font-size: clamp(2.75rem, 4.6vw, 4.5rem); line-height: 1.08; letter-spacing: -.04em; }
+    .iq-hero h1 span { color: var(--grey-title); }
+    .iq-lead { max-width: 35ch; margin: 26px 0; color: var(--ink-soft); font-size: 1.125rem; line-height: 1.65; }
+    .iq-meta { display: flex; flex-wrap: wrap; gap: 10px 24px; padding: 0; margin: 0 0 28px; list-style: none; color: var(--ink-soft); font-size: .875rem; }
+    .iq-meta li { display: inline-flex; align-items: center; gap: 7px; }
+    .iq-meta svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+    .iq-note { margin: 16px 0 0; color: var(--ink-soft); font-size: .8125rem; line-height: 1.6; max-width: 48ch; }
+    .iq-hero .knop { min-height: 52px; }
+    .iq-preview { padding: 30px; position: relative; }
+    .iq-preview-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .iq-preview-top p { margin: 0; font-size: .875rem; font-weight: 600; }
+    .iq-preview-top span { font-size: .75rem; color: var(--ink-soft); }
+    .iq-preview-caption { margin: 22px 0 0; text-align: center; color: var(--ink-soft); font-size: .8125rem; }
+    .iq-matrix { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; width: min(100%, 292px); margin: 24px auto 0; }
+    .iq-tile { display: grid; place-items: center; aspect-ratio: 1; min-width: 0; border-radius: 12px; background: var(--surface); color: var(--ink); }
+    .iq-tile svg { width: 80%; height: 80%; }
+    .iq-tile.iq-missing { border: 1px dashed var(--accent); background: var(--accent-zacht); color: var(--accent); font-size: 2rem; font-weight: 500; }
+    .iq-dot { fill: currentColor; }
+    .iq-outline { fill: none; stroke: currentColor; stroke-width: 5; stroke-linejoin: round; }
+    .iq-topics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px; padding: 28px 0; border-top: 1px solid var(--line); }
+    .iq-topic { display: grid; grid-template-columns: 38px 1fr; gap: 14px; align-items: start; }
+    .iq-topic-icon { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; background: var(--surface); color: var(--ink-soft); font-size: 1rem; font-weight: 600; }
+    .iq-topic h2 { margin: 0 0 7px; font-size: 1rem; font-weight: 600; }
+    .iq-topic p { margin: 0; color: var(--ink-soft); font-size: .875rem; line-height: 1.5; }
+    .iq-test, .iq-results, .iq-finish { max-width: 820px; margin: 20px auto 0; }
+    .iq-level { color: var(--ink-soft); font-size: .75rem; margin-left: 10px; }
+    .iq-shape { width: min(100%, 180px); }
+    .iq-cell { fill: var(--card); stroke: var(--line); stroke-width: 1; }
+    .iq-cell.is-filled { fill: currentColor; stroke: currentColor; }
+    .iq-stage .iq-pattern-matrix { width: min(100%, 320px); }
+    .iq-net { width: min(100%, 270px); }
+    .iq-net text { fill: var(--ink); font: 600 14px var(--font); text-anchor: middle; dominant-baseline: central; }
+    .iq-figure-caption { margin: 12px 0 0; color: var(--ink-soft); font-size: .75rem; text-align: center; }
+    .iq-skip { display: block; margin: 12px auto 0; }
+    .iq-finish h2 { margin: 16px 0; font-size: clamp(2rem, 4vw, 2.75rem); letter-spacing: -.03em; }
+    .iq-finish h2:focus { outline: none; }
+    .iq-finish .kaart { padding: 28px; }
+    .iq-overview { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 10px; margin: 24px 0; }
+    .iq-overview button { min-width: 0; min-height: 48px; border: 1px dashed var(--line); border-radius: 12px; background: var(--surface); color: var(--ink-soft); font: 500 .875rem var(--font); cursor: pointer; transition: transform 160ms var(--ease), border-color 160ms var(--ease); }
+    .iq-overview button.is-answered { border: 1px solid var(--accent); background: var(--accent-zacht); color: var(--accent); }
+    :where(html.has-hover) .iq-overview button:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .iq-overview button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .iq-overview button:active { transform: scale(.98); }
+    .iq-overview button span { display: block; font-size: .65rem; }
+    .iq-finish-note { color: var(--ink-soft); font-size: .875rem; line-height: 1.6; }
+    .iq-test-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .iq-counter { margin: 0; font-size: .875rem; color: var(--ink-soft); }
+    .iq-text-button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 12px; border: 1px solid var(--transparent); border-radius: var(--pill); background: var(--transparent); color: var(--ink-soft); font: 500 .875rem/1.5 var(--font); cursor: pointer; transition: transform 160ms var(--ease), background-color 160ms var(--ease), color 160ms var(--ease); }
+    :where(html.has-hover) .iq-text-button:hover { color: var(--ink); background: var(--surface); transform: translateY(-1px); }
+    .iq-progress { display: block; width: 100%; height: 4px; margin: 8px 0 32px; border: 0; border-radius: 4px; background: var(--surface); overflow: hidden; appearance: none; }
+    .iq-progress::-webkit-progress-bar { background: var(--surface); }
+    .iq-progress::-webkit-progress-value { background: var(--accent); border-radius: 4px; transition: width 180ms var(--ease); }
+    .iq-progress::-moz-progress-bar { background: var(--accent); border-radius: 4px; }
+    .iq-question { padding: clamp(22px, 4vw, 32px); }
+    .iq-question h2 { margin: 14px 0 10px; font-size: clamp(1.5rem, 3vw, 2rem); letter-spacing: -.02em; line-height: 1.25; }
+    .iq-question h2:focus, .iq-results h2:focus, .iq-hero h1:focus { outline: none; }
+    .iq-sub { margin: 0; font-size: .9375rem; line-height: 1.6; color: var(--ink-soft); }
+    .iq-stage { display: grid; place-items: center; margin: 22px 0; }
+    .iq-stage .iq-matrix { margin: 0; width: min(100%, 220px); gap: 8px; }
+    .iq-frames { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); width: 100%; max-width: 520px; gap: 12px; }
+    .iq-sequence { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 24px 12px; border-radius: 16px; background: var(--surface); font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 600; font-variant-numeric: tabular-nums; }
+    .iq-number { min-width: 44px; text-align: center; }
+    .iq-sequence .iq-number:last-child { color: var(--accent); }
+    .iq-statement { margin: 0; width: 100%; padding: 24px; border-radius: 16px; background: var(--surface); font-size: 1.0625rem; line-height: 1.75; }
+    .iq-choices { border: 0; margin: 0; padding: 0; min-width: 0; }
+    .iq-choices legend { padding: 0; margin: 0 0 14px; color: var(--ink-soft); font-size: .8125rem; }
+    .iq-option-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .iq-option { position: relative; display: flex; align-items: center; gap: 14px; min-height: 66px; padding: 15px 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); cursor: pointer; transition: background-color 180ms var(--ease), border-color 180ms var(--ease), transform 180ms var(--ease), box-shadow 180ms var(--ease); }
+    .iq-option input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+    .iq-option:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .iq-option:has(input:checked) { border-color: var(--accent); background: var(--accent-zacht); box-shadow: 0 0 0 1px var(--accent); }
+    :where(html.has-hover) .iq-option:hover { border-color: var(--accent); background: var(--accent-zacht); transform: translateY(-2px); }
+    .iq-option:active { transform: scale(.99); }
+    .iq-option-letter { flex-shrink: 0; display: grid; place-items: center; width: 30px; height: 30px; border: 1px solid var(--line); border-radius: 50%; color: var(--ink-soft); font-size: .75rem; font-weight: 600; }
+    .iq-option:has(input:checked) .iq-option-letter { border-color: var(--accent); background: var(--accent); color: var(--white); }
+    .iq-option-text { font-size: .9375rem; line-height: 1.5; }
+    .iq-option svg { width: 62px; height: 62px; margin: 0 auto; color: var(--ink); }
+    .iq-option-grid.is-visual { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .is-visual .iq-option { flex-direction: column; gap: 6px; padding: 12px; }
+    .is-visual .iq-option-letter { align-self: flex-start; width: 24px; height: 24px; }
+    .iq-actions { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 24px; }
+    .iq-actions .knop-secundair { min-width: 0; }
+    .iq-question-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 18px; }
+    .iq-question-footer p { margin: 0; color: var(--ink-soft); font-size: .75rem; line-height: 1.5; }
+    .iq-results-header { text-align: center; margin-bottom: 28px; }
+    .iq-results-header h2 { font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -.03em; margin: 16px 0 12px; }
+    .iq-results-header p { margin: 0; color: var(--ink-soft); line-height: 1.6; }
+    .iq-score-card { display: grid; grid-template-columns: 200px 1fr; gap: 40px; align-items: center; padding: 32px; }
+    .iq-ring { --score-hoek: 0deg; display: grid; place-items: center; width: 172px; height: 172px; border-radius: 50%; background: conic-gradient(var(--teal) var(--score-hoek), var(--surface) 0); }
+    .iq-ring-inner { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 150px; height: 150px; border-radius: 50%; background: var(--card); }
+    .iq-ring strong { font-size: 3rem; line-height: 1.1; letter-spacing: -.03em; }
+    .iq-ring span { font-size: .8125rem; color: var(--ink-soft); margin-top: 5px; }
+    .iq-breakdown { display: grid; gap: 22px; }
+    .iq-breakdown-row { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; font-size: .875rem; }
+    .iq-breakdown-row span:last-child { color: var(--ink-soft); }
+    .iq-meter { height: 5px; overflow: hidden; border-radius: 4px; background: var(--surface); }
+    .iq-meter span { display: block; height: 100%; border-radius: inherit; background: var(--teal); }
+    .iq-results-note { text-align: center; margin: 18px auto 32px; max-width: 56ch; font-size: .8125rem; color: var(--ink-soft); line-height: 1.6; }
+    .iq-review { margin-top: 48px; }
+    .iq-review h3 { margin: 0 0 20px; font-size: 1.25rem; }
+    .iq-review-list { padding: 0 24px; }
+    .iq-review details + details { border-top: 1px solid var(--line); }
+    .iq-review summary { min-height: 64px; padding: 20px 0; display: flex; justify-content: space-between; align-items: center; gap: 16px; cursor: pointer; list-style: none; font-size: .9375rem; font-weight: 500; }
+    .iq-review summary::-webkit-details-marker { display: none; }
+    .iq-review summary::after { content: '+'; font-size: 1.25rem; color: var(--ink-soft); }
+    .iq-review details[open] summary::after { content: '−'; }
+    .iq-review summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    :where(html.has-hover) .iq-review summary:hover { color: var(--accent); text-decoration: none; }
+    .iq-review summary .label { margin-left: auto; flex-shrink: 0; }
+    .iq-review-body { padding-bottom: 22px; font-size: .9375rem; line-height: 1.65; }
+    .iq-review-body p { margin: 0 0 8px; }
+    .iq-review-body p:last-child { margin-bottom: 0; color: var(--ink-soft); }
+    .iq-review-body .iq-stage { margin: 14px 0; }
+    .iq-review-body .iq-matrix { width: 180px; }
+    .iq-dialog { width: min(440px, calc(100% - 32px)); padding: 28px; border: 1px solid var(--line); border-radius: 20px; background: var(--card); color: var(--ink); box-shadow: var(--shadow-soft); }
+    .iq-dialog::backdrop { background: var(--shadow-far-color); backdrop-filter: blur(6px); }
+    .iq-dialog h2 { margin: 0 0 12px; font-size: 1.5rem; }
+    .iq-dialog p { color: var(--ink-soft); line-height: 1.6; margin: 0; }
+    .iq-dialog .iq-actions { flex-wrap: wrap; }
+    .iq-dialog .knop, .iq-dialog .knop-secundair { flex: 1; min-width: 130px; }
+    .iq-footer { width: min(100% - 48px, 1112px); margin: auto auto 0; padding: 20px 0 28px; display: flex; justify-content: space-between; gap: 20px; color: var(--ink-soft); font-size: .75rem; line-height: 1.6; }
+    .iq-footer p { margin: 0; }
+    .iq-footer p:last-child { text-align: right; }
+    .iq-screen-enter { animation: iq-enter 180ms var(--ease) both; }
+    @keyframes iq-enter { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+    @media (max-width: 767px) {
+      .iq-page { padding-top: 86px; }
+      .iq-hero { grid-template-columns: minmax(0, 1fr); gap: 32px; padding: 22px 0 36px; }
+      .iq-hero h1 { font-size: clamp(2.65rem, 9vw, 4rem); }
+      .iq-lead { margin: 22px 0; font-size: 1rem; }
+      .iq-hero .knop { margin-inline: 0; width: auto; padding-inline: 26px; }
+      .iq-preview { max-width: 460px; width: 100%; margin: auto; padding: 24px; }
+      .iq-topics { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+      .iq-test, .iq-results { margin-top: 0; }
+      .iq-finish .kaart { padding: 20px; }
+      .iq-overview { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+      .iq-finish > .iq-actions { flex-wrap: wrap; }
+      .iq-question { padding: 20px; }
+      .iq-option-grid.is-visual { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .is-visual .iq-option { flex-direction: row; min-height: 80px; }
+      .is-visual .iq-option-letter { align-self: center; }
+      .iq-option-grid.is-text { grid-template-columns: minmax(0, 1fr); }
+      .iq-option { padding: 12px; gap: 10px; }
+      .iq-actions .knop, .iq-actions .knop-secundair { width: auto; max-width: none; margin: 0; min-width: 0; padding-inline: 22px; }
+      .iq-question-footer { align-items: flex-start; }
+      .iq-frames { gap: 8px; }
+      .iq-statement { padding: 18px; font-size: 1rem; }
+      .iq-score-card { grid-template-columns: 1fr; gap: 28px; padding: 28px; }
+      .iq-ring { margin: auto; }
+      .iq-results > .iq-actions { flex-direction: column; }
+      .iq-results > .iq-actions button { width: 100%; max-width: 320px; }
+      .iq-review-list { padding-inline: 18px; }
+      .iq-review summary { font-size: .8125rem; gap: 8px; }
+      .iq-footer { flex-direction: column; gap: 8px; }
+      .iq-footer p:last-child { text-align: left; }
+    }
+    body[data-screen="intro"] .iq-page { display: flex; padding: 76px 0 0; }
+    body[data-screen="intro"] .iq-wrap { display: flex; }
+    #intro { display: flex; flex-direction: column; width: 100%; }
+    body[data-screen="intro"] .iq-hero { flex: 1; gap: 40px; padding: clamp(12px, 2.5dvh, 28px) 0; }
+    body[data-screen="intro"] .iq-hero h1 { font-size: clamp(2.75rem, 6.6dvh, 3.75rem); }
+    body[data-screen="intro"] .iq-eyebrow { margin-bottom: 12px; }
+    body[data-screen="intro"] .iq-lead { max-width: 48ch; margin: 16px 0; font-size: 1.0625rem; line-height: 1.5; }
+    body[data-screen="intro"] .iq-meta { margin-bottom: 20px; }
+    body[data-screen="intro"] .iq-note { margin-top: 12px; line-height: 1.5; }
+    body[data-screen="intro"] .iq-topics { padding: 16px 0; gap: 20px; }
+    body[data-screen="intro"] .iq-footer { padding: 12px 0; }
+    @media (max-height: 760px) and (min-width: 768px) {
+      body[data-screen="intro"] .iq-page { padding-top: 68px; }
+      body[data-screen="intro"] .iq-hero h1 { font-size: 2.75rem; }
+      body[data-screen="intro"] .iq-preview { padding: 22px; }
+      body[data-screen="intro"] .iq-preview .iq-matrix { width: min(100%, 32dvh); margin-top: 16px; }
+      body[data-screen="intro"] .iq-topics p { display: none; }
+      body[data-screen="intro"] .iq-topic { align-items: center; }
+      body[data-screen="intro"] .iq-topic h2 { margin: 0; }
+    }
+    @media (max-width: 767px) {
+      body[data-screen="intro"] .iq-page { padding-top: 72px; }
+      body[data-screen="intro"] .iq-hero { display: flex; align-items: center; padding: 12px 0 16px; }
+      body[data-screen="intro"] .iq-hero > div:first-child { width: 100%; }
+      body[data-screen="intro"] .iq-hero h1 { font-size: clamp(1.875rem, 5.2dvh, 2.5rem); }
+      body[data-screen="intro"] .iq-eyebrow { font-size: .8125rem; }
+      body[data-screen="intro"] .iq-lead { margin: 12px 0 16px; font-size: .9375rem; }
+      body[data-screen="intro"] .iq-meta { gap: 8px 14px; margin-bottom: 18px; font-size: .75rem; }
+      body[data-screen="intro"] .iq-meta svg { display: none; }
+      body[data-screen="intro"] .iq-hero .knop { min-height: 48px; }
+      body[data-screen="intro"] .iq-note { font-size: .75rem; }
+      body[data-screen="intro"] .iq-preview { display: none; }
+      body[data-screen="intro"] .iq-topics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; padding: 14px 0; }
+      body[data-screen="intro"] .iq-topic { grid-template-columns: 26px 1fr; align-items: center; gap: 8px; }
+      body[data-screen="intro"] .iq-topic-icon { width: 26px; height: 26px; border-radius: 8px; font-size: .75rem; }
+      body[data-screen="intro"] .iq-topic h2 { margin: 0; font-size: .75rem; }
+      body[data-screen="intro"] .iq-topic p { display: none; }
+      body[data-screen="intro"] .iq-footer { padding: 8px 0 12px; font-size: .6875rem; }
+      body[data-screen="intro"] .iq-footer p:first-child { display: none; }
+    }
+    @media (max-width: 767px) and (max-height: 700px) {
+      body[data-screen="intro"] .iq-eyebrow { display: none; }
+      body[data-screen="intro"] .iq-hero h1 { font-size: 1.875rem; }
+      body[data-screen="intro"] .iq-hero h1 span br { display: none; }
+    }
+    @media (max-width: 767px) and (max-height: 600px) {
+      body[data-screen="intro"] .iq-page { padding-top: 64px; }
+      body[data-screen="intro"] .iq-hero { padding: 8px 0 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .iq-screen-enter { animation: none; }
+      .iq-option, .iq-text-button, .iq-overview button, .iq-progress::-webkit-progress-value { transition: none; }
+      .iq-option:hover, .iq-option:active, .iq-text-button:hover, .iq-overview button:hover, .iq-overview button:active { transform: none; }
+    }
+  </style>
+</head>
+<body data-nav="vast" data-screen="intro">
+  <a class="skip-link" href="#inhoud">Ga naar inhoud</a>
+  <header class="site-header">
+    <nav class="navigation iq-nav" aria-label="Hoofdnavigatie">
+      <a class="brand" href="../index.html" aria-label="Berie's Exam Space, startpagina">
+        <span class="brand-symbol" aria-hidden="true">B</span>
+        <span class="brand-name"><span>Berie's</span> <span>Exam Space</span></span>
+      </a>
+      <span class="label gedimd">Oefenversie</span>
+    </nav>
+  </header>
+  <main class="pagina iq-page" id="inhoud">
+    <div class="wrap iq-wrap">
+      <section id="intro" aria-labelledby="intro-title">
+        <div class="iq-hero">
+          <div>
+            <p class="iq-eyebrow">Een nieuwe uitdaging in jouw space</p>
+            <h1 id="intro-title" tabindex="-1">IQ-test.<br><span>Daag je<br> denken uit.</span></h1>
+            <p class="iq-lead">Herken patronen, draai vormen in je hoofd en leg verbanden. 30 vragen die steeds uitdagender worden, op jouw tempo.</p>
+            <ul class="iq-meta">
+              <li><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="2" width="14" height="16" rx="3"/><path d="M6 7h8M6 11h8M6 15h5"/></svg><span data-total>30</span> vragen</li>
+              <li><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M10 5v5l3 2"/></svg>Zonder tijdsdruk</li>
+              <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m3 10 4 4L17 4"/></svg>Uitleg achteraf</li>
+            </ul>
+            <button class="knop" id="start" type="button">Begin de test →</button>
+            <p class="iq-note">Je kunt overslaan en teruggaan. Je krijgt een oefenscore, geen IQ-getal. Antwoorden blijven alleen in deze geopende pagina.</p>
+          </div>
+          <div class="kaart iq-preview">
+            <div class="iq-preview-top"><p>Zie jij het patroon?</p><span>Een voorproefje</span></div>
+            <div id="preview-pattern"></div>
+            <p class="iq-preview-caption">Kijk rustig. Soms zie je het ineens.</p>
+          </div>
+        </div>
+        <div class="iq-topics" aria-label="De vier onderdelen">
+          <div class="iq-topic"><span class="iq-topic-icon" aria-hidden="true">◫</span><div><h2>Patronen</h2><p>Ontdek de regel achter vormen.</p></div></div>
+          <div class="iq-topic"><span class="iq-topic-icon" aria-hidden="true">123</span><div><h2>Getallen</h2><p>Vind de volgende stap in een reeks.</p></div></div>
+          <div class="iq-topic"><span class="iq-topic-icon" aria-hidden="true">↻</span><div><h2>Ruimtelijk inzicht</h2><p>Draai, spiegel en vouw in gedachten.</p></div></div>
+          <div class="iq-topic"><span class="iq-topic-icon" aria-hidden="true">↗</span><div><h2>Logica</h2><p>Leg verbanden en trek conclusies.</p></div></div>
+        </div>
+        <noscript><p class="kaart">Schakel JavaScript in om deze oefenversie te proberen.</p></noscript>
+      </section>
+      <section class="iq-test" id="test" aria-labelledby="question-title" hidden>
+        <div class="iq-test-top"><p class="iq-counter" id="counter"></p><button class="iq-text-button" id="stop" type="button">Stoppen</button></div>
+        <progress class="iq-progress" id="progress" max="30" value="0" aria-label="Beantwoorde vragen"></progress>
+        <form id="question-form">
+          <div class="kaart iq-question">
+            <span class="label gedimd" id="category"></span><span class="iq-level" id="level"></span>
+            <h2 id="question-title" tabindex="-1"></h2>
+            <p class="iq-sub" id="question-hint"></p>
+            <div class="iq-stage" id="question-stage"></div>
+            <fieldset class="iq-choices"><legend>Kies één antwoord</legend><div class="iq-option-grid" id="options"></div></fieldset>
+          </div>
+          <div class="iq-actions"><button class="knop-secundair" id="previous" type="button">← Vorige</button><button class="knop" id="next" type="submit" disabled>Volgende →</button></div>
+          <button class="iq-text-button iq-skip" id="skip" type="button">Later beantwoorden</button>
+        </form>
+        <div class="iq-question-footer"><button class="iq-text-button" id="overview" type="button">Vragenoverzicht</button><p>Oefenversie · geen IQ-meting</p></div>
+      </section>
+      <section class="iq-finish" id="finish" aria-labelledby="finish-title" hidden>
+        <span class="label gedimd">Jouw ronde</span><h2 id="finish-title" tabindex="-1">Nog even nalopen.</h2>
+        <div class="kaart">
+          <p class="iq-sub" id="finish-status"></p>
+          <div class="iq-overview" id="question-overview" role="group" aria-label="Ga naar een vraag"></div>
+          <p class="iq-finish-note">Blauw met een vinkje is beantwoord. Een open vakje wacht nog op een antwoord. Klik op een nummer om je keuze te bekijken of aan te passen.</p>
+        </div>
+        <p class="iq-finish-note" id="finish-note"></p>
+        <div class="iq-actions"><button class="knop-secundair" id="continue" type="button">Verder met vragen →</button><button class="knop" id="complete" type="button">Bekijk uitslag →</button></div>
+      </section>
+      <section class="iq-results" id="results" aria-labelledby="results-title" hidden>
+        <header class="iq-results-header"><span class="label">Afgerond</span><h2 id="results-title" tabindex="-1">Je ronde zit erop.</h2><p id="result-summary"></p></header>
+        <div class="kaart iq-score-card">
+          <div class="iq-ring" id="score-ring"><div class="iq-ring-inner"><strong id="score"></strong><span>van <span data-total>30</span> goed</span></div></div>
+          <div class="iq-breakdown" id="breakdown"></div>
+        </div>
+        <p class="iq-results-note">Dit is je score op deze oefenvragen, geen IQ-score of vergelijking met andere studenten.</p>
+        <div class="iq-actions"><button class="knop-secundair" id="home" type="button">Terug naar het begin</button><button class="knop" id="retry" type="button">Nog eens proberen →</button></div>
+        <section class="iq-review" aria-labelledby="review-title"><h3 id="review-title">Zo zit het in elkaar</h3><div class="kaart iq-review-list" id="review"></div></section>
+      </section>
+    </div>
+  </main>
+  <footer class="iq-footer"><p>Berie's Exam Space · IQ-test, oefenversie</p><p>Duidelijk leren. Rustig groeien.<br>Een project van The Berie Foundation</p></footer>
+  <dialog class="iq-dialog" id="stop-dialog" aria-labelledby="stop-title" aria-describedby="stop-description">
+    <h2 id="stop-title">Even stoppen?</h2><p id="stop-description">Je gaat terug naar het begin. Je antwoorden van deze ronde worden gewist.</p>
+    <div class="iq-actions"><button class="knop-secundair" id="stop-confirm" type="button">Stoppen</button><button class="knop" id="stop-cancel" type="button" autofocus>Verdergaan</button></div>
+  </dialog>
+  <script>
+    (() => {
+      'use strict';
+      const questions = [
+        {"category":"Patronen","title":"Welk vakje ontbreekt?","hint":"Bekijk de rijen en de kolommen.","type":"dots","options":[4,6,5,7],"answer":2,"explanation":"Bij elke stap naar rechts of naar beneden komt er één stip bij. In het lege vak horen vijf stippen.","id":"p1","level":1},
+        {"id":"extra-getallen-1","category":"Getallen","level":1,"title":"Een vaste stap","hint":"Vergelijk elk getal met het getal ervoor.","type":"numbers","sequence":[6,11,16,21],"options":["24","25","26","27"],"answer":2,"explanation":"Er komt steeds 5 bij: 6, 11, 16, 21. Het volgende getal is dus 21 + 5 = 26."},
+        {"id":"s1","category":"Ruimtelijk inzicht","level":1,"title":"Draai de vorm een kwartslag.","hint":"Welke vorm krijg je na 90° met de klok mee?","type":"shape","source":[0,3,6,7],"options":[[1,2,5,8],[0,1,2,3],[2,5,7,8],[5,6,7,8]],"answer":1,"explanation":"De lange linkerzijde komt bovenaan te liggen. Het extra blokje middenonder komt middenlinks. De vorm zelf blijft gelijk."},
+        {"category":"Logica","title":"Wat weet je zeker?","hint":"Gebruik alleen de informatie hieronder.","type":"text","statement":"Alle kaarten met een ster hebben een blauwe rand. Geen kaart met een blauwe rand is gevouwen.","options":["Alle kaarten zonder ster zijn gevouwen.","Sommige gevouwen kaarten hebben een ster.","Geen kaart met een ster is gevouwen.","Elke kaart met een blauwe rand heeft een ster."],"answer":2,"explanation":"Een kaart met een ster heeft een blauwe rand. Kaarten met een blauwe rand zijn nooit gevouwen, dus kaarten met een ster ook niet.","id":"l1","level":1},
+        {"category":"Patronen","title":"Welke kaart komt hierna?","hint":"Let op de plaats van beide vormen.","type":"rotation","options":[0,2,1,3],"answer":3,"explanation":"De twee vormen schuiven telkens een kwartslag met de klok mee. Daarna staat de cirkel links en het vierkant rechts.","id":"p2","level":1},
+        {"id":"extra-getallen-2","category":"Getallen","level":1,"title":"Steeds kleiner","hint":"Welke deling geeft steeds het volgende getal?","type":"numbers","sequence":[96,48,24,12],"options":["6","3","8","4"],"answer":0,"explanation":"Elk getal is de helft van het vorige. Na 12 komt daarom 12 ÷ 2 = 6."},
+        {"category":"Logica","title":"Welke presentatie is als derde?","hint":"Zet de vier presentaties in de juiste volgorde.","type":"text","statement":"Vier presentaties, A, B, C en D, volgen elkaar op. A komt direct vóór B. C komt vóór A. D komt na B.","options":["Presentatie A","Presentatie B","Presentatie C","Presentatie D"],"answer":1,"explanation":"De enige mogelijke volgorde is C, A, B, D. Presentatie B is dus als derde.","id":"l2","level":1},
+        {"id":"p3","category":"Patronen","level":1,"title":"Waar komt het blokje?","hint":"Zoek de terugkerende volgorde in elke rij.","type":"pattern","tiles":[[0],[1],[2],[1],[2],[0],[2],[0],null],"options":[[2],[1],[0],[4]],"answer":1,"explanation":"Het blokje schuift bovenaan telkens één plek naar rechts. Na rechts begint het weer links. De laatste rij is rechts, links, midden."},
+        {"id":"extra-logica-1","category":"Logica","level":1,"title":"Een noodzakelijke voorwaarde","hint":"Welke voorwaarde moet in elk geval vervuld zijn voordat de ventilator kan draaien?","type":"text","statement":"Een ventilator kan alleen draaien als zowel schakelaar X als schakelaar Y aanstaat. Schakelaar X staat uit. Wat volgt zeker?","options":["De ventilator draait op lage snelheid.","De ventilator draait niet.","Schakelaar Y staat ook uit.","Schakelaar Y staat aan."],"answer":1,"explanation":"Om te kunnen draaien moeten beide schakelaars aanstaan. X staat uit, dus aan die noodzakelijke voorwaarde is niet voldaan. De ventilator draait niet. Over de stand van Y is niets gegeven."},
+        {"id":"p4","category":"Patronen","level":1,"title":"Welke tegel maakt de rij af?","hint":"In elke rij gebeurt hetzelfde met de eerste twee tegels.","type":"pattern","tiles":[[0],[2],[0,2],[3],[5],[3,5],[6],[8],null],"options":[[6,7,8],[0,2],[6,8],[6]],"answer":2,"explanation":"De derde tegel bevat alle gevulde vakjes van de eerste twee tegels samen. Onderaan zijn dat het vakje linksonder en het vakje rechtsonder."},
+        {"id":"p5","category":"Patronen","level":2,"title":"Wat blijft er over?","hint":"Zoek één regel die bij de eerste twee rijen past.","type":"pattern","tiles":[[0,1,3],[1,2,3],[0,2],[3,4,6],[4,5,6],[3,5],[6,7,8],[0,7,8],null],"options":[[0,6],[0,6,7,8],[7,8],[0,8]],"answer":0,"explanation":"Vakjes die in beide eerste tegels gevuld zijn, vallen weg. Alleen vakjes die in precies één van beide gevuld zijn, blijven over. In de laatste rij blijven linksboven en linksonder gevuld."},
+        {"category":"Getallen","title":"Welk getal volgt?","hint":"Zoek de regel tussen de getallen.","type":"numbers","sequence":[4,7,13,22,34],"options":["46","49","48","52"],"answer":1,"explanation":"De verschillen zijn 3, 6, 9 en 12. Het volgende verschil is 15, dus 34 + 15 = 49.","id":"n1","level":2},
+        {"id":"s2","category":"Ruimtelijk inzicht","level":2,"title":"Kijk in de spiegel.","hint":"Spiegel van links naar rechts. Boven en onder blijven gelijk.","type":"shape","source":[0,1,4,7],"options":[[1,4,7,8],[0,1,4,7],[2,3,4,5],[1,2,4,7]],"answer":3,"explanation":"Bij links-rechts spiegelen wisselen de buitenste kolommen. Het blokje linksboven komt rechtsboven; de middelste kolom blijft op dezelfde plaats."},
+        {"id":"extra-logica-2","category":"Logica","level":2,"title":"Terug door de voorwaarden","hint":"Redeneer vanaf controle R terug door de twee voorwaarden.","type":"text","statement":"Voor drie controlehandelingen geldt: als controle P is uitgevoerd, is ook Q uitgevoerd. Als Q is uitgevoerd, is ook R uitgevoerd. Controle R is niet uitgevoerd. Wat volgt zeker?","options":["P en Q zijn niet uitgevoerd.","P is uitgevoerd, Q niet.","Q is uitgevoerd, P niet.","P en Q zijn uitgevoerd."],"answer":0,"explanation":"Q kan niet zijn uitgevoerd, want dan zou R ook zijn uitgevoerd. P kan evenmin zijn uitgevoerd, want dan zou Q zijn uitgevoerd. Dus P en Q zijn allebei niet uitgevoerd."},
+        {"id":"p6","category":"Patronen","level":2,"title":"Hoe draait het patroon verder?","hint":"Dezelfde beweging herhaalt zich binnen elke rij.","type":"pattern","tiles":[[0,3,6,7],[0,1,2,3],[1,2,5,8],[0,1,4],[2,4,5],[4,7,8],[0,1,4,7],[2,3,4,5],null],"options":[[2,3,4,5],[1,2,4,7],[0,1,4,7],[1,4,7,8]],"answer":3,"explanation":"Elke tegel is de vorige tegel een kwartslag met de klok mee gedraaid. De ontbrekende tegel is dus de eerste tegel van die rij een halve slag gedraaid."},
+        {"category":"Getallen","title":"Wat is de volgende stap?","hint":"Niet elke stap hoeft dezelfde bewerking te zijn.","type":"numbers","sequence":[3,6,5,10,9,18],"options":["17","19","36","16"],"answer":0,"explanation":"De bewerkingen wisselen elkaar af: verdubbelen en één aftrekken. Na 18 volgt daarom 17.","id":"n2","level":2},
+        {"id":"s3","category":"Ruimtelijk inzicht","level":2,"title":"Draai de vorm een halve slag.","hint":"Welke vorm krijg je na 180° draaien?","type":"shape","source":[0,1,4,5,8],"options":[[0,3,4,7,8],[2,4,5,6,7],[1,2,3,4,6],[0,1,4,5,8]],"answer":0,"explanation":"Bij een halve slag wisselen boven en onder én links en rechts. Het vakje rechtsboven blijft leeg, en de gevulde trap loopt van linksboven via het midden naar rechtsonder."},
+        {"id":"extra-logica-3","category":"Logica","level":2,"title":"Drie opschriften","hint":"Vergelijk eerst het opschrift van doos A met dat van doos C.","type":"text","statement":"In precies één van drie dozen A, B en C ligt een sleutel. Op A staat: ‘De sleutel ligt in A.’ Op B staat: ‘De sleutel ligt niet in B.’ Op C staat: ‘De sleutel ligt niet in A.’ Precies één opschrift is waar. Waar ligt de sleutel?","options":["Doos C.","Dit is niet te bepalen.","Doos A.","Doos B."],"answer":3,"explanation":"De opschriften van A en C spreken elkaar precies tegen: daarvan is er altijd één waar. Omdat in totaal maar één opschrift waar is, moet het opschrift van B onwaar zijn. De sleutel ligt dus in B."},
+        {"id":"extra-getallen-3","category":"Getallen","level":2,"title":"Groeiende sprongen","hint":"Schrijf de verschillen tussen opeenvolgende getallen op.","type":"numbers","sequence":[2,5,10,17,26],"options":["35","36","38","37"],"answer":3,"explanation":"De verschillen zijn 3, 5, 7 en 9: telkens 2 groter. De volgende sprong is 11, dus het volgende getal is 26 + 11 = 37."},
+        {"id":"s4","category":"Ruimtelijk inzicht","level":2,"title":"Spiegel en draai.","hint":"Spiegel eerst links-rechts. Draai daarna 90° met de klok mee.","type":"shape","source":[0,1,3,4,6],"options":[[0,1,2,4,5],[0,1,2,3,4],[2,4,5,7,8],[4,5,6,7,8]],"answer":3,"explanation":"Na links-rechts spiegelen staan rechts drie blokjes en in de middelste kolom de bovenste twee. Na een kwartslag met de klok mee is de onderste rij helemaal gevuld en staan in de middelste rij de twee rechterblokjes."},
+        {"id":"p7","category":"Patronen","level":3,"title":"Welke combinatie klopt?","hint":"Zoek de twee bewerkingen die samen elke rij verklaren.","type":"pattern","tiles":[[0,1,3,4],[1,2,4,5],[4,5],[3,4,6,7],[0,1,3,4],[1,4],[1,4,5,7,8],[0,3,4,6,7],null],"options":[[4,7],[4,5],[3,4],[1,4]],"answer":2,"explanation":"Neem eerst alleen de vakjes die in beide tegels gevuld zijn. Draai dat resultaat daarna een kwartslag met de klok mee. Onderaan overlappen midden en middenonder; na draaien worden dat middenlinks en midden."},
+        {"id":"extra-getallen-4","category":"Getallen","level":3,"title":"Twee voorgangers","hint":"Gebruik vanaf het derde getal steeds de twee getallen ervoor, met dezelfde regel.","type":"numbers","sequence":[2,3,8,19,46],"options":["103","111","114","119"],"answer":1,"explanation":"Verdubbel steeds het vorige getal en tel het getal daarvoor erbij op: 2 × 3 + 2 = 8, 2 × 8 + 3 = 19 en 2 × 19 + 8 = 46. Daarna volgt 2 × 46 + 19 = 111."},
+        {"id":"s5","category":"Ruimtelijk inzicht","level":3,"title":"Welke vlakken ontmoeten elkaar?","hint":"Vouw dit net tot een kubus. Welke drie vlakken raken samen één hoekpunt?","type":"net","net":[{"x":1,"y":0,"t":"A"},{"x":0,"y":1,"t":"B"},{"x":1,"y":1,"t":"C"},{"x":2,"y":1,"t":"D"},{"x":3,"y":1,"t":"E"},{"x":1,"y":2,"t":"F"}],"options":["A, C en F","B, C en D","A, C en E","A, B en C"],"answer":3,"explanation":"Bij het vouwen komen A en F tegenover elkaar, B en D tegenover elkaar en C en E tegenover elkaar. A, B en C vormen samen één hoek. Elke andere optie bevat twee tegenoverliggende vlakken."},
+        {"id":"extra-logica-4","category":"Logica","level":3,"title":"Steeds twee lampen","hint":"Bekijk welke standen je met deze drie knoppen kunt bereiken.","type":"text","statement":"Drie lampen staan aanvankelijk uit. Knop X wisselt de stand van de linker en middelste lamp; knop Y die van de middelste en rechter; knop Z die van de linker en rechter. Wisselen betekent: aan wordt uit en uit wordt aan. Je mag elke knop zo vaak indrukken als je wilt. Welke eindstand is onmogelijk?","options":["Alleen de linker en middelste lamp branden.","Alle lampen staan uit.","Alle drie de lampen branden.","Alleen de middelste en rechter lamp branden."],"answer":2,"explanation":"Elke druk wisselt twee lampen. Het aantal brandende lampen verandert daardoor met 2, met −2 of helemaal niet. Vanuit 0 blijft dat aantal dus even; 3 is onmogelijk. De andere standen bereik je met respectievelijk X, geen druk (of tweemaal X), en Y."},
+        {"id":"p8","category":"Patronen","level":3,"title":"Welke tegel ontbreekt?","hint":"De derde tegel volgt in elke rij dezelfde regel.","type":"pattern","tiles":[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,2,4,6],[1,4,7],null],"options":[[4],[3,5,8],[0,1,2,4,6,7],[3,5]],"answer":1,"explanation":"In de derde tegel worden precies de vakjes gevuld die in beide eerste tegels leeg zijn. In de laatste rij zijn dat middenlinks, middenrechts en rechtsonder."},
+        {"id":"extra-getallen-5","category":"Getallen","level":3,"title":"Twee bewerkingen","hint":"Er wisselen twee soorten bewerkingen af. Bekijk ze in paren.","type":"numbers","sequence":[5,10,8,24,21,84],"options":["80","81","82","79"],"answer":0,"explanation":"De bewerkingen zijn achtereenvolgens × 2, − 2, × 3, − 3 en × 4. Elk paar gebruikt hetzelfde getal; per paar wordt dat getal 1 groter. Nu volgt − 4, dus 84 − 4 = 80."},
+        {"id":"s6","category":"Ruimtelijk inzicht","level":3,"title":"Wat komt aan de achterkant?","hint":"Vouw dit net tot een kubus. B ligt boven en C ligt voor. Welk vlak ligt achter?","type":"net","net":[{"x":0,"y":0,"t":"A"},{"x":1,"y":0,"t":"B"},{"x":1,"y":1,"t":"C"},{"x":1,"y":2,"t":"D"},{"x":2,"y":2,"t":"E"},{"x":1,"y":3,"t":"F"}],"options":["D","E","F","A"],"answer":2,"explanation":"De strook B, C, D, F loopt rondom de kubus: boven, voor, onder, achter. F komt daarom tegenover C te liggen. A en E worden de zijkanten."},
+        {"id":"extra-logica-5","category":"Logica","level":3,"title":"Drie bestanden selecteren","hint":"Gebruik alle voorwaarden samen.","type":"text","statement":"Uit vijf bestanden A, B, C, D en E worden precies drie bestanden geselecteerd. A en B worden óf allebei geselecteerd óf allebei niet geselecteerd. Van C en D wordt precies één bestand geselecteerd. Wat volgt zeker?","options":["Bestand A wordt niet geselecteerd.","Bestand E wordt niet geselecteerd.","Bestand C wordt geselecteerd.","Bestand D wordt geselecteerd."],"answer":1,"explanation":"Zonder A en B kun je hoogstens twee bestanden selecteren: één van C en D, plus E. Daarom moeten A en B allebei geselecteerd zijn. Samen met precies één van C en D zijn dat al drie bestanden, dus E wordt niet geselecteerd."},
+        {"id":"extra-getallen-6","category":"Getallen","level":3,"title":"Sprongen met een patroon","hint":"Bereken eerst de verschillen. Onderzoek daarna hoe elk verschil uit het vorige ontstaat.","type":"numbers","sequence":[1,2,4,10,34],"options":["130","144","154","170"],"answer":2,"explanation":"De verschillen zijn 1, 2, 6 en 24. Ze ontstaan achtereenvolgens door × 2, × 3 en × 4. Het volgende verschil is 24 × 5 = 120, dus het volgende getal is 34 + 120 = 154."},
+        {"id":"s7","category":"Ruimtelijk inzicht","level":3,"title":"Maak de spiegeling af.","hint":"Vul alleen de rechterhelft aan. De linkerhelft blijft onveranderd en de hele tegel wordt links-rechts symmetrisch.","type":"shape","size":4,"source":[0,5,8,12,13],"options":[[0,3,5,6,8,11,12,13,14,15],[0,3,5,6,8,11,12,13],[0,2,5,7,8,10,12,13,14,15],[0,1,2,3,4,7,9,10,12,15]],"answer":0,"explanation":"Elke rij wordt gespiegeld rond de verticale middenlijn. Rij 1 en 3 krijgen beide buitenste vakjes, rij 2 beide middelste vakjes en rij 4 alle vier de vakjes."}
+      ];
+      const $ = id => document.getElementById(id);
+      const positions = { 1: [[50,50]], 2: [[32,32],[68,68]], 3: [[28,28],[50,50],[72,72]], 4: [[28,28],[72,28],[28,72],[72,72]], 5: [[28,28],[72,28],[50,50],[28,72],[72,72]], 6: [[28,26],[72,26],[28,50],[72,50],[28,74],[72,74]], 7: [[28,26],[72,26],[28,50],[50,50],[72,50],[28,74],[72,74]] };
+      const dots = n => `<svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">${positions[n].map(([x,y]) => `<circle class="iq-dot" cx="${x}" cy="${y}" r="7"/>`).join('')}</svg>`;
+      const pair = rotation => `<svg viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g transform="rotate(${rotation * 90} 50 50)"><circle class="iq-dot" cx="50" cy="25" r="11"/><rect class="iq-outline" x="40" y="65" width="20" height="20" rx="1"/></g></svg>`;
+      const pairLabels = ['Cirkel boven, vierkant onder', 'Cirkel rechts, vierkant links', 'Cirkel onder, vierkant boven', 'Cirkel links, vierkant rechts'];
+      const categories = ['Patronen', 'Getallen', 'Ruimtelijk inzicht', 'Logica'];
+      const levels = ['Opwarmen', 'Verder denken', 'Extra uitdaging'];
+      const shape = (cells, size = 3) => `<svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">${Array.from({length: size * size}, (_, i) => `<rect class="iq-cell${cells.includes(i) ? ' is-filled' : ''}" x="${6 + (i % size) * 88 / size}" y="${6 + Math.floor(i / size) * 88 / size}" width="${88 / size - 3}" height="${88 / size - 3}" rx="2"/>`).join('')}</svg>`;
+      const cellText = (cells, size = 3) => 'Gevulde vakjes: ' + cells.map(i => `rij ${Math.floor(i / size) + 1}, kolom ${i % size + 1}`).join('; ');
+      const netText = net => net.map(face => `${face.t}: rij ${face.y + 1}, kolom ${face.x + 1}`).join('; ');
+      const netSvg = net => `<svg class="iq-net" viewBox="0 0 ${(Math.max(...net.map(f => f.x)) + 1) * 44 + 4} ${(Math.max(...net.map(f => f.y)) + 1) * 44 + 4}" role="img" aria-label="Kubusnet. ${netText(net)}">${net.map(f => `<rect class="iq-cell" x="${f.x * 44 + 2}" y="${f.y * 44 + 2}" width="44" height="44"/><text x="${f.x * 44 + 24}" y="${f.y * 44 + 24}">${f.t}</text>`).join('')}</svg>`;
+      const matrix = () => `<div class="iq-matrix" role="img" aria-label="Raster van drie bij drie. Bovenste rij: één, twee, drie stippen. Middelste rij: twee, drie, vier stippen. Onderste rij: drie, vier stippen en een ontbrekend vak.">${[1,2,3,2,3,4,3,4,null].map(n => n ? `<div class="iq-tile">${dots(n)}</div>` : '<div class="iq-tile iq-missing" aria-hidden="true">?</div>').join('')}</div>`;
+      const visual = question => {
+        if (question.type === 'shape') return `<div class="iq-shape" role="img" aria-label="Raster van ${question.size || 3} bij ${question.size || 3}. ${cellText(question.source, question.size)}">${shape(question.source, question.size)}</div>`;
+        if (question.type === 'net') return netSvg(question.net);
+        if (question.type === 'pattern') return `<div class="iq-matrix iq-pattern-matrix" role="img" aria-label="Negen tegels in drie rijen. Elke tegel heeft drie bij drie vakjes. ${question.tiles.map((cells, i) => `Tegel ${i + 1}: ${cells ? cellText(cells) : 'ontbreekt'}`).join('. ')}">${question.tiles.map(cells => cells ? `<div class="iq-tile">${shape(cells)}</div>` : '<div class="iq-tile iq-missing" aria-hidden="true">?</div>').join('')}</div>`;
+        if (question.type === 'dots') return matrix();
+        if (question.type === 'rotation') return `<div class="iq-frames" role="img" aria-label="Kaart één: cirkel boven, vierkant onder. Kaart twee: cirkel rechts, vierkant links. Kaart drie: cirkel onder, vierkant boven. Daarna een ontbrekende kaart.">${[0,1,2].map(n => `<div class="iq-tile">${pair(n)}</div>`).join('')}<div class="iq-tile iq-missing" aria-hidden="true">?</div></div>`;
+        if (question.type === 'numbers') return `<div class="iq-sequence" role="img" aria-label="Getallenreeks: ${question.sequence.join(', ')}, vraagteken.">${[...question.sequence, '?'].map(n => `<span class="iq-number" aria-hidden="true">${n}</span>`).join('')}</div>`;
+        const p = document.createElement('p');
+        p.className = 'iq-statement';
+        p.textContent = question.statement;
+        return p.outerHTML;
+      };
+      const isVisual = q => ['dots', 'rotation', 'shape', 'pattern'].includes(q.type);
+      const optionImage = (q, n) => q.type === 'dots' ? dots(q.options[n]) : q.type === 'rotation' ? pair(q.options[n]) : shape(q.options[n], q.size);
+      const optionText = (q, n) => n === null ? 'Geen antwoord' : q.type === 'dots' ? `${q.options[n]} stippen` : q.type === 'rotation' ? pairLabels[q.options[n]] : ['shape', 'pattern'].includes(q.type) ? cellText(q.options[n], q.size) : q.options[n];
+      document.querySelectorAll('[data-total]').forEach(el => { el.textContent = questions.length; });
+      $('progress').max = questions.length;
+      let current = 0;
+      let answers = Array(questions.length).fill(null);
+      let screen = 'intro';
+      function show(id, focusId) {
+        screen = id;
+        document.body.dataset.screen = id;
+        ['intro','test','finish','results'].forEach(name => { $(name).hidden = name !== id; });
+        const element = $(id);
+        element.classList.remove('iq-screen-enter');
+        void element.offsetWidth;
+        element.classList.add('iq-screen-enter');
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        $(focusId).focus({ preventScroll: true });
+      }
+      function renderQuestion() {
+        const q = questions[current];
+        $('counter').textContent = `Vraag ${current + 1} van ${questions.length}`;
+        $('progress').value = answers.filter(answer => answer !== null).length;
+        $('category').textContent = q.category;
+        $('level').textContent = levels[q.level - 1];
+        $('question-title').textContent = q.title;
+        $('question-hint').textContent = q.hint;
+        $('question-stage').innerHTML = visual(q);
+        $('options').className = 'iq-option-grid' + (isVisual(q) ? ' is-visual' : q.type === 'text' ? ' is-text' : '');
+        $('options').replaceChildren();
+        q.options.forEach((option, index) => {
+          const label = document.createElement('label');
+          label.className = 'iq-option';
+          const input = document.createElement('input');
+          input.type = 'radio'; input.name = 'answer'; input.value = index; input.checked = answers[current] === index;
+          input.setAttribute('aria-label', `${String.fromCharCode(65 + index)}. ${optionText(q, index)}`);
+          const letter = document.createElement('span');
+          letter.className = 'iq-option-letter'; letter.textContent = String.fromCharCode(65 + index); letter.setAttribute('aria-hidden','true');
+          label.append(input, letter);
+          if (isVisual(q)) label.insertAdjacentHTML('beforeend', optionImage(q, index));
+          else { const text = document.createElement('span'); text.className = 'iq-option-text'; text.textContent = option; label.append(text); }
+          input.addEventListener('change', () => {
+            answers[current] = index;
+            $('next').disabled = false;
+            $('progress').value = answers.filter(answer => answer !== null).length;
+            $('skip').hidden = true;
+          });
+          $('options').append(label);
+        });
+        $('previous').textContent = current === 0 ? '← Begin' : '← Vorige';
+        $('next').textContent = current === questions.length - 1 ? 'Naar overzicht →' : 'Volgende →';
+        $('next').disabled = answers[current] === null;
+        $('skip').hidden = answers[current] !== null;
+        show('test', 'question-title');
+      }
+      function start() { current = 0; answers = Array(questions.length).fill(null); renderQuestion(); }
+      function overview() {
+        const answered = answers.filter(answer => answer !== null).length;
+        const remaining = questions.length - answered;
+        $('finish-status').textContent = `${answered} van ${questions.length} vragen beantwoord. ${remaining ? `Nog ${remaining} open.` : 'Alles ingevuld.'}`;
+        $('finish-note').textContent = remaining ? 'Je kunt de open vragen nog beantwoorden. Als je nu afrondt, tellen ze mee in het totaal, maar leveren ze geen punten op.' : 'Klaar? Bekijk je score en de uitleg bij alle vragen.';
+        $('continue').textContent = remaining ? 'Naar open vraag →' : 'Antwoorden nalopen';
+        $('complete').disabled = answered === 0;
+        if (answered === 0) $('finish-note').textContent = 'Beantwoord eerst minstens één vraag voordat je de ronde afrondt.';
+        $('question-overview').replaceChildren();
+        questions.forEach((q, i) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = answers[i] === null ? '' : 'is-answered';
+          button.setAttribute('aria-label', `Vraag ${i + 1}, ${q.category}, ${answers[i] === null ? 'nog open' : 'beantwoord'}`);
+          button.innerHTML = `${i + 1}<span aria-hidden="true">${answers[i] === null ? 'open' : '✓'}</span>`;
+          button.addEventListener('click', () => { current = i; renderQuestion(); });
+          $('question-overview').append(button);
+        });
+        show('finish', 'finish-title');
+      }
+      function advance() {
+        if (current < questions.length - 1) { current++; renderQuestion(); }
+        else overview();
+      }
+      function result() {
+        if (!answers.some(answer => answer !== null)) return;
+        const good = questions.filter((q, i) => answers[i] === q.answer).length;
+        const skipped = answers.filter(answer => answer === null).length;
+        $('result-summary').textContent = `${good} goed · ${questions.length - good - skipped} onjuist · ${skipped} overgeslagen`;
+        $('score').textContent = good;
+        $('score-ring').style.setProperty('--score-hoek', `${good / questions.length * 360}deg`);
+        $('breakdown').replaceChildren();
+        categories.forEach(category => {
+          const selected = questions.map((q, index) => ({ q, index })).filter(({ q }) => q.category === category);
+          const correct = selected.filter(({ q, index }) => answers[index] === q.answer).length;
+          const block = document.createElement('div');
+          block.innerHTML = `<div class="iq-breakdown-row"><span>${category}</span><span>${correct} van ${selected.length} goed</span></div><div class="iq-meter" aria-hidden="true"><span style="width:${correct / selected.length * 100}%"></span></div>`;
+          $('breakdown').append(block);
+        });
+        $('review').replaceChildren();
+        questions.forEach((q, index) => {
+          const correct = answers[index] === q.answer;
+          const detail = document.createElement('details');
+          const summary = document.createElement('summary');
+          summary.innerHTML = `<span>${index + 1}. ${q.category}</span><span class="label${correct ? '' : ' gedimd'}">${correct ? 'Goed' : answers[index] === null ? 'Overgeslagen' : 'Nog oefenen'}</span>`;
+          const body = document.createElement('div'); body.className = 'iq-review-body';
+          const prompt = document.createElement('p'); const strong = document.createElement('strong'); strong.textContent = q.title; prompt.append(strong); body.append(prompt);
+          const hint = document.createElement('p'); hint.textContent = q.hint; body.append(hint);
+          const stage = document.createElement('div'); stage.className = 'iq-stage'; stage.innerHTML = visual(q); body.append(stage);
+          const appendAnswer = (label, choice) => {
+            const text = document.createElement('p');
+            text.textContent = `${label}: ${choice === null ? 'Geen antwoord' : isVisual(q) ? `Optie ${String.fromCharCode(65 + choice)}` : optionText(q, choice)}`;
+            body.append(text);
+            if (choice !== null && isVisual(q)) {
+              const figure = document.createElement('div'); figure.className = 'iq-shape'; figure.style.width = '88px';
+              figure.setAttribute('role','img'); figure.setAttribute('aria-label',optionText(q,choice));
+              figure.innerHTML = optionImage(q,choice); body.append(figure);
+            }
+          };
+          appendAnswer('Jouw antwoord', answers[index]);
+          appendAnswer('Juiste antwoord', q.answer);
+          const explanation = document.createElement('p'); explanation.textContent = q.explanation; body.append(explanation);
+          detail.append(summary, body); $('review').append(detail);
+        });
+        show('results', 'results-title');
+      }
+      $('preview-pattern').innerHTML = matrix();
+      $('start').addEventListener('click', start);
+      $('retry').addEventListener('click', start);
+      $('home').addEventListener('click', () => show('intro', 'intro-title'));
+      $('previous').addEventListener('click', () => {
+        if (current === 0) $('stop-dialog').showModal();
+        else { current--; renderQuestion(); }
+      });
+      $('question-form').addEventListener('submit', event => {
+        event.preventDefault();
+        if (screen !== 'test' || answers[current] === null) return;
+        advance();
+      });
+      $('skip').addEventListener('click', advance);
+      $('overview').addEventListener('click', overview);
+      $('continue').addEventListener('click', () => { const open = answers.indexOf(null); current = open === -1 ? 0 : open; renderQuestion(); });
+      $('complete').addEventListener('click', result);
+      $('stop').addEventListener('click', () => $('stop-dialog').showModal());
+      $('stop-cancel').addEventListener('click', () => $('stop-dialog').close());
+      $('stop-confirm').addEventListener('click', () => {
+        $('stop-dialog').close(); answers.fill(null); current = 0; show('intro', 'intro-title');
+      });
+    })();
+  </script>
+</body>
+</html>
